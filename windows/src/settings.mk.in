@@ -1,0 +1,5 @@
+JOBS := $(shell nproc)
+MXE_TARGETS := @TARGET_ARCH@-w64-mingw32.@LIBTYPE@
+LOCAL_PKG_LIST := gcc
+.DEFAULT local-pkg-list:
+local-pkg-list: $(LOCAL_PKG_LIST)

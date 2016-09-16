@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings FATAL => 'all';
+use utf8;
+
+use lib '..';
+use Makefile;
+
+makefile {
+   tag        => 'iphydf/windows',
+   version    => 'latest',
+   maintainer => 'Iphigenia Df "iphydf@gmail.com"',
+
+   targets => {
+      'i686-static' => {
+         WINEARCH    => 'win32',
+         TARGET_ARCH => 'i686',
+         LIBTYPE     => 'static',
+      },
+      'i686-shared' => {
+         WINEARCH    => 'win32',
+         TARGET_ARCH => 'i686',
+         LIBTYPE     => 'shared',
+      },
+      'x86_64-static' => {
+         WINEARCH    => 'win64',
+         TARGET_ARCH => 'x86_64',
+         LIBTYPE     => 'static',
+      },
+      'x86_64-shared' => {
+         WINEARCH    => 'win64',
+         TARGET_ARCH => 'x86_64',
+         LIBTYPE     => 'shared',
+      },
+   },
+};

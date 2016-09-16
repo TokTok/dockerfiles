@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings FATAL => 'all';
+use utf8;
+
+use lib '..';
+use Makefile;
+
+makefile {
+   tag => 'ghc-android',
+
+   targets => {
+      'arm' => {
+         NDK_TOOLCHAIN => 'arm-linux-androideabi-4.8',
+         NDK_TARGET    => 'arm-linux-androideabi',
+         NDK_ABI       => 'arm-unknown-linux-androideabi',
+         ARCH_OPTS     => '-fllvm',
+      },
+      'i686' => {
+         NDK_TOOLCHAIN => 'x86-4.8',
+         NDK_TARGET    => 'i686-linux-android',
+         NDK_ABI       => 'i686-linux-android',
+         ARCH_OPTS     => '',
+      },
+   },
+};

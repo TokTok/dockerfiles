@@ -7,29 +7,38 @@ use utf8;
 use lib '..';
 use Makefile;
 
+my %configure = (
+   shared => '--enable-shared --disable-static',
+   static => '--enable-static --disable-shared',
+);
+
 makefile {
-   tag        => 'iphydf/windows-qt5',
+   tag        => 'toktoknet/windows-qt5',
 
    targets => {
       'i686-static' => {
          WINEARCH    => 'win32',
          TARGET_ARCH => 'i686',
          LIBTYPE     => 'static',
+         CONF_FLAGS  => $configure{static},
       },
       'i686-shared' => {
          WINEARCH    => 'win32',
          TARGET_ARCH => 'i686',
          LIBTYPE     => 'shared',
+         CONF_FLAGS  => $configure{shared},
       },
       'x86_64-static' => {
          WINEARCH    => 'win64',
          TARGET_ARCH => 'x86_64',
          LIBTYPE     => 'static',
+         CONF_FLAGS  => $configure{static},
       },
       'x86_64-shared' => {
          WINEARCH    => 'win64',
          TARGET_ARCH => 'x86_64',
          LIBTYPE     => 'shared',
+         CONF_FLAGS  => $configure{shared},
       },
    },
 };

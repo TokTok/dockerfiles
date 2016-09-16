@@ -8,9 +8,7 @@ use lib '..';
 use Makefile;
 
 makefile {
-   tag        => 'iphydf/windows',
-   version    => 'latest',
-   maintainer => 'Iphigenia Df "iphydf@gmail.com"',
+   tag        => 'windows',
 
    targets => {
       'i686-static' => {

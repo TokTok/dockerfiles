@@ -1,5 +1,5 @@
 # https://raw.githubusercontent.com/TokTok/dockerfiles/master/windows/src/Dockerfile.in
-FROM iphydf/windows:latest.@TARGET@
+FROM @ORGNAME@/windows:@VERSION@.@TARGET@
 MAINTAINER @MAINTAINER@
 
 RUN cd /usr/src/mxe \
@@ -17,11 +17,10 @@ RUN cd /usr/src/mxe \
 RUN curl https://fukuchi.org/works/qrencode/qrencode-3.4.4.tar.gz | tar zx \
 && cd qrencode-3.4.4 \
 && ./configure \
-     --prefix=/usr/src/mxe/usr/@TARGET_ARCH@-w64-mingw32.static \
-     --host=@TARGET_ARCH@-w64-mingw32.static \
-     --enable-static \
-     --disable-shared \
+     --prefix=/usr/src/mxe/usr/@TARGET_ARCH@-w64-mingw32.@LIBTYPE@ \
+     --host=@TARGET_ARCH@-w64-mingw32.@LIBTYPE@ \
      --disable-thread-safety \
+     @CONF_FLAGS@ \
 && make && make install \
 && cd .. && rm -rf qrencode-3.4.4*
 
@@ -33,13 +32,12 @@ RUN git clone --depth=1 --branch=v3.3.1 https://github.com/sqlcipher/sqlcipher \
 && sed -i -e 's/install:\tsqlcipher\$(BEXE)/install:/' Makefile.in \
 && sed -i -e 's/\$(LTINSTALL) sqlcipher\$(BEXE)/#&/' Makefile.in \
 && ./configure \
-     --prefix=/usr/src/mxe/usr/@TARGET_ARCH@-w64-mingw32.static \
-     --host=@TARGET_ARCH@-w64-mingw32.static \
-     --enable-static \
-     --disable-shared \
+     --prefix=/usr/src/mxe/usr/@TARGET_ARCH@-w64-mingw32.@LIBTYPE@ \
+     --host=@TARGET_ARCH@-w64-mingw32.@LIBTYPE@ \
      --disable-tcl \
      --disable-amalgamation \
      --with-crypto-lib=none \
+     @CONF_FLAGS@ \
 && make && make install \
 && cd .. && rm -rf sqlcipher
 

@@ -71,3 +71,12 @@ WORKDIR /work
 
 ENV CMAKE_TOOLCHAIN_FILE /usr/src/mxe/usr/${CROSS_TRIPLE}/share/cmake/mxe-conf.cmake
 RUN echo 'set(CMAKE_CROSSCOMPILING_EMULATOR "/usr/bin/wine")' >> ${CMAKE_TOOLCHAIN_FILE}
+
+# Install packages needed to build toxcore.
+RUN cd /usr/src/mxe \
+&& make -j12 \
+   check \
+   libsodium \
+   libvpx \
+   opus \
+&& make clean-junk clean-pkg

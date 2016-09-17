@@ -13,7 +13,7 @@ my %configure = (
 );
 
 makefile {
-   tag        => 'toktoknet/windows-qt5',
+   tag        => 'windows-qt5',
 
    targets => {
       'i686-static' => {

@@ -6,8 +6,6 @@ RUN cd /usr/src/mxe \
 && make -j12 \
    ffmpeg \
    gtk2 \
-   check \
-   libsodium \
    openal \
    qtbase \
    qtsvg \

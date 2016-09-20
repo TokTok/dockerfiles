@@ -1,11 +1,10 @@
 #!/bin/bash
 
-THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source $THIS_DIR/set-env.sh
+. set-env.sh
 ####################################################################################################
 
 # Add target bindir links
-function bindir_link() {
+bindir_link() {
   [ -e "$GHC_PREFIX/$NDK_TARGET/bin/$1" ] || \
     (echo ln -s $GHC_PREFIX/bin/*-$1 $GHC_PREFIX/$NDK_TARGET/bin/$1; \
     ln -s $GHC_PREFIX/bin/*-$1 $GHC_PREFIX/$NDK_TARGET/bin/$1)

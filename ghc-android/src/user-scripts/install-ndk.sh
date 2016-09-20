@@ -1,7 +1,6 @@
 #!/bin/bash
 
-THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source $THIS_DIR/set-env.sh
+. set-env.sh
 ####################################################################################################
 
 NDK_TAR_FILE=android-ndk-${NDK_RELEASE}-linux-x86_64.zip

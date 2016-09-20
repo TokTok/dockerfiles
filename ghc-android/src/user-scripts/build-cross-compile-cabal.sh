@@ -1,7 +1,6 @@
 #!/bin/bash
 
-THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source $THIS_DIR/set-env.sh
+. set-env.sh
 ####################################################################################################
 
 # install a cabal that supports cross compilation

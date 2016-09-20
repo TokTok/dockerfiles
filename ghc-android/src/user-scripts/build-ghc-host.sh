@@ -1,10 +1,9 @@
 #!/bin/bash
 
-THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source $THIS_DIR/set-env.sh
+. set-env.sh
 ####################################################################################################
 
-$THIS_DIR/download-ghc.sh
+./download-ghc.sh
 
 cd $NDK_ADDON_SRC
 tar xf ${GHC_TAR_PATH}

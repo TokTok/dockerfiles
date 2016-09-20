@@ -1,7 +1,6 @@
 #!/bin/bash
 
-THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source $THIS_DIR/set-env.sh
+. set-env.sh
 ####################################################################################################
 
 HSC2HS_TARGET=$(ls $GHC_PREFIX/bin/*-hsc2hs)

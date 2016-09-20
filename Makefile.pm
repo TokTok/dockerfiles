@@ -77,7 +77,7 @@ sub makefile {
    print $fh "build: ", (join " ", (map { "build-$_" } @targets)), "\n";
    for my $target (@targets) {
       print $fh "\nbuild-$target: Makefile\n";
-      print $fh "\tdocker build -t $config->{targets}{$target}{FULLTAG} -f $target/Dockerfile $target\n";
+      print $fh "\tdocker build -t $config->{targets}{$target}{FULLTAG} -f $target/Dockerfile $target | tee $target/build.log\n";
    }
 
    print $fh "\n\n";
@@ -98,6 +98,8 @@ sub makefile {
          "find", $target,
          "-(",
          "-name", "*.sh",
+         "-or",
+         "-name", "*.pl",
          "-or",
          "-perm", "/u=x",
          "-)",

@@ -11,13 +11,19 @@ RUN ./build-libsodium.sh
 #
 # distributive and comonad have a broken Setup.hs, so we need to configure with
 # the host cabal and build with the target cabal. zlib needs a patch for FFI.
+# See cabal-install-happy.sh for details on happy.
 #
 COPY patches/*.patch $BASE/patches/
-COPY user-scripts/cabal-install-zlib.sh user-scripts/cabal-install-setup.sh $BASE/
+COPY user-scripts/cabal-install-setup.sh \
+     user-scripts/cabal-install-zlib.sh \
+     user-scripts/install-happy.sh \
+     $BASE/
 RUN ./cabal-install-zlib.sh \
  && ./cabal-install-setup.sh distributive 0.5.0.2 \
- && ./cabal-install-setup.sh comonad 5
+ && ./cabal-install-setup.sh comonad 5 \
+ && ./install-happy.sh
 
+# Install hstox dependencies.
 COPY install-deps.sh $BASE/
 RUN ${NDK_TARGET}-cabal update \
  && ./install-deps.sh

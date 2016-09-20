@@ -10,33 +10,19 @@ use Makefile;
 #DEPS:= $(shell perl -n -e 'next LINE if /^\s*--/; $$S == 1 and /:/ and $$S=2; $$S==1 and /, (.*)/ and print " \"$$1\""; not defined $$S and /build-depends:/ and $$S=1;' $(DEPFILE))
 my @DEPS = (
    "QuickCheck >= 2.9.1",
-   "async",
    "base16-bytestring",
    "binary",
    "binary-bits",
-   "binary-conduit",
    "bytestring",
-   "conduit",
-   "conduit-extra",
    "containers",
-   "data-binary-ieee754",
    "data-msgpack",
-   "deepseq",
-   "exceptions",
-   "hashable",
    "integer-gmp",
    "iproute",
-   "monad-control",
-   "mtl",
    "network <= 2.6.2.1",
    "network-msgpack-rpc",
    "saltine",
-   "scientific",
-   "split",
-   "tagged",
    "text",
    "transformers",
-   "unordered-containers",
 );
 
 my $DEPS = join " ", map { "\"$_\"" } @DEPS;
@@ -45,11 +31,9 @@ makefile {
    tag => 'ghc-android-hstox',
 
    targets => {
-      'arm' => {
-         DEPENDENCIES => $DEPS,
-      },
-      'i686' => {
-         DEPENDENCIES => $DEPS,
-      },
+      'aarch64' => { DEPENDENCIES => $DEPS },
+      'arm'     => { DEPENDENCIES => $DEPS },
+      'i686'    => { DEPENDENCIES => $DEPS },
+      'x86_64'  => { DEPENDENCIES => $DEPS },
    },
 };

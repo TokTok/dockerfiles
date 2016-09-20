@@ -6,12 +6,12 @@
 # build scripts, but not run directly by Docker.
 #
 
-set -e -u
+set -eu
 
 if [ -e /etc/makepkg.conf ]; then
   source /etc/makepkg.conf
 fi
-MAKEFLAGS=${MAKEFLAGS:--j12}
+MAKEFLAGS=${MAKEFLAGS:--j$(nproc)}
 
 # Basic configuration
 GHCHOME=$HOME/.ghc
@@ -19,9 +19,10 @@ BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$BASEDIR"
 
 # Basic parameters
-NDK_RELEASE=${NDK_RELEASE:-r9b}
-NDK_MD5=56c0999a2683d6711591843217f943e0
+NDK_RELEASE=${NDK_RELEASE:-r12b}
+NDK_MD5=1d1a5ee71a5123be01e0dd9adb5df80d
 NDK_PLATFORM=${NDK_PLATFORM:-android-14}
+NDK_TOOLCHAIN=${NDK_TOOLCHAIN:-arm-linux-androideabi-4.9}
 
 NDK_DESC=$NDK_PLATFORM-$NDK_TOOLCHAIN
 NDK="$GHCHOME/$NDK_PLATFORM/$NDK_TOOLCHAIN"
@@ -39,11 +40,11 @@ GHC_SRC="$NDK_ADDON_SRC/ghc"
 GHC_RELEASE=8.0.1
 GHC_MD5=c185b8a1f3e67e43533ec590b751c2ff
 
-NCURSES_RELEASE=5.9
-NCURSES_MD5=8cb9c412e5f2d96bc6f459aa8c6282a1
+NCURSES_RELEASE=6.0
+NCURSES_MD5=ee13d052e1ead260d7c28071f46eefb1
 
-GMP_RELEASE=5.1.3
-GMP_MD5=e5fe367801ff067b923d1e6a126448aa
+GMP_RELEASE=6.1.1
+GMP_MD5=e70e183609244a332d80529e7e155a35
 
 CONFIG_SUB_SRC=${CONFIG_SUB_SRC:-/usr/share/automake-1.15}
 
@@ -80,8 +81,6 @@ function apply_patches() {
 export PATH="$NDK/bin":$PATH
 
 # Download and configure the Android NDK toolchain
-NDK_TAR_FILE=android-ndk-${NDK_RELEASE}-linux-x86_64.tar.bz2
-NDK_TAR_PATH="${TARDIR}/${NDK_TAR_FILE}"
 NDK_PATH="$HOME/android-ndk-$NDK_RELEASE"
 
 # Unpack ncurses

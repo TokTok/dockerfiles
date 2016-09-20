@@ -23,9 +23,9 @@ There are two versions of the compiler installed.
 
    ~/.ghc/android-host
 
-2. One that targets the ARM achitecture
+2. One that targets the Android platform
 
-  ~/.ghc/android-14/arm-linux-androideabi-4.8
+  ~/.ghc/$NDK_PLATFORM/$NDK_TOOLCHAIN
 
 
 Environment variables

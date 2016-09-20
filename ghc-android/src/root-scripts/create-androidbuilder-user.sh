@@ -1,6 +1,5 @@
 #!/bin/bash
 
-THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PASSWORD=adb
 USER=androidbuilder
 HOME=/home/$USER

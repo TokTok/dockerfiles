@@ -4,6 +4,8 @@ THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source $THIS_DIR/set-env.sh
 ####################################################################################################
 
+$THIS_DIR/download-ghc.sh
+
 cd $NDK_ADDON_SRC
 tar xf ${GHC_TAR_PATH}
 mv ghc-${GHC_RELEASE} "$GHC_STAGE0_SRC"
@@ -31,3 +33,4 @@ make $MAKEFLAGS
 make $MAKEFLAGS install
 
 rm -rf ${BASH_SOURCE[0]} "$GHC_STAGE0_SRC"
+rm -rf ${BASH_SOURCE[0]} "$GHC_TAR_PATH"

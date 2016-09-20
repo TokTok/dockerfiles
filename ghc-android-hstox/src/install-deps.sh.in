@@ -4,4 +4,4 @@ THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source $THIS_DIR/set-env.sh
 ####################################################################################################
 
-${NDK_TARGET}-cabal install --avoid-reinstalls @DEPENDENCIES@
+${NDK_TARGET}-cabal install --jobs=$(nproc) --avoid-reinstalls @DEPENDENCIES@

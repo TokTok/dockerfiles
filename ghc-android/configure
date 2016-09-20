@@ -11,16 +11,32 @@ makefile {
    tag => 'ghc-android',
 
    targets => {
+      'aarch64' => {
+         NDK_PLATFORM  => 'android-21',
+         NDK_TOOLCHAIN => 'aarch64-linux-android-4.9',
+         NDK_TARGET    => 'aarch64-linux-android',
+         NDK_ABI       => 'aarch64-linux-android',
+         ARCH_OPTS     => '',
+      },
       'arm' => {
-         NDK_TOOLCHAIN => 'arm-linux-androideabi-4.8',
+         NDK_PLATFORM  => 'android-9',
+         NDK_TOOLCHAIN => 'arm-linux-androideabi-4.9',
          NDK_TARGET    => 'arm-linux-androideabi',
          NDK_ABI       => 'arm-unknown-linux-androideabi',
          ARCH_OPTS     => '-fllvm',
       },
       'i686' => {
-         NDK_TOOLCHAIN => 'x86-4.8',
+         NDK_PLATFORM  => 'android-9',
+         NDK_TOOLCHAIN => 'x86-4.9',
          NDK_TARGET    => 'i686-linux-android',
          NDK_ABI       => 'i686-linux-android',
+         ARCH_OPTS     => '',
+      },
+      'x86_64' => {
+         NDK_PLATFORM  => 'android-21',
+         NDK_TOOLCHAIN => 'x86_64-4.9',
+         NDK_TARGET    => 'x86_64-linux-android',
+         NDK_ABI       => 'x86_64-linux-android',
          ARCH_OPTS     => '',
       },
    },

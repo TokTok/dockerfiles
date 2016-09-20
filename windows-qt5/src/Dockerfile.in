@@ -24,8 +24,11 @@ RUN curl https://fukuchi.org/works/qrencode/qrencode-3.4.4.tar.gz | tar zx \
 
 RUN apt-get install -y tcl
 
+COPY patches/sqlcipher.patch /work/
 RUN git clone --depth=1 --branch=v3.3.1 https://github.com/sqlcipher/sqlcipher \
 && cd sqlcipher \
+&& patch -p1 < ../sqlcipher.patch \
+&& autoreconf -fi \
 && sed -i -e 's/SQLITE_OS_UNIX=1/SQLITE_OS_WIN=1/' configure \
 && sed -i -e 's/install:\tsqlcipher\$(BEXE)/install:/' Makefile.in \
 && sed -i -e 's/\$(LTINSTALL) sqlcipher\$(BEXE)/#&/' Makefile.in \
@@ -34,9 +37,10 @@ RUN git clone --depth=1 --branch=v3.3.1 https://github.com/sqlcipher/sqlcipher \
      --host=@TARGET_ARCH@-w64-mingw32.@LIBTYPE@ \
      --disable-tcl \
      --disable-amalgamation \
-     --with-crypto-lib=none \
+     --with-crypto-lib=openssl \
      @CONF_FLAGS@ \
+     || (cat config.log && false) \
 && make && make install \
-&& cd .. && rm -rf sqlcipher
+&& cd .. && rm -rf sqlcipher*
 
 ENV DEFAULT_DOCKCROSS_IMAGE @FULLTAG@

@@ -19,7 +19,7 @@ my @DEPS = (
    "integer-gmp",
    "iproute",
    "network <= 2.6.2.1",
-   "network-msgpack-rpc",
+   "network-msgpack-rpc >= 0.0.3",
    "saltine",
    "text",
    "transformers",

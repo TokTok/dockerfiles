@@ -96,19 +96,19 @@ sub makefile {
    for my $target (@targets) {
       system (
          "find", $target,
-         "-(",
+         "(",
          "-name", "*.sh",
          "-or",
          "-name", "*.pl",
          "-or",
-         "-perm", "/u=x",
-         "-)",
+         "-perm", "+100",
+         ")",
          "-exec", "chmod", "755", "{}", ";",
       );
       die "chmod failed" if $?;
       system (
          "find", $target,
-         "-not", "-perm", "/u=x",
+         "-not", "-perm", "+100",
          "-exec", "chmod", "644", "{}", ";",
       );
       die "chmod failed" if $?;

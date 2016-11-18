@@ -35,7 +35,7 @@ sub makefile {
 
    $config->{tag}        = "$config->{orgname}/$config->{tag}";
 
-   my @targets = keys $config->{targets};
+   my @targets = keys %{ $config->{targets} };
    print "Building for [@targets]\n";
 
    for my $target (@targets) {
@@ -54,7 +54,7 @@ sub makefile {
       my $vars = $config->{targets}{$target};
       for my $srcfile (<src/*.in>) {
          my $lines = slurp $srcfile;
-         for my $var (keys $vars) {
+         for my $var (keys %$vars) {
             $lines =~ s/\@$var\@/$vars->{$var}/g;
          }
          if (my @unresolved = $lines =~ /\@(\w+)\@/g) {

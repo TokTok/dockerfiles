@@ -2,7 +2,7 @@ machine:
   timezone:
     Europe/Berlin
   environment:
-    MAKEFLAGS: "j16"
+
 dependencies:
   pre:
   - sudo apt-get update
@@ -19,8 +19,10 @@ dependencies:
   - clang --version ; exit 0
 
 compile:
+  pre:
+    - echo "dummy"
   override:
-    - make -j16 > $CIRCLE_ARTIFACTS/make_out.txt 2>&1 ; touch ~/ready.txt :
+    - make > $CIRCLE_ARTIFACTS/make_out.txt 2>&1 ; touch ~/ready.txt :
         background: true
 
     - ready_="0";
@@ -35,7 +37,6 @@ compile:
       fi ;
       done ;
       exit 0
-
 
 test:
   override:

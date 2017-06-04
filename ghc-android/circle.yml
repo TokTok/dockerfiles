@@ -3,7 +3,6 @@ machine:
     Europe/Berlin
   environment:
     MAKEFLAGS: "j16"
-
 dependencies:
   pre:
   - sudo apt-get update

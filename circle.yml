@@ -1,7 +1,6 @@
 machine:
   timezone:
     Europe/Berlin
-  environment:
 
 dependencies:
   pre:

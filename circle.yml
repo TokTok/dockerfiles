@@ -1,8 +1,6 @@
 machine:
   timezone:
     Europe/Berlin
-  php:
-    version: 5.3.10
 dependencies:
   pre:
   - sudo apt-get update

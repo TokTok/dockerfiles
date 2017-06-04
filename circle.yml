@@ -1,6 +1,8 @@
 machine:
   timezone:
     Europe/Berlin
+  php:
+    version: 5.3.10
 
 dependencies:
   pre:
@@ -8,11 +10,6 @@ dependencies:
   - sudo apt-get install clang
   - sudo apt-get install build-essential libtool autotools-dev automake checkinstall check yasm
   - sudo apt-get install pkg-config
-
-# ------------ network_test requires that "localhost" resolves to ::1 ------------
-  - sudo bash -c "echo '::1             localhost ipv6-localhost ipv6-loopback' >> /etc/hosts" # ipv6 localhost entry
-# ------------ network_test requires that "localhost" resolves to ::1 ------------
-
   - java -version ; exit 0
   - gcc --version ; exit 0
   - clang --version ; exit 0
@@ -23,7 +20,6 @@ compile:
   override:
     - make > $CIRCLE_ARTIFACTS/make_out.txt 2>&1 ; touch ~/ready.txt :
         background: true
-
     - ready_="0";
       counter=0;
       while [ $ready_ == "0" ]; do
@@ -39,6 +35,6 @@ compile:
 
 test:
   override:
-    echo "dummy"
+    - echo "dummy"
 
 

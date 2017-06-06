@@ -1,0 +1,18 @@
+machine:
+  services:
+  - docker
+  environment:
+    DOCKERFLAGS: --rm=false
+
+dependencies:
+  override:
+  - docker info
+  - make
+  - make -C ghc-android build-aarch64
+  - make -C ghc-android build-arm
+  - make -C ghc-android build-i686
+  - make -C ghc-android build-x86_64
+  - make -C windows build-i686-shared
+  - make -C windows build-i686-static
+  - make -C windows build-x86_64-shared
+  - make -C windows build-x86_64-static

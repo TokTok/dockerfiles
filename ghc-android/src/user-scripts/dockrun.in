@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e -u
+
+if [ -z "${DOCKERFLAGS}" ]; then
+  DOCKERFLAGS='--rm'
+fi
+
+docker run ${DOCKERFLAGS} \
+  -v $PWD:/work \
+  -v $HOME/.cache/cabal.@TARGET@:/home/androidbuilder/.ghc/@NDK_PLATFORM@/@NDK_TOOLCHAIN@/.cabal \
+  -e BUILDER_UID=`id -u` \
+  -e BUILDER_GID=`id -g` \
+  -e BUILDER_USER=`id -un` \
+  -e BUILDER_GROUP=`id -gn` \
+  @FULLTAG@ \
+  "$@"

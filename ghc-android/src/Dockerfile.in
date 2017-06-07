@@ -127,7 +127,14 @@ RUN ./update-cabal-install.sh
 COPY user-scripts/README $HOME/
 RUN cat $HOME/README
 
-WORKDIR $HOME
+USER root
+RUN apt-get install -y runit
+
+ENTRYPOINT ["/home/androidbuilder/entrypoint.sh"]
+WORKDIR /work
+COPY user-scripts/entrypoint.sh /home/androidbuilder/
+COPY user-scripts/target-cabal /home/androidbuilder/.cabal/bin/
+COPY user-scripts/dockrun /root/
 
 #
 # Now to add add some PATHs

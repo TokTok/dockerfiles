@@ -52,7 +52,7 @@ sub makefile {
 
    for my $target (@targets) {
       my $vars = $config->{targets}{$target};
-      for my $srcfile (<src/*.in>) {
+      for my $srcfile (<src/*.in>, <src/*/*.in>) {
          my $lines = slurp $srcfile;
          for my $var (keys %$vars) {
             $lines =~ s/\@$var\@/$vars->{$var}/g;

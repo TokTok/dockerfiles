@@ -20,7 +20,9 @@ echo 'deb-src http://security.ubuntu.com/ubuntu/ xenial-security multiverse' >> 
 apt-get update
 # HACK
 
-apt-get source nettle
+# apt-get source nettle
+wget 'https://ftp.gnu.org/gnu/nettle/nettle-3.3.tar.gz' -O nettlXe.tar.gz
+tar -xzvf nettlXe.tar.gz
 
 pushd nettle*
 sed -i -e 's/__gmpz_mpz_powm/__gmpz_powm/' configure.ac

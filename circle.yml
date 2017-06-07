@@ -1,6 +1,10 @@
 machine:
   timezone:
     Europe/Berlin
+  services:
+    - docker
+  environment:
+    DOCKERFLAGS: --rm=false
 dependencies:
   pre:
   - sudo apt-get update
@@ -15,6 +19,7 @@ compile:
   pre:
     - echo "dummy"
   override:
+    - docker info
     - make
     - make -C ghc-android build-arm > $CIRCLE_ARTIFACTS/make_out.txt 2>&1 ; touch ~/ready.txt :
         background: true

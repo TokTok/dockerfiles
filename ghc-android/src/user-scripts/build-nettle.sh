@@ -21,8 +21,7 @@ echo "################################"
 # HACK
 
 # apt-get source nettle
-sudo apt-get install wget
-wget 'https://ftp.gnu.org/gnu/nettle/nettle-3.3.tar.gz' -O nettlXe.tar.gz
+curl 'https://ftp.gnu.org/gnu/nettle/nettle-3.3.tar.gz' --output nettlXe.tar.gz
 tar -xzvf nettlXe.tar.gz
 
 pushd nettle*

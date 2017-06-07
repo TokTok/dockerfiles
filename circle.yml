@@ -26,6 +26,7 @@ compile:
     - ready_="0";
       counter=0;
       while [ $ready_ == "0" ]; do
+      tail -20 ~/ready.txt;
       echo "running ...";
       counter=$[ $counter + 1 ] ;
       if [ $counter -eq 38 ] ; then exit 0 ; fi ;

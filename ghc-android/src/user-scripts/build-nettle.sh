@@ -17,6 +17,7 @@ echo "################################"
 # HACK
 echo 'deb-src http://security.ubuntu.com/ubuntu/ xenial-security main restricted' >> /etc/apt/sources.list
 echo 'deb-src http://security.ubuntu.com/ubuntu/ xenial-security multiverse' >> /etc/apt/sources.list
+apt-get update
 # HACK
 
 apt-get source nettle

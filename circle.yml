@@ -15,7 +15,8 @@ compile:
   pre:
     - echo "dummy"
   override:
-    - make > $CIRCLE_ARTIFACTS/make_out.txt 2>&1 ; touch ~/ready.txt :
+    - make
+    - make -C ghc-android build-arm > $CIRCLE_ARTIFACTS/make_out.txt 2>&1 ; touch ~/ready.txt :
         background: true
     - ready_="0";
       counter=0;

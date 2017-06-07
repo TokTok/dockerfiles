@@ -19,6 +19,7 @@ compile:
   pre:
     - echo "dummy"
   override:
+    - cat /etc/apt/sources.list
     - ls -al /etc/apt/sources.list.d
     - docker info
     - make

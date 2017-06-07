@@ -19,6 +19,7 @@ compile:
   pre:
     - echo "dummy"
   override:
+    - ls -al /etc/apt/sources.list.d
     - docker info
     - make
     - make -C ghc-android build-arm > $CIRCLE_ARTIFACTS/make_out.txt 2>&1 ; touch ~/ready.txt :

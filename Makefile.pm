@@ -77,7 +77,7 @@ sub makefile {
    print $fh "build: ", (join " ", (map { "build-$_" } @targets)), "\n";
    for my $target (@targets) {
       print $fh "\nbuild-$target: Makefile\n";
-      print $fh "\tdocker build -t $config->{targets}{$target}{FULLTAG} -f $target/Dockerfile $target | tee $target/build.log\n";
+      print $fh "\tdocker build \$(DOCKERFLAGS) -t $config->{targets}{$target}{FULLTAG} -f $target/Dockerfile $target | tee $target/build.log\n";
    }
 
    print $fh "\n\n";

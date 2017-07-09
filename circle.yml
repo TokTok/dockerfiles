@@ -102,5 +102,5 @@ test:
     - ls -al
     - ls -al /home/ubuntu/dockerfiles/ghc-android/
     - ls -al /home/ubuntu/dockerfiles/ghc-android/arm
-    - if [ -f ~/ok.txt ]; then echo 'Docker image OK';exit 0; else echo 'docker image generation FAILED' ;exit 0 ; fi
+    - if [ -f ~/ok.txt ]; then echo 'Docker image OK';exit 0; else echo 'docker image generation FAILED' ;exit 1 ; fi
 

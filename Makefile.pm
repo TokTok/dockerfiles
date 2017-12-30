@@ -65,7 +65,7 @@ sub makefile {
       }
 
       for my $dir (grep { -d } <src/*>) {
-         system "cp", "-a", $dir, $target;
+         system 'cp', '-a', $dir, $target;
          die "copy failed for $dir -> $target/$dir" if $?;
       }
    }
@@ -74,14 +74,14 @@ sub makefile {
 
    open my $fh, '>', 'Makefile'
       or die "Makefile: $!";
-   print $fh "build: ", (join " ", (map { "build-$_" } @targets)), "\n";
+   print $fh 'build: ', (join ' ', (map { "build-$_" } @targets)), "\n";
    for my $target (@targets) {
       print $fh "\nbuild-$target: Makefile\n";
       print $fh "\tdocker build \$(DOCKERFLAGS) -t $config->{targets}{$target}{FULLTAG} -f $target/Dockerfile $target | tee $target/build.log\n";
    }
 
    print $fh "\n\n";
-   print $fh "push: ", (join " ", (map { "push-$_" } @targets)), "\n";
+   print $fh 'push: ', (join ' ', (map { "push-$_" } @targets)), "\n";
    for my $target (@targets) {
       print $fh "\npush-$target: build-$target\n";
       print $fh "\tdocker push $config->{targets}{$target}{FULLTAG}\n";
@@ -95,23 +95,23 @@ sub makefile {
    print "Setting permissions\n";
    for my $target (@targets) {
       system (
-         "find", $target,
-         "(",
-         "-name", "*.sh",
-         "-or",
-         "-name", "*.pl",
-         "-or",
-         "-perm", "+100",
-         ")",
-         "-exec", "chmod", "755", "{}", ";",
+         'find', $target,
+         '(',
+         '-name', '*.sh',
+         '-or',
+         '-name', '*.pl',
+         '-or',
+         '-perm', '-u=x',
+         ')',
+         '-exec', 'chmod', '755', '{}', ';',
       );
-      die "chmod failed" if $?;
+      die 'chmod failed' if $?;
       system (
-         "find", $target,
-         "-not", "-perm", "+100",
-         "-exec", "chmod", "644", "{}", ";",
+         'find', $target,
+         '-not', '-perm', '-u=x',
+         '-exec', 'chmod', '644', '{}', ';',
       );
-      die "chmod failed" if $?;
+      die 'chmod failed' if $?;
    }
 }
 

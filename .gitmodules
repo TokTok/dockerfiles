@@ -1,0 +1,3 @@
+[submodule "buildfarm"]
+	path = buildfarm
+	url = https://github.com/TokTok/docker-buildfarm

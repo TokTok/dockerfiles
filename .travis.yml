@@ -2,3 +2,7 @@
 language: generic
 
 script: make && git diff --exit-code
+
+git:
+  depth: 1
+  submodules_depth: 5

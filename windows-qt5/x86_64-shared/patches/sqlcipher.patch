@@ -1,0 +1,13 @@
+diff -u -r a/configure.ac b/configure.ac
+--- a/configure.ac	2016-09-20 15:23:39.888411443 +0100
++++ b/configure.ac	2016-09-20 15:30:11.300433380 +0100
+@@ -223,7 +223,8 @@
+         BUILD_CFLAGS+=" -DSQLCIPHER_CRYPTO_OPENSSL"
+ 	      AC_MSG_RESULT([openssl])
+         AC_CHECK_LIB([crypto], [HMAC_Init_ex], ,
+-                     AC_MSG_ERROR([Library crypto not found. Install openssl!"]))
++                     AC_MSG_ERROR([Library crypto not found. Install openssl!"]),
++                     [-lz -lgdi32])
+     fi
+   fi
+ fi

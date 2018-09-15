@@ -1,4 +1,4 @@
 ---
 language: generic
 
-script: make
+script: make && git diff --exit-code

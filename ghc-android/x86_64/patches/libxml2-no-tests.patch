@@ -1,0 +1,38 @@
+--- Makefile.in.orig	2016-06-30 12:59:52.046291990 +0200
++++ Makefile.in	2016-06-30 13:00:07.790225809 +0200
+@@ -91,14 +91,6 @@
+ POST_UNINSTALL = :
+ build_triplet = @build@
+ host_triplet = @host@
+-noinst_PROGRAMS = testSchemas$(EXEEXT) testRelax$(EXEEXT) \
+-	testSAX$(EXEEXT) testHTML$(EXEEXT) testXPath$(EXEEXT) \
+-	testURI$(EXEEXT) testThreads$(EXEEXT) testC14N$(EXEEXT) \
+-	testAutomata$(EXEEXT) testRegexp$(EXEEXT) testReader$(EXEEXT) \
+-	testapi$(EXEEXT) testModule$(EXEEXT) runtest$(EXEEXT) \
+-	runsuite$(EXEEXT) testchar$(EXEEXT) testdict$(EXEEXT) \
+-	runxmlconf$(EXEEXT) testrecurse$(EXEEXT) testlimits$(EXEEXT)
+-bin_PROGRAMS = xmllint$(EXEEXT) xmlcatalog$(EXEEXT)
+ subdir = .
+ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+ am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
+--- Makefile.am.orig	2016-06-30 13:29:45.062752850 +0200
++++ Makefile.am	2016-06-30 13:31:15.838370558 +0200
+@@ -10,12 +10,12 @@
+ 
+ AM_CFLAGS = $(THREAD_CFLAGS) $(Z_CFLAGS) $(LZMA_CFLAGS)
+ 
+-noinst_PROGRAMS=testSchemas testRelax testSAX testHTML testXPath testURI \
+-                testThreads testC14N testAutomata testRegexp \
+-                testReader testapi testModule runtest runsuite testchar \
+-		testdict runxmlconf testrecurse testlimits
+-
+-bin_PROGRAMS = xmllint xmlcatalog
++#noinst_PROGRAMS=testSchemas testRelax testSAX testHTML testXPath testURI \
++#                testThreads testC14N testAutomata testRegexp \
++#                testReader testapi testModule runtest runsuite testchar \
++#		testdict runxmlconf testrecurse testlimits
++#
++#bin_PROGRAMS = xmllint xmlcatalog
+ 
+ bin_SCRIPTS=xml2-config
+ 

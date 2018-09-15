@@ -1,0 +1,197 @@
+diff -ru ghc-8.0.1/compiler/llvmGen/LlvmCodeGen/Ppr.hs ghc-8.0.1-android/compiler/llvmGen/LlvmCodeGen/Ppr.hs
+--- ghc-8.0.1/compiler/llvmGen/LlvmCodeGen/Ppr.hs	2016-05-16 19:08:53.000000000 +0200
++++ ghc-8.0.1-android/compiler/llvmGen/LlvmCodeGen/Ppr.hs	2016-06-30 20:37:05.243554135 +0200
+@@ -65,6 +65,12 @@
+     Platform { platformArch = ArchX86, platformOS = OSiOS } ->
+         text "target datalayout = \"e-p:32:32:32-i1:8:8-i8:8:8-i16:16:16-i32:32:32-i64:32:64-f32:32:32-f64:32:64-v64:64:64-v128:128:128-a0:0:64-f80:128:128-n8:16:32\""
+         $+$ text "target triple = \"i386-apple-darwin11\""
++    Platform { platformArch = ArchARM64, platformOS = OSAndroid } ->
++        text "target datalayout = \"e-m:e-i64:64-i128:128-n32:64-S128\""
++        $+$ text "target triple = \"aarch64-unknown-linux-android\""
++    Platform { platformArch = ArchARM64, platformOS = OSAndroid } ->
++        text "target datalayout = \"e-m:e-i64:64-i128:128-n32:64-S128\""
++        $+$ text "target triple = \"aarch64-none-linux-android\""
+     Platform { platformArch = ArchARM64, platformOS = OSiOS } ->
+         text "target datalayout = \"e-p:64:64:64-i1:8:8-i8:8:8-i16:16:16-i32:32:32-i64:64:64-f32:32:32-f64:64:64-v64:64:64-v128:128:128-a0:0:64-n32:64-S128\""
+         $+$ text "target triple = \"arm64-apple-ios7.0.0\""
+diff -ru ghc-8.0.1/compiler/main/DriverPipeline.hs ghc-8.0.1-android/compiler/main/DriverPipeline.hs
+--- ghc-8.0.1/compiler/main/DriverPipeline.hs	2016-05-16 19:08:53.000000000 +0200
++++ ghc-8.0.1-android/compiler/main/DriverPipeline.hs	2016-06-30 20:37:05.243554135 +0200
+@@ -1832,7 +1832,7 @@
+             let os = platformOS (targetPlatform dflags)
+             in if os == OSOsf3 then ["-lpthread", "-lexc"]
+                else if os `elem` [OSMinGW32, OSFreeBSD, OSOpenBSD,
+-                                  OSNetBSD, OSHaiku, OSQNXNTO, OSiOS, OSDarwin]
++                                  OSNetBSD, OSHaiku, OSQNXNTO, OSiOS, OSDarwin, OSAndroid]
+                then []
+                else ["-lpthread"]
+          | otherwise               = []
+Only in ghc-8.0.1-android/compiler/main: DriverPipeline.hs.orig
+diff -ru ghc-8.0.1/compiler/main/DynFlags.hs ghc-8.0.1-android/compiler/main/DynFlags.hs
+--- ghc-8.0.1/compiler/main/DynFlags.hs	2016-05-16 19:08:53.000000000 +0200
++++ ghc-8.0.1-android/compiler/main/DynFlags.hs	2016-06-30 20:37:05.243554135 +0200
+@@ -3632,6 +3632,7 @@
+ default_PIC platform =
+   case (platformOS platform, platformArch platform) of
+     (OSDarwin, ArchX86_64) -> [Opt_PIC]
++    (OSAndroid, _) -> [Opt_PIC]
+     (OSOpenBSD, ArchX86_64) -> [Opt_PIC] -- Due to PIE support in
+                                          -- OpenBSD since 5.3 release
+                                          -- (1 May 2013) we need to
+@@ -4788,7 +4789,7 @@
+         in loop dflags' warn
+  | hscTarget dflags == HscLlvm &&
+    not ((arch == ArchX86_64) && (os == OSLinux || os == OSDarwin || os == OSFreeBSD)) &&
+-   not ((isARM arch) && (os == OSLinux)) &&
++   not (((isARM arch) && (os == OSLinux)) || ((isARM arch) && (os == OSAndroid))) &&
+    (gopt Opt_PIC dflags || WayDyn `elem` ways dflags)
+     = if cGhcWithNativeCodeGen == "YES"
+       then let dflags' = dflags { hscTarget = HscAsm }
+Only in ghc-8.0.1-android/compiler/main: DynFlags.hs.orig
+diff -ru ghc-8.0.1/ghc.mk ghc-8.0.1-android/ghc.mk
+--- ghc-8.0.1/ghc.mk	2016-05-16 19:08:53.000000000 +0200
++++ ghc-8.0.1-android/ghc.mk	2016-06-30 20:41:51.994358558 +0200
+@@ -431,11 +431,11 @@
+ # compiler already has installed (or up-to-date enough).
+ 
+ PACKAGES_STAGE0 = binary Cabal/Cabal hpc ghc-boot-th ghc-boot hoopl transformers template-haskell
+-ifeq "$(Windows_Host)" "NO"
+-ifneq "$(HostOS_CPP)" "ios"
+-PACKAGES_STAGE0 += terminfo
+-endif
+-endif
++# ifeq "$(Windows_Host)" "NO"
++# ifneq "$(HostOS_CPP)" "ios"
++# PACKAGES_STAGE0 += terminfo
++# endif
++# endif
+ 
+ PACKAGES_STAGE1 += ghc-prim
+ PACKAGES_STAGE1 += $(INTEGER_LIBRARY)
+@@ -470,11 +470,11 @@
+ PACKAGES_STAGE1 += xhtml
+ endif
+ 
+-ifeq "$(Windows_Target)" "NO"
+-ifneq "$(TargetOS_CPP)" "ios"
+-PACKAGES_STAGE1 += terminfo
+-endif
+-endif
++# ifeq "$(Windows_Target)" "NO"
++# ifneq "$(TargetOS_CPP)" "ios"
++# PACKAGES_STAGE1 += terminfo
++# endif
++# endif
+ PACKAGES_STAGE1 += haskeline
+ PACKAGES_STAGE1 += ghci
+ 
+Only in ghc-8.0.1-android: ghc.mk.orig
+Only in ghc-8.0.1-android: ghc.mk.rej
+diff -ru ghc-8.0.1/libraries/base/GHC/Event/EPoll.hsc ghc-8.0.1-android/libraries/base/GHC/Event/EPoll.hsc
+--- ghc-8.0.1/libraries/base/GHC/Event/EPoll.hsc	2016-05-16 19:08:53.000000000 +0200
++++ ghc-8.0.1-android/libraries/base/GHC/Event/EPoll.hsc	2016-06-30 20:44:21.709734401 +0200
+@@ -167,7 +167,7 @@
+  , epollOut = EPOLLOUT
+  , epollErr = EPOLLERR
+  , epollHup = EPOLLHUP
+- , epollOneShot = EPOLLONESHOT
++ , epollOneShot = 0x40000000
+  }
+ 
+ -- | Create a new epoll context, returning a file descriptor associated with the context.
+diff -ru ghc-8.0.1/libraries/haskeline/haskeline.cabal ghc-8.0.1-android/libraries/haskeline/haskeline.cabal
+--- ghc-8.0.1/libraries/haskeline/haskeline.cabal	2016-04-20 12:08:25.000000000 +0200
++++ ghc-8.0.1-android/libraries/haskeline/haskeline.cabal	2016-06-30 20:37:05.247554118 +0200
+@@ -36,7 +36,7 @@
+ -- restricted to only one line and thus only shows part of the input at once.)
+ flag terminfo
+     Description: Use the terminfo package for POSIX consoles.
+-    Default: True
++    Default: False
+ 
+ -- Note that the Setup script checks whether -liconv is necessary.  This flag
+ -- lets us override that decision.  When it is True, we use -liconv.  When it
+Only in ghc-8.0.1-android/libraries/haskeline: haskeline.cabal.orig
+diff -ru ghc-8.0.1/libraries/unix/include/HsUnix.h ghc-8.0.1-android/libraries/unix/include/HsUnix.h
+--- ghc-8.0.1/libraries/unix/include/HsUnix.h	2016-02-04 17:16:38.000000000 +0100
++++ ghc-8.0.1-android/libraries/unix/include/HsUnix.h	2016-06-30 20:53:17.459501265 +0200
+@@ -89,6 +89,10 @@
+ #include <signal.h>
+ #endif
+ 
++#ifndef _POSIX_VDISABLE
++#define _POSIX_VDISABLE '\0'
++#endif
++
+ /* defined in rts/posix/Signals.c */
+ extern HsInt nocldstop;
+ 
+diff -ru ghc-8.0.1/mk/config.mk.in ghc-8.0.1-android/mk/config.mk.in
+--- ghc-8.0.1/mk/config.mk.in	2016-05-16 19:08:53.000000000 +0200
++++ ghc-8.0.1-android/mk/config.mk.in	2016-06-30 20:37:05.247554118 +0200
+@@ -110,7 +110,9 @@
+ NoSharedLibsPlatformList = \
+ 	powerpc-ibm-aix \
+ 	x86_64-unknown-mingw32 \
+-	i386-unknown-mingw32
++	i386-unknown-mingw32 \
++	aarch64-linux-android \
++	aarch64-unknown-linux-android
+ 
+ ifeq "$(SOLARIS_BROKEN_SHLD)" "YES"
+ NoSharedLibsPlatformList += i386-unknown-solaris2
+Only in ghc-8.0.1-android/mk: config.mk.in.orig
+diff -ru ghc-8.0.1/rts/posix/OSThreads.c ghc-8.0.1-android/rts/posix/OSThreads.c
+--- ghc-8.0.1/rts/posix/OSThreads.c	2016-05-16 19:08:53.000000000 +0200
++++ ghc-8.0.1-android/rts/posix/OSThreads.c	2016-06-30 20:56:57.342584601 +0200
+@@ -249,7 +249,7 @@
+     return nproc;
+ }
+ 
+-#if defined(HAVE_SCHED_H) && defined(HAVE_SCHED_SETAFFINITY)
++#if 0 && defined(HAVE_SCHED_H) && defined(HAVE_SCHED_SETAFFINITY)
+ // Schedules the thread to run on CPU n of m.  m may be less than the
+ // number of physical CPUs, in which case, the thread will be allowed
+ // to run on CPU n, n+m, n+2m etc.
+@@ -268,7 +268,7 @@
+     sched_setaffinity(0, sizeof(cpu_set_t), &cs);
+ }
+ 
+-#elif defined(darwin_HOST_OS) && defined(THREAD_AFFINITY_POLICY)
++#elif 0 && defined(darwin_HOST_OS) && defined(THREAD_AFFINITY_POLICY)
+ // Schedules the current thread in the affinity set identified by tag n.
+ void
+ setThreadAffinity (nat n, nat m GNUC3_ATTRIBUTE(__unused__))
+@@ -282,7 +282,7 @@
+                       THREAD_AFFINITY_POLICY_COUNT);
+ }
+ 
+-#elif defined(HAVE_SYS_CPUSET_H) /* FreeBSD 7.1+ */
++#elif 0 && defined(HAVE_SYS_CPUSET_H) /* FreeBSD 7.1+ */
+ void
+ setThreadAffinity(nat n, nat m)
+ {
+diff -ru ghc-8.0.1/utils/ghc-pkg/ghc-pkg.cabal ghc-8.0.1-android/utils/ghc-pkg/ghc-pkg.cabal
+--- ghc-8.0.1/utils/ghc-pkg/ghc-pkg.cabal	2016-05-16 19:08:54.000000000 +0200
++++ ghc-8.0.1-android/utils/ghc-pkg/ghc-pkg.cabal	2016-06-30 20:37:05.247554118 +0200
+@@ -31,7 +31,6 @@
+                    ghc-boot,
+                    bytestring
+     if !os(windows)
+-        Build-Depends: unix,
+-                       terminfo
++        Build-Depends: unix
+     if os(windows)
+         c-sources: CRT_noglob.c
+diff -ru ghc-8.0.1/utils/ghc-pkg/Main.hs ghc-8.0.1-android/utils/ghc-pkg/Main.hs
+--- ghc-8.0.1/utils/ghc-pkg/Main.hs	2016-05-16 19:08:54.000000000 +0200
++++ ghc-8.0.1-android/utils/ghc-pkg/Main.hs	2016-06-30 20:37:05.247554118 +0200
+@@ -69,6 +69,8 @@
+ import qualified System.Info(os)
+ #endif
+ 
++#define BOOTSTRAPPING
++
+ #if !defined(mingw32_HOST_OS) && !defined(BOOTSTRAPPING)
+ import System.Console.Terminfo as Terminfo
+ #endif

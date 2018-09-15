@@ -6,7 +6,7 @@
 cd $NDK_ADDON_SRC
 apt-get source gsasl
 
-pushd gsasl*
+pushd gsasl*/
 patch -p1 < $BASEDIR/patches/gsasl-avoid-memxor-conflict.patch
 sed -i -e 's/^dist_man_MANS/#&/' doc/Makefile.am
 autoreconf -fi

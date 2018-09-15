@@ -6,7 +6,7 @@
 cd $NDK_ADDON_SRC
 apt-get source libidn
 
-pushd libidn*
+pushd libidn*/
 sed -i -e 's/^dist_man_MANS/#&/' doc/Makefile.am
 autoreconf -fi
 ./configure --prefix="$NDK_ADDON_PREFIX" --host=$NDK_TARGET --build=$BUILD_ARCH \

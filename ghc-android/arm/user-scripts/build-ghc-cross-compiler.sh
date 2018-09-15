@@ -42,7 +42,7 @@ perl boot
   --prefix="$GHC_PREFIX" \
   --target=$NDK_TARGET \
   --with-ghc=$GHC_STAGE0 \
-  --with-gcc=$NDK/bin/$NDK_TARGET-gcc
+  CC=$NDK/bin/$NDK_TARGET-gcc
 
 #
 # The nature of parallel builds that once in a blue moon this directory does not get created

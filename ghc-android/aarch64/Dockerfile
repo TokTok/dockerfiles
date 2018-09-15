@@ -1,5 +1,5 @@
 # vim:ft=dockerfile
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 MAINTAINER Iphigenia Df "iphydf@gmail.com"
 
 #
@@ -17,10 +17,10 @@ RUN apt-get update && apt-get -y install \
  ghc \
  git \
  libtool \
- llvm-3.7 \
+ llvm-6.0 \
  p7zip-full \
  pkg-config \
- python \
+ python3 \
  texinfo \
  unzip \
  zlib1g-dev
@@ -102,12 +102,13 @@ RUN ./build-libidn.sh
 # architecture and then we build the cross-compiler.
 #
 
-COPY patches/ghc-* $BASE/patches/
+RUN sed -i -e 's/-8.0.1/-8.0.2/;s/-c185b8a1f3e67e43533ec590b751c2ff/-d0afb5ec441b14527a53d2445cc26ec3/' $BASE/set-env.sh
 COPY user-scripts/download-ghc.sh \
      user-scripts/build-ghc-host.sh \
      $BASE/
 RUN ./build-ghc-host.sh
 
+COPY patches/ghc-* $BASE/patches/
 COPY user-scripts/build-ghc-cross-compiler.sh $BASE/
 RUN ./build-ghc-cross-compiler.sh
 

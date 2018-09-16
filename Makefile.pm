@@ -51,9 +51,6 @@ sub makefile {
    print "Generating docker sources\n";
 
    for my $target (@targets) {
-      # Clean up old files.
-      system 'rm', '-rf', <$target/*>;
-
       my $vars = $config->{targets}{$target};
       for my $srcfile (<src/*.in>) {
          my $lines = slurp $srcfile;

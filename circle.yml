@@ -1,0 +1,106 @@
+machine:
+  timezone:
+    Europe/Berlin
+  services:
+    - docker
+  environment:
+    DOCKERFLAGS: --rm=false
+dependencies:
+  pre:
+  - sudo apt-get update
+  - sudo apt-get install clang
+  - sudo apt-get install build-essential libtool autotools-dev automake checkinstall check yasm
+  - sudo apt-get install pkg-config
+  - java -version ; exit 0
+  - gcc --version ; exit 0
+  - clang --version ; exit 0
+
+compile:
+  pre:
+    - echo "dummy"
+  override:
+    - cat /etc/apt/sources.list
+    - ls -al /etc/apt/sources.list.d
+    - docker info
+    - make
+    - make -C ghc-android build-arm > $CIRCLE_ARTIFACTS/make_out.txt 2>&1 ; if [ $? -eq 0 ]; then touch ~/ok.txt ; fi ; touch ~/ready.txt :
+        background: true
+
+    - ready_="0";
+      counter=0;
+      while [ $ready_ == "0" ]; do
+      tail -20 $CIRCLE_ARTIFACTS/make_out.txt;
+      echo "running ...";
+      counter=$[ $counter + 1 ] ;
+      if [ $counter -eq 38 ] ; then exit 0 ; fi ;
+      if [ ! -f ~/ready.txt ]; then
+      sleep 180 ;
+      else ready_="1" ;
+      fi ;
+      done ;
+      exit 0
+
+    - ready_="0";
+      counter=0;
+      while [ $ready_ == "0" ]; do
+      tail -20 $CIRCLE_ARTIFACTS/make_out.txt;
+      echo "running ...";
+      counter=$[ $counter + 1 ] ;
+      if [ $counter -eq 38 ] ; then exit 0 ; fi ;
+      if [ ! -f ~/ready.txt ]; then
+      sleep 180 ;
+      else ready_="1" ;
+      fi ;
+      done ;
+      exit 0
+
+
+    - ready_="0";
+      counter=0;
+      while [ $ready_ == "0" ]; do
+      tail -20 $CIRCLE_ARTIFACTS/make_out.txt;
+      echo "running ...";
+      counter=$[ $counter + 1 ] ;
+      if [ $counter -eq 38 ] ; then exit 0 ; fi ;
+      if [ ! -f ~/ready.txt ]; then
+      sleep 180 ;
+      else ready_="1" ;
+      fi ;
+      done ;
+      exit 0
+
+    - ready_="0";
+      counter=0;
+      while [ $ready_ == "0" ]; do
+      tail -20 $CIRCLE_ARTIFACTS/make_out.txt;
+      echo "running ...";
+      counter=$[ $counter + 1 ] ;
+      if [ $counter -eq 38 ] ; then exit 0 ; fi ;
+      if [ ! -f ~/ready.txt ]; then
+      sleep 180 ;
+      else ready_="1" ;
+      fi ;
+      done ;
+      exit 0
+
+    - ready_="0";
+      counter=0;
+      while [ $ready_ == "0" ]; do
+      tail -20 $CIRCLE_ARTIFACTS/make_out.txt;
+      echo "running ...";
+      counter=$[ $counter + 1 ] ;
+      if [ $counter -eq 38 ] ; then exit 0 ; fi ;
+      if [ ! -f ~/ready.txt ]; then
+      sleep 180 ;
+      else ready_="1" ;
+      fi ;
+      done ;
+      exit 0
+
+test:
+  override:
+    - ls -al
+    - ls -al /home/ubuntu/dockerfiles/ghc-android/
+    - ls -al /home/ubuntu/dockerfiles/ghc-android/arm
+    - if [ -f ~/ok.txt ]; then echo 'Docker image OK';exit 0; else echo 'docker image generation FAILED' ;exit 1 ; fi
+

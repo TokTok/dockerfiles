@@ -1,0 +1,56 @@
+# vim:ft=dockerfile
+FROM ubuntu:19.10
+MAINTAINER @MAINTAINER@
+
+#
+# Install required packages
+#
+RUN apt-get update && apt-get -y install \
+ autoconf \
+ automake \
+ autopoint \
+ build-essential \
+ c2hs \
+ cabal-install \
+ ca-certificates \
+ curl \
+ ghc \
+ git \
+ libtool \
+ llvm-6.0 \
+ p7zip-full \
+ pkg-config \
+ python3 \
+ texinfo \
+ unzip \
+ zlib1g-dev \
+ && apt-get clean
+
+# Create a new user 'androidbuilder'
+COPY root-scripts/create-androidbuilder-user.sh /root/
+RUN /root/create-androidbuilder-user.sh
+
+# Log-in to the new user
+USER androidbuilder
+ENV HOME /home/androidbuilder
+
+# Set the working directory
+ENV BASE $HOME/ghc-build
+
+# The adding of the patches happens later in the Docker build, just before the
+# patched code is built
+RUN mkdir -p $BASE/patches
+
+COPY user-scripts/set-env.sh $BASE/
+
+WORKDIR $BASE
+
+#
+# First we build GHC for the host architecture, since it can be shared between
+# different Android architectures (Docker layer sharing).
+#
+
+COPY user-scripts/download-ghc.sh \
+     user-scripts/build-ghc-host.sh \
+     $BASE/
+RUN ./build-ghc-host.sh

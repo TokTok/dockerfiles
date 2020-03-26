@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings FATAL => 'all';
+use utf8;
+
+use lib '..';
+use Makefile;
+
+makefile {
+   tag => 'ghc',
+   version => '8.6.5',
+
+   targets => {
+      base => {
+         SUFFIX => '',
+      },
+   },
+};

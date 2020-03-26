@@ -5,19 +5,53 @@ workflows:
   version: 2
   build:
     jobs:
+      - ghc-base
       - ghc-android-aarch64
+      - ghc-android-arm
+      - ghc-android-i686
+      - ghc-android-x86_64
 
 jobs:
-  ghc-android-aarch64:
-    docker:
-      - image: alpine:3.11.5
+  ghc-base:
+    docker: {image: alpine:3.11.5}
 
     steps:
-      - run: apk add make perl
       - checkout
-      - run: make
       - setup_remote_docker
-      - run: apk add docker-cli
-      - run: echo "$DOCKER_PASS" | docker login --username "$DOCKER_USER" --password-stdin
-      - run: docker build -t toktoknet/ghc-android:latest.aarch64 ghc-android/aarch64
-      - run: docker push toktoknet/ghc-android:latest.aarch64
+      - run: .circleci/build-image ghc base
+
+  ghc-android-aarch64:
+    requires: [ghc-base]
+    docker: {image: alpine:3.11.5}
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image ghc-android aarch64
+
+  ghc-android-arm:
+    requires: [ghc-base]
+    docker: {image: alpine:3.11.5}
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image ghc-android arm
+
+  ghc-android-i686:
+    requires: [ghc-base]
+    docker: {image: alpine:3.11.5}
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image ghc-android i686
+
+  ghc-android-x86_64:
+    requires: [ghc-base]
+    docker: {image: alpine:3.11.5}
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image ghc-android x86_64

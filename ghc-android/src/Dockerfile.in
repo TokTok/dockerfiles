@@ -1,51 +1,10 @@
 # vim:ft=dockerfile
-FROM ubuntu:16.04
+FROM toktoknet/ghc:8.6.5
 MAINTAINER @MAINTAINER@
 
 #
-# Install required packages
-#
-RUN apt-get update && apt-get -y install \
- autoconf \
- automake \
- autopoint \
- build-essential \
- c2hs \
- cabal-install \
- ca-certificates \
- curl \
- ghc \
- git \
- libtool \
- llvm-3.7 \
- p7zip-full \
- pkg-config \
- python \
- texinfo \
- unzip \
- zlib1g-dev
-
-# Create a new user 'androidbuilder'
-COPY root-scripts/create-androidbuilder-user.sh /root/
-RUN /root/create-androidbuilder-user.sh
-
-# Log-in to the new user
-USER androidbuilder
-ENV HOME /home/androidbuilder
-
-# Set the working directory
-ENV BASE $HOME/ghc-build
-
-# The adding of the patches happens later in the Docker build, just before the
-# patched code is built
-RUN mkdir -p $BASE/patches
-
-COPY user-scripts/set-env.sh $BASE/
-
-WORKDIR $BASE
-
-#
-# Start preparing the environment.
+# Start preparing the environment. This is where we branch off for different
+# Android architectures.
 #
 
 ENV \
@@ -98,16 +57,10 @@ COPY user-scripts/build-libidn.sh $BASE/
 RUN ./build-libidn.sh
 
 #
-# At last we are ready to build GHC. First we build it for the host
-# architecture and then we build the cross-compiler.
+# At last we are ready to build the cross-compiler.
 #
 
 COPY patches/ghc-* $BASE/patches/
-COPY user-scripts/download-ghc.sh \
-     user-scripts/build-ghc-host.sh \
-     $BASE/
-RUN ./build-ghc-host.sh
-
 COPY user-scripts/build-ghc-cross-compiler.sh $BASE/
 RUN ./build-ghc-cross-compiler.sh
 
@@ -117,6 +70,9 @@ RUN ./build-hsc2hs-wrapper.sh
 COPY patches/cabal-wrapper $BASE/patches/
 COPY user-scripts/build-cross-compile-cabal.sh $BASE/
 RUN ./build-cross-compile-cabal.sh
+
+COPY user-scripts/install-happy.sh $BASE/
+RUN ./install-happy.sh
 
 COPY user-scripts/add-bindir-links.sh $BASE/
 RUN ./add-bindir-links.sh

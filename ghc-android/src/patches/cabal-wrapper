@@ -9,7 +9,7 @@ export HOME=$NDK
 mkdir -p $NDK/cabal
 [ -e "$NDK/.cabal" ] || ln -s $NDK/cabal $NDK/.cabal
 
-if [ "$1" = install -o "$1" = configure ]; then
+if [ "$1" = install -o "$1" = new-install -o "$1" = configure ]; then
   exec $NEW_CABAL \
     --with-compiler=$BIN_GHC \
     --with-gcc=$CC \
@@ -18,11 +18,10 @@ if [ "$1" = install -o "$1" = configure ]; then
     --with-ld=$BIN_LD \
     --with-hsc2hs=$BIN_HSC2HS \
     --with-strip=$BIN_STRIP \
-    --package-db=$PKGDB \
     --hsc2hs-options=--cross-compile \
     --configure-option=--host=$NDK_TARGET \
     "$@"
-elif [ "$1" = build ]; then
+elif [ "$1" = build -o "$1" = new-build ]; then
   exec $NEW_CABAL \
     --with-gcc=$CC \
     --with-ghc=$BIN_GHC \

@@ -41,10 +41,11 @@ sub makefile {
    for my $target (@targets) {
       my $vars = $config->{targets}{$target};
       $vars->{TARGET}     //= $target;
+      $vars->{SUFFIX}     //= ".$target";
       $vars->{ORGNAME}    //= $config->{orgname};
       $vars->{MAINTAINER} //= $config->{maintainer};
       $vars->{VERSION}    //= $config->{version};
-      $vars->{FULLVER}    //= "$config->{version}.$target";
+      $vars->{FULLVER}    //= "$config->{version}$vars->{SUFFIX}";
       $vars->{FULLTAG}    //= "$config->{tag}:$vars->{FULLVER}";
    }
 

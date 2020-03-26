@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034
 
 #
 # This script is responsible for setting up all the environment variables
@@ -37,8 +38,8 @@ GHC_PREFIX="$NDK"
 GHC_SRC="$NDK_ADDON_SRC/ghc"
 
 # GHC tarball
-GHC_RELEASE=8.0.1
-GHC_MD5=c185b8a1f3e67e43533ec590b751c2ff
+GHC_RELEASE=8.6.5
+GHC_MD5=b47726aaf302eb87b4970fcee924d45d
 
 NCURSES_RELEASE=6.0
 NCURSES_MD5=ee13d052e1ead260d7c28071f46eefb1
@@ -46,7 +47,7 @@ NCURSES_MD5=ee13d052e1ead260d7c28071f46eefb1
 GMP_RELEASE=6.1.1
 GMP_MD5=e70e183609244a332d80529e7e155a35
 
-CONFIG_SUB_SRC=${CONFIG_SUB_SRC:-/usr/share/automake-1.15}
+CONFIG_SUB_SRC=${CONFIG_SUB_SRC:-/usr/share/automake-1.16}
 
 BUILD_GCC=gcc
 BUILD_ARCH=$($BUILD_GCC -v 2>&1 | grep ^Target: | cut -f 2 -d ' ')

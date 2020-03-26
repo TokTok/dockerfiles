@@ -1,0 +1,7 @@
+#!/bin/sh
+
+apk add make perl docker-cli
+make
+echo "$DOCKER_PASS" | docker login --username "$DOCKER_USER" --password-stdin
+make -C $1 build-$2
+make -C $1 push-$2

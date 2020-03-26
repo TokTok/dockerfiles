@@ -9,6 +9,7 @@ use Makefile;
 
 makefile {
    tag => 'ghc-android',
+   version => '8.6.5',
 
    targets => {
       'aarch64' => {

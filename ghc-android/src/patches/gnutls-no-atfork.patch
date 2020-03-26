@@ -1,7 +1,7 @@
 diff -ru a/src/Makefile.am b/src/Makefile.am
---- a/src/Makefile.am	2016-06-30 14:03:47.106158181 +0200
-+++ b/src/Makefile.am	2016-06-30 14:04:13.982044861 +0200
-@@ -51,30 +51,30 @@
+--- a/src/Makefile.am	2019-06-08 17:19:19.000000000 +0000
++++ b/src/Makefile.am	2020-03-25 12:43:46.349342402 +0000
+@@ -82,32 +82,32 @@
  LIBOPTS = $(LIBOPTS_LDADD)
  endif
  
@@ -26,15 +26,17 @@ diff -ru a/src/Makefile.am b/src/Makefile.am
 +#bin_PROGRAMS += danetool
  endif
  
+-noinst_PROGRAMS = systemkey
++#noinst_PROGRAMS = systemkey
+ 
+ if ENABLE_PKCS11
+ 
+ # TPM makes use of PKCS #11 callbacks
  if ENABLE_TROUSERS
 -bin_PROGRAMS += tpmtool
 +#bin_PROGRAMS += tpmtool
  endif
  
--noinst_PROGRAMS = systemkey
-+#noinst_PROGRAMS = systemkey
- 
- if ENABLE_PKCS11
 -bin_PROGRAMS += p11tool
 +#bin_PROGRAMS += p11tool
  endif

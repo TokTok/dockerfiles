@@ -11,6 +11,8 @@ mv ghc-${GHC_RELEASE} "$GHC_SRC"
 apply_patches 'ghc-*' "$GHC_SRC"
 pushd "$GHC_SRC" > /dev/null
 
+cp libraries/base/config.sub libraries/unix/config.sub
+
 # Setup build.mk
 cat > mk/build.mk <<EOF
 Stage1Only           = YES
@@ -28,21 +30,15 @@ BUILD_DOCBOOK_PS     = NO
 BUILD_DOCBOOK_PDF    = NO
 EOF
 
-# Update config.sub and config.guess
-for x in $(find . -name "config.sub") ; do
-  dir=$(dirname $x)
-  cp -v "$CONFIG_SUB_SRC/config.sub" "$dir"
-  cp -v "$CONFIG_SUB_SRC/config.guess" "$dir"
-done
-
 # Configure
 perl boot
 ./configure \
   --enable-bootstrap-with-devel-snapshot \
   --prefix="$GHC_PREFIX" \
-  --target=$NDK_TARGET \
-  --with-ghc=$GHC_STAGE0 \
-  --with-gcc=$NDK/bin/$NDK_TARGET-gcc
+  --target="$NDK_TARGET" \
+  GHC="$GHC_STAGE0" \
+  CC="$NDK/bin/$NDK_TARGET-gcc" \
+  CFLAGS="-std=c99"
 
 #
 # The nature of parallel builds that once in a blue moon this directory does not get created

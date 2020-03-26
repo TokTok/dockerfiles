@@ -1,4 +1,6 @@
 ---
 language: generic
+dist: xenial
+os: linux
 
 script: make

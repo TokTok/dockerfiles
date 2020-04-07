@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. set-env.sh
+. set-env-android.sh
 ####################################################################################################
 
 echo Deleting unused files from NDK installation in $NDK_PATH

@@ -5,7 +5,7 @@
 
 ./download-ghc.sh
 
-cd $NDK_ADDON_SRC
+cd "$HOST_BUILD_DIR"
 tar xf ${GHC_TAR_PATH}
 mv ghc-${GHC_RELEASE} "$GHC_STAGE0_SRC"
 pushd "$GHC_STAGE0_SRC" > /dev/null

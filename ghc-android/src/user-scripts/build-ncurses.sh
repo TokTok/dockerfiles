@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. set-env.sh
+. set-env-android.sh
 ####################################################################################################
 
 echo Downloading ncurses $NCURSES_RELEASE

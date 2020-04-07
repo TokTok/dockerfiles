@@ -14,7 +14,8 @@ ENV \
  NDK_ABI=@NDK_ABI@ \
  ARCH_OPTS=@ARCH_OPTS@
 
-COPY user-scripts/install-ndk.sh \
+COPY user-scripts/set-env-android.sh \
+     user-scripts/install-ndk.sh \
      user-scripts/unpack-ndk.pl \
      user-scripts/create-ndk-standalone-toolchain.sh \
      user-scripts/cleanup-ndk.sh \

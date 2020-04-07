@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. set-env.sh
+. set-env-android.sh
 ####################################################################################################
 
 git clone https://github.com/ironsteel/iconv-android.git $ICONV_SRC 2>&1

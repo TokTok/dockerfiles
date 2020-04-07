@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. set-env.sh
+. set-env-android.sh
 ####################################################################################################
 
 HSC2HS_TARGET=$(ls $GHC_PREFIX/bin/*-hsc2hs)

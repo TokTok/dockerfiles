@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. set-env.sh
+. set-env-android.sh
 ####################################################################################################
 
 # install a cabal that supports cross compilation

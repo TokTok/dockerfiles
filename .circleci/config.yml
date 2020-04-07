@@ -6,14 +6,18 @@ workflows:
   build:
     jobs:
       - ghc-base
-      - ghc-android-aarch64
-      - ghc-android-arm
-      - ghc-android-i686
-      - ghc-android-x86_64
+      - ghc-android-aarch64:
+          requires: [ghc-base]
+      - ghc-android-arm:
+          requires: [ghc-base]
+      - ghc-android-i686:
+          requires: [ghc-base]
+      - ghc-android-x86_64:
+          requires: [ghc-base]
 
 jobs:
   ghc-base:
-    docker: {image: alpine:3.11.5}
+    docker: [{image: alpine:3.11.5}]
 
     steps:
       - checkout
@@ -21,8 +25,7 @@ jobs:
       - run: .circleci/build-image ghc base
 
   ghc-android-aarch64:
-    requires: [ghc-base]
-    docker: {image: alpine:3.11.5}
+    docker: [{image: alpine:3.11.5}]
 
     steps:
       - checkout
@@ -30,8 +33,7 @@ jobs:
       - run: .circleci/build-image ghc-android aarch64
 
   ghc-android-arm:
-    requires: [ghc-base]
-    docker: {image: alpine:3.11.5}
+    docker: [{image: alpine:3.11.5}]
 
     steps:
       - checkout
@@ -39,8 +41,7 @@ jobs:
       - run: .circleci/build-image ghc-android arm
 
   ghc-android-i686:
-    requires: [ghc-base]
-    docker: {image: alpine:3.11.5}
+    docker: [{image: alpine:3.11.5}]
 
     steps:
       - checkout
@@ -48,8 +49,7 @@ jobs:
       - run: .circleci/build-image ghc-android i686
 
   ghc-android-x86_64:
-    requires: [ghc-base]
-    docker: {image: alpine:3.11.5}
+    docker: [{image: alpine:3.11.5}]
 
     steps:
       - checkout

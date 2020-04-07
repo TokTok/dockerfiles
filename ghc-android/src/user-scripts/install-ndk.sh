@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. set-env.sh
+. set-env-android.sh
 ####################################################################################################
 
 NDK_TAR_FILE=android-ndk-${NDK_RELEASE}-linux-x86_64.zip

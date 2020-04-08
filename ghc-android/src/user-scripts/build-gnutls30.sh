@@ -4,7 +4,7 @@
 ####################################################################################################
 
 cd $NDK_ADDON_SRC
-apt-get source libgnutls30
+apt-get source gnutls28
 
 pushd gnutls28*/
 patch -p1 < $BASEDIR/patches/gnutls-no-atfork.patch
@@ -20,7 +20,6 @@ autoreconf -fi
   --prefix="$NDK_ADDON_PREFIX" \
   --host="$NDK_TARGET" \
   --build="$BUILD_ARCH" \
-  CC="$NDK_TARGET-gcc -fgnu89-inline" \
   --enable-static \
   --disable-shared
 pushd gl

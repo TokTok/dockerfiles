@@ -30,14 +30,16 @@ BUILD_DOCBOOK_PS     = NO
 BUILD_DOCBOOK_PDF    = NO
 EOF
 
-# Configure
+# No -fPIC here.
+unset CFLAGS
+unset CXXFLAGS
+
 perl boot
 ./configure \
   --enable-bootstrap-with-devel-snapshot \
   --prefix="$GHC_PREFIX" \
   --target="$NDK_TARGET" \
   GHC="$GHC_STAGE0" \
-  CC="$NDK/bin/$NDK_TARGET-gcc" \
   CFLAGS="$CFLAGS -std=c99"
 
 #

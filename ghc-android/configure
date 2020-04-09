@@ -31,14 +31,14 @@ makefile {
          NDK_TOOLCHAIN => 'x86-4.9',
          NDK_TARGET    => 'i686-linux-android',
          NDK_ABI       => 'i686-linux-android',
-         ARCH_OPTS     => '',
+         ARCH_OPTS     => '-fasm',
       },
       'x86_64' => {
          NDK_API       => '21',
          NDK_TOOLCHAIN => 'x86_64-4.9',
          NDK_TARGET    => 'x86_64-linux-android',
          NDK_ABI       => 'x86_64-linux-android',
-         ARCH_OPTS     => '',
+         ARCH_OPTS     => '-fasm',
       },
    },
 };

@@ -11,9 +11,10 @@
 # Basic parameters
 NDK_RELEASE=${NDK_RELEASE:-r12b}
 NDK_MD5=1d1a5ee71a5123be01e0dd9adb5df80d
-NDK_PLATFORM=${NDK_PLATFORM:-android-14}
+NDK_API=${NDK_API:-14}
 NDK_TOOLCHAIN=${NDK_TOOLCHAIN:-arm-linux-androideabi-4.9}
 
+NDK_PLATFORM=android-$NDK_API
 NDK_DESC=$NDK_PLATFORM-$NDK_TOOLCHAIN
 NDK="$GHCHOME/$NDK_PLATFORM/$NDK_TOOLCHAIN"
 NDK_ADDON_SRC="$BASEDIR/build-$NDK_DESC"
@@ -32,6 +33,8 @@ mkdir -p "$NDK_ADDON_SRC"
 
 # Add toolchain to path
 export PATH="$NDK/bin":$PATH
+export CFLAGS="-fPIC"
+export CXXFLAGS="-fPIC"
 
 # Download and configure the Android NDK toolchain
 NDK_PATH="$HOME/android-ndk-$NDK_RELEASE"

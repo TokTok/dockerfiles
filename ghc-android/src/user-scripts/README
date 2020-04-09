@@ -1,5 +1,5 @@
 ----------------------------------------
-GHC 8.0.1 Android cross-compiler for ARM
+GHC 8.6.5 Android cross-compiler for ARM
 ----------------------------------------
 
 Congratulations! You are the proud owner of a GHC ARM cross compilation
@@ -21,18 +21,17 @@ There are two versions of the compiler installed.
 
 1. One that targets the host architecture (x86_64)
 
-   ~/.ghc/android-host
+  ~/.ghc/android-host
 
 2. One that targets the Android platform
 
-  ~/.ghc/$NDK_PLATFORM/$NDK_TOOLCHAIN
+  ~/.ghc/android-$NDK_API/$NDK_TOOLCHAIN
 
 
 Environment variables
 ---------------------
 
 The PATH has been extended with the path to the cross-compiler.
-To access the host compiler use the prefix $GHC_HOST/bin. e.g.
+To access the host compiler use the prefix \$GHC_HOST/bin. e.g.
 
-  $ $GHC_HOST/bin/ghc --version
-
+  $ $GHC_HOST/bin/ghc --version\n

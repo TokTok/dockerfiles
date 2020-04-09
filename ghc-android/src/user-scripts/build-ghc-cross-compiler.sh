@@ -21,7 +21,7 @@ SRC_HC_OPTS          = -O -H64m
 GhcStage1HcOpts      = -O2 -fasm
 GhcStage2HcOpts      = -O2 -fasm $ARCH_OPTS
 GhcHcOpts            = -Rghc-timing
-GhcLibHcOpts         = -O2
+GhcLibHcOpts         = -O2 -fPIC
 GhcLibWays           = v
 STRIP_CMD            = $NDK/bin/$NDK_TARGET-strip
 HADDOCK_DOCS         = NO
@@ -38,7 +38,7 @@ perl boot
   --target="$NDK_TARGET" \
   GHC="$GHC_STAGE0" \
   CC="$NDK/bin/$NDK_TARGET-gcc" \
-  CFLAGS="-std=c99"
+  CFLAGS="$CFLAGS -std=c99"
 
 #
 # The nature of parallel builds that once in a blue moon this directory does not get created

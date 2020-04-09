@@ -19,7 +19,7 @@ autoreconf -fi
   --with-build-cc="$BUILD_GCC" \
   --enable-static \
   --disable-shared \
-  CFLAGS="-std=c99"
+  CFLAGS="$CFLAGS -std=c99"
 make $MAKEFLAGS
 make install
 popd

@@ -6,7 +6,7 @@
 # GHC build dependencies for the Android cross compiler.
 #
 
-. set-env.sh
+. "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/set-env.sh"
 
 # Basic parameters
 NDK_RELEASE=${NDK_RELEASE:-r12b}

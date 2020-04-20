@@ -1,0 +1,5 @@
+genrule(
+    name = "test-clang",
+    outs = ["test-clang.txt"],
+    cmd = "/usr/local/bin/clang --version > $@",
+)

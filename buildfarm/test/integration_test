@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings FATAL => 'all';
+use utf8;
+
+my @RUN = ('docker', 'run', '--rm', '-t', '--name');
+my $SERVER = 'integration_test_server';
+my $WORKER = 'integration_test_worker';
+
+sub start {
+   open my $server, '-|', @RUN, $SERVER, '-p', '8980:8980', 'toxchat/buildfarm-server'
+      or die "could not start server: $!";
+
+   while (my $line = <$server>) {
+      print "<server> $line";
+      last if $line =~ 'INFO: buildfarm-server.* initialized';
+   }
+
+   open my $worker, '-|', @RUN, $WORKER, 'toxchat/buildfarm-worker', $ENV{HOSTNAME}
+      or die "could not start worker $!";
+
+   while (my $line = <$worker>) {
+      print "<worker> $line";
+      last if $line =~ 'INFO: .* Starting';
+   }
+
+   ($server, $worker)
+}
+
+sub stop {
+   my ($server, $worker) = @_;
+   my $success = 1;
+
+   $success &&= system ('docker', 'kill', $WORKER) == 0;
+   while (defined (my $line = <$worker>)) {
+      print "<worker> $line";
+   }
+   $success &&= system ('docker', 'kill', $SERVER) == 0;
+   while (defined (my $line = <$server>)) {
+      print "<server> $line";
+   }
+   close $server;
+   close $worker;
+
+   $success
+}
+
+my ($server, $worker) = start;
+
+my $success = 1;
+chdir 'test' or die "chdir 'test': $!";
+$success &&= system ('bazel', 'build', '//...') == 0;
+$success &&= system ('bazel', 'clean') == 0;
+
+$success &&= stop $server, $worker;
+
+die "test failed!\nsee errors above to debug\n" unless $success;

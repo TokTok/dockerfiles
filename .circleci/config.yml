@@ -5,17 +5,69 @@ workflows:
   version: 2
   build:
     jobs:
-      - ghc-base
-      - ghc-android-aarch64:
-          requires: [ghc-base]
-      - ghc-android-arm:
-          requires: [ghc-base]
-      - ghc-android-i686:
-          requires: [ghc-base]
-      - ghc-android-x86_64:
-          requires: [ghc-base]
+      - builder
+      - buildfarm-base
+      - buildfarm-server:
+          requires: [buildfarm-base]
+      - buildfarm-worker:
+          requires: [builder, buildfarm-base]
+# Disabled GHC for now, because we're not actively developing it and it takes
+# hours to build these.
+#     - ghc-base
+#     - ghc-android-aarch64:
+#         requires: [ghc-base]
+#     - ghc-android-arm:
+#         requires: [ghc-base]
+#     - ghc-android-i686:
+#         requires: [ghc-base]
+#     - ghc-android-x86_64:
+#         requires: [ghc-base]
 
 jobs:
+  ##################################################
+  #
+  # :: Bazel docker-sandbox and buildfarm images
+  #
+  ##################################################
+
+  builder:
+    docker: [{image: alpine:3.11.5}]
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image buildfarm builder
+
+  buildfarm-base:
+    docker: [{image: alpine:3.11.5}]
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image buildfarm buildfarm-base
+
+  buildfarm-server:
+    docker: [{image: alpine:3.11.5}]
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image buildfarm buildfarm-server
+
+  buildfarm-worker:
+    docker: [{image: alpine:3.11.5}]
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image buildfarm buildfarm-worker
+
+  ##################################################
+  #
+  # :: GHC for Android
+  #
+  ##################################################
+
   ghc-base:
     docker: [{image: alpine:3.11.5}]
 

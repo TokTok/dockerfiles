@@ -1,0 +1,9 @@
+---
+build:
+  docker:
+    web: buildfarm/server/Dockerfile
+    worker: buildfarm/worker/Dockerfile
+run:
+  # "web" doesn't actually work yet, because Heroku doesn't support HTTP/2.
+  web: /entrypoint.sh $PORT
+  worker: /entrypoint.sh code.tox.chat

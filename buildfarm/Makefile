@@ -1,32 +1,32 @@
-build: build-builder build-base build-server build-worker
+build: build-builder build-buildfarm-base build-buildfarm-server build-buildfarm-worker
 
 build-builder:
 	docker build builder -t toxchat/builder:1.0.0
 
-build-base: build-builder
+build-buildfarm-base: build-builder
 	docker build base -t toxchat/buildfarm-base:1.0.0
 
-build-server: build-base
+build-buildfarm-server: build-buildfarm-base
 	docker build server -t toxchat/buildfarm-server:1.0.0
 
-build-worker: build-base
+build-buildfarm-worker: build-buildfarm-base
 	docker build worker -t toxchat/buildfarm-worker:1.0.0
 
 
-push: push-builder push-base push-server push-worker
+push: push-builder push-buildfarm-base push-buildfarm-server push-buildfarm-worker
 
 push-builder: build-builder
 	docker push toxchat/builder:1.0.0
 
-push-base: build-base
+push-buildfarm-base: build-buildfarm-base
 	docker push toxchat/buildfarm-base:1.0.0
 
-push-server: build-server
+push-buildfarm-server: build-buildfarm-server
 	docker push toxchat/buildfarm-server:1.0.0
 
-push-worker: build-worker
+push-buildfarm-worker: build-buildfarm-worker
 	docker push toxchat/buildfarm-worker:1.0.0
 
 
-check: build-server build-worker test/integration_test
+check: build-buildfarm-server build-buildfarm-worker test/integration_test
 	test/integration_test

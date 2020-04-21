@@ -3,13 +3,13 @@ build: build-builder build-buildfarm-base build-buildfarm-server build-buildfarm
 build-builder:
 	docker build builder -t toxchat/builder:1.0.0
 
-build-buildfarm-base: build-builder
+build-buildfarm-base:
 	docker build base -t toxchat/buildfarm-base:1.0.0
 
-build-buildfarm-server: build-buildfarm-base
+build-buildfarm-server:
 	docker build server -t toxchat/buildfarm-server:1.0.0
 
-build-buildfarm-worker: build-buildfarm-base
+build-buildfarm-worker:
 	docker build worker -t toxchat/buildfarm-worker:1.0.0
 
 

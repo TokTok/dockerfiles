@@ -11,17 +11,15 @@ workflows:
           requires: [buildfarm-base]
       - buildfarm-worker:
           requires: [builder, buildfarm-base]
-# Disabled GHC for now, because we're not actively developing it and it takes
-# hours to build these.
-#     - ghc-base
-#     - ghc-android-aarch64:
-#         requires: [ghc-base]
-#     - ghc-android-arm:
-#         requires: [ghc-base]
-#     - ghc-android-i686:
-#         requires: [ghc-base]
-#     - ghc-android-x86_64:
-#         requires: [ghc-base]
+      - ghc-base
+      - ghc-android-aarch64:
+          requires: [ghc-base]
+      - ghc-android-arm:
+          requires: [ghc-base]
+      - ghc-android-i686:
+          requires: [ghc-base]
+      - ghc-android-x86_64:
+          requires: [ghc-base]
 
 jobs:
   ##################################################
@@ -36,7 +34,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: .circleci/build-image buildfarm builder
+      - run: .circleci/build-image buildfarm/builder toxchat/builder:1.0.0
 
   buildfarm-base:
     docker: [{image: alpine:3.11.5}]
@@ -44,7 +42,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: .circleci/build-image buildfarm buildfarm-base
+      - run: .circleci/build-image buildfarm/base toxchat/buildfarm-base:1.0.0
 
   buildfarm-server:
     docker: [{image: alpine:3.11.5}]
@@ -52,7 +50,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: .circleci/build-image buildfarm buildfarm-server
+      - run: .circleci/build-image buildfarm/server toxchat/buildfarm-server:1.0.0
 
   buildfarm-worker:
     docker: [{image: alpine:3.11.5}]
@@ -60,7 +58,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: .circleci/build-image buildfarm buildfarm-worker
+      - run: .circleci/build-image buildfarm/worker toxchat/buildfarm-worker:1.0.0
 
   ##################################################
   #
@@ -74,7 +72,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: .circleci/build-image ghc base
+      - run: .circleci/build-image ghc/base toktoknet/ghc:8.6.5
 
   ghc-android-aarch64:
     docker: [{image: alpine:3.11.5}]
@@ -82,7 +80,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: .circleci/build-image ghc-android aarch64
+      - run: .circleci/build-image ghc-android/aarch64 toktoknet/ghc-android:8.6.5.aarch64
 
   ghc-android-arm:
     docker: [{image: alpine:3.11.5}]
@@ -90,7 +88,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: .circleci/build-image ghc-android arm
+      - run: .circleci/build-image ghc-android/arm toktoknet/ghc-android:8.6.5.arm
 
   ghc-android-i686:
     docker: [{image: alpine:3.11.5}]
@@ -98,7 +96,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: .circleci/build-image ghc-android i686
+      - run: .circleci/build-image ghc-android/i686 toktoknet/ghc-android:8.6.5.i686
 
   ghc-android-x86_64:
     docker: [{image: alpine:3.11.5}]
@@ -106,4 +104,4 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: .circleci/build-image ghc-android x86_64
+      - run: .circleci/build-image ghc-android/x86_64 toktoknet/ghc-android:8.6.5.x86_64

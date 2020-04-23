@@ -1,13 +1,13 @@
 FROM ubuntu:16.04 AS build
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
- ca-certificates=20170717~16.04.2 \
- g++=4:5.3.1-1ubuntu1 \
- git=1:2.7.4-0ubuntu1.9 \
- openjdk-8-jdk-headless=8u242-b08-0ubuntu3~16.04 \
- unzip=6.0-20ubuntu1 \
- wget=1.17.1-1ubuntu1.5 \
- zlib1g-dev=1:1.2.8.dfsg-2ubuntu4.3 \
+ ca-certificates \
+ g++ \
+ git \
+ openjdk-8-jdk-headless \
+ unzip \
+ wget \
+ zlib1g-dev \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 

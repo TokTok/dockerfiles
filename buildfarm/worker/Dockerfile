@@ -1,5 +1,7 @@
-FROM toxchat/buildfarm-base:1.0.0 as base
-FROM toxchat/builder:1.0.0
+# hadolint ignore=DL3007
+FROM toxchat/buildfarm-base:latest as base
+# hadolint ignore=DL3007
+FROM toxchat/builder:latest
 
 COPY --from=base /buildfarm-operationqueue-worker_deploy.jar /
 COPY logging.properties worker.config /config/

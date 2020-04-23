@@ -1,4 +1,5 @@
-FROM toxchat/buildfarm-base:1.0.0 as base
+# hadolint ignore=DL3007
+FROM toxchat/buildfarm-base:latest as base
 FROM alpine:3.11.5
 RUN apk --no-cache add openjdk8
 

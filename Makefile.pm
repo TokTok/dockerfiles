@@ -9,7 +9,7 @@ our @ISA = qw/Exporter/;
 our @EXPORT = qw/makefile/;
 
 my $ORGNAME    = 'toktoknet';
-my $MAINTAINER = 'Iphigenia Df "iphydf@gmail.com"';
+my $MAINTAINER = 'Iphigenia Df <iphydf@gmail.com>';
 
 sub slurp {
    my ($file) = @_;

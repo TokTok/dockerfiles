@@ -1,6 +1,6 @@
 # vim:ft=dockerfile
 FROM toktoknet/ghc:8.6.5
-MAINTAINER @MAINTAINER@
+LABEL maintainer="@MAINTAINER@"
 
 #
 # Start preparing the environment. This is where we branch off for different
@@ -30,32 +30,32 @@ RUN ./install-ndk.sh \
 
 COPY patches/iconv-* $BASE/patches/
 COPY user-scripts/build-iconv.sh $BASE/
-RUN ./build-iconv.sh
+RUN ["./build-iconv.sh"]
 
 COPY user-scripts/build-ncurses.sh $BASE/
-RUN ./build-ncurses.sh
+RUN ["./build-ncurses.sh"]
 
 COPY patches/gmp-* $BASE/patches/
 COPY user-scripts/build-gmp.sh $BASE/
-RUN ./build-gmp.sh
+RUN ["./build-gmp.sh"]
 
 COPY user-scripts/build-nettle.sh $BASE/
-RUN ./build-nettle.sh
+RUN ["./build-nettle.sh"]
 
 COPY patches/gnutls-* $BASE/patches/
 COPY user-scripts/build-gnutls30.sh $BASE/
-RUN ./build-gnutls30.sh
+RUN ["./build-gnutls30.sh"]
 
 COPY patches/gsasl-* $BASE/patches/
 COPY user-scripts/build-gsasl.sh $BASE/
-RUN ./build-gsasl.sh
+RUN ["./build-gsasl.sh"]
 
 COPY patches/libxml2-* $BASE/patches/
 COPY user-scripts/build-libxml2.sh $BASE/
-RUN ./build-libxml2.sh
+RUN ["./build-libxml2.sh"]
 
 COPY user-scripts/build-libidn.sh $BASE/
-RUN ./build-libidn.sh
+RUN ["./build-libidn.sh"]
 
 #
 # At last we are ready to build the cross-compiler.
@@ -63,23 +63,23 @@ RUN ./build-libidn.sh
 
 COPY patches/ghc-* $BASE/patches/
 COPY user-scripts/build-ghc-cross-compiler.sh $BASE/
-RUN ./build-ghc-cross-compiler.sh
+RUN ["./build-ghc-cross-compiler.sh"]
 
 COPY user-scripts/build-hsc2hs-wrapper.sh $BASE/
-RUN ./build-hsc2hs-wrapper.sh
+RUN ["./build-hsc2hs-wrapper.sh"]
 
 COPY patches/cabal-wrapper $BASE/patches/
 COPY user-scripts/build-cross-compile-cabal.sh $BASE/
-RUN ./build-cross-compile-cabal.sh
+RUN ["./build-cross-compile-cabal.sh"]
 
 COPY user-scripts/install-happy.sh $BASE/
-RUN ./install-happy.sh
+RUN ["./install-happy.sh"]
 
 COPY user-scripts/add-bindir-links.sh $BASE/
-RUN ./add-bindir-links.sh
+RUN ["./add-bindir-links.sh"]
 
 COPY user-scripts/update-cabal-install.sh $BASE/
-RUN ./update-cabal-install.sh
+RUN ["./update-cabal-install.sh"]
 
 WORKDIR $HOME
 
@@ -92,4 +92,4 @@ ENV \
  PLATFORM_PREFIX=$HOME/.ghc/android-$NDK_API/$NDK_TOOLCHAIN
 
 COPY user-scripts/README $HOME/
-RUN eval "echo \"$(cat $HOME/README)\""
+RUN eval "echo \"$(cat \"$HOME/README\")\""

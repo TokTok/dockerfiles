@@ -1,0 +1,20 @@
+---
+_extends: template
+
+repository:
+  name: dockerfiles
+  description: Dockerfiles for (cross-)compiling TokTok projects for various platforms
+  topics: docker, ghc, android, windows, qt, buildfarm, bazel
+  has_issues: true
+
+branches:
+  - name: "master"
+    protection:
+      required_status_checks:
+        contexts:
+          - Codacy/PR Quality Review
+          - Codefactor
+          - Travis CI - Pull Request
+          - WIP
+          - code-review/reviewable
+          - license/cla

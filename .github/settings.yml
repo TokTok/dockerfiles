@@ -13,7 +13,8 @@ branches:
       required_status_checks:
         contexts:
           - Codacy/PR Quality Review
-          - Codefactor
+          - CodeFactor
+          - Milestone Check
           - Travis CI - Pull Request
           - WIP
           - code-review/reviewable

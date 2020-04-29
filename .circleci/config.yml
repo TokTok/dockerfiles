@@ -11,6 +11,7 @@ workflows:
           requires: [buildfarm-base]
       - buildfarm-worker:
           requires: [builder, buildfarm-base]
+
       - ghc-base
       - ghc-android-aarch64:
           requires: [ghc-base]
@@ -20,6 +21,15 @@ workflows:
           requires: [ghc-base]
       - ghc-android-x86_64:
           requires: [ghc-base]
+
+      - kythe-release
+      - kythe-webui
+      - kythe-buildenv
+          requires: [kythe-release]
+      - kythe-tables:
+          requires: [kythe-buildenv]
+      - kythe-serving
+          requires: [kythe-release, kythe-tables, kythe-webui]
 
 jobs:
   ##################################################
@@ -105,3 +115,49 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: .circleci/build-image ghc-android/x86_64 toktoknet/ghc-android:8.6.5.x86_64
+
+  ##################################################
+  #
+  # :: Kythe code indexing
+  #
+  ##################################################
+
+  kythe-release:
+    docker: [{image: alpine:3.11.5}]
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image kythe/release toxchat/kythe-release:latest
+
+  kythe-webui:
+    docker: [{image: alpine:3.11.5}]
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image kythe/webui toxchat/kythe-webui:latest
+
+  kythe-buildenv:
+    docker: [{image: alpine:3.11.5}]
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image kythe/buildenv toxchat/kythe-buildenv:latest
+
+  kythe-tables:
+    docker: [{image: alpine:3.11.5}]
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image kythe/tables toxchat/kythe-tables:latest
+
+  kythe-serving:
+    docker: [{image: alpine:3.11.5}]
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image kythe/serving toxchat/kythe-serving:latest

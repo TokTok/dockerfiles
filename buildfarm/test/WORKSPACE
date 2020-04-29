@@ -1,1 +1,27 @@
 workspace(name = "test")
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "bazel_toolchains",
+    sha256 = "144290c4166bd67e76a54f96cd504ed86416ca3ca82030282760f0823c10be48",
+    strip_prefix = "bazel-toolchains-3.1.1",
+    urls = [
+        "https://github.com/bazelbuild/bazel-toolchains/releases/download/3.1.0/bazel-toolchains-3.1.1.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-toolchains/releases/download/3.1.1/bazel-toolchains-3.1.1.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "rules_cc",
+    sha256 = "abe679f9a6513a72d73f09f96318b0060770fdc93695a6cd766550b492ce6ef1",
+    strip_prefix = "rules_cc-4c3e410486a078d6492baeaebb406ce4d20e3164",
+    urls = ["https://github.com/bazelbuild/rules_cc/archive/4c3e410486a078d6492baeaebb406ce4d20e3164.tar.gz"],
+)
+
+http_archive(
+    name = "com_google_absl",
+    sha256 = "550419777b03a1ba0d56bb9b37e342902547468a42fbafceb9775019f09bb1e9",
+    strip_prefix = "abseil-cpp-6e18c7115df9b7ca0987cc346b1b1d4b3cc829b3",
+    urls = ["https://github.com/abseil/abseil-cpp/archive/6e18c7115df9b7ca0987cc346b1b1d4b3cc829b3.tar.gz"],
+)

@@ -1,3 +1,17 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+
+cc_library(
+    name = "testlib",
+    srcs = ["testlib.c"],
+    hdrs = ["testlib.h"],
+)
+
+cc_binary(
+    name = "testprog",
+    srcs = ["testprog.c"],
+    deps = [":testlib"],
+)
+
 genrule(
     name = "test-clang",
     outs = ["test-clang.txt"],

@@ -12,6 +12,8 @@ BUILD="$1"
 IMAGE="$2"
 
 make
-docker pull "$IMAGE" || true
+if [ ! -f "$BUILD/.nocache" ]; then
+  docker pull "$IMAGE" || true
+fi
 docker build --cache-from "$IMAGE" --tag "$IMAGE" "$BUILD"
 docker push "$IMAGE"

@@ -15,14 +15,12 @@ ENV \
  ARCH_OPTS=@ARCH_OPTS@
 
 COPY user-scripts/set-env-android.sh \
-     user-scripts/install-ndk.sh \
+     user-scripts/download-ndk.sh \
+     user-scripts/unpack-ndk.sh \
      user-scripts/unpack-ndk.pl \
-     user-scripts/create-ndk-standalone-toolchain.sh \
-     user-scripts/cleanup-ndk.sh \
      $BASE/
-RUN ./install-ndk.sh \
- && ./create-ndk-standalone-toolchain.sh \
- && ./cleanup-ndk.sh
+RUN ./download-ndk.sh \
+ && ./unpack-ndk.sh
 
 #
 # Build required libraries for Android.

@@ -27,34 +27,34 @@ sub must_popen {
 }
 
 my @common = qw(
-   build
    sources/android/cpufeatures
-   sources/cxx-stl/gnu-libstdc++/4.9/include
-   prebuilt/linux-x86_64
-   prebuilt/darwin-x86_64
-   toolchains/llvm
+   toolchains/llvm/prebuilt/linux-x86_64/bin/clang
+   toolchains/llvm/prebuilt/linux-x86_64/bin/clang++
+   toolchains/llvm/prebuilt/linux-x86_64/lib/lib64
+   toolchains/llvm/prebuilt/linux-x86_64/lib64
+   toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include
 );
 
 my %NDK_FILES = (
    'aarch64-linux-android' => [@common, qw(
-      platforms/android-21/arch-arm64
-      prebuilt/android-arm64
-      sources/cxx-stl/gnu-libstdc++/4.9/libs/arm64-v8a
-      toolchains/aarch64-linux-android-4.9
+      toolchains/llvm/prebuilt/linux-x86_64/aarch64-linux-android
+      toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-*
+      toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android29-*
+      toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/29
    )],
    'arm-linux-androideabi' => [@common, qw(
-      platforms/android-9
-      sources/cxx-stl/gnu-libstdc++/4.9/libs/armeabi*
+      platforms/android-29/arch-arm
+      sources/cxx-stl/llvm-libc++/libs/armeabi-v7a
       toolchains/arm-linux-androideabi-4.9
    )],
    'i686-linux-android' => [@common, qw(
-      platforms/android-9
-      sources/cxx-stl/gnu-libstdc++/4.9/libs/x86
+      platforms/android-29/arch-x86
+      sources/cxx-stl/llvm-libc++/libs/x86
       toolchains/x86-4.9
    )],
    'x86_64-linux-android' => [@common, qw(
-      platforms/android-21
-      sources/cxx-stl/gnu-libstdc++/4.9/libs/x86_64
+      platforms/android-29/arch-x86_64
+      sources/cxx-stl/llvm-libc++/libs/x86_64
       toolchains/x86_64-4.9
    )],
 );

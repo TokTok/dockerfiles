@@ -14,7 +14,7 @@ makefile {
    targets => {
       'aarch64' => {
          NDK_API       => '21',
-         NDK_TOOLCHAIN => 'aarch64-linux-android-4.9',
+         NDK_TOOLCHAIN => 'aarch64-linux-android',
          NDK_TARGET    => 'aarch64-linux-android',
          NDK_ABI       => 'aarch64-linux-android',
          ARCH_OPTS     => '-fllvm',

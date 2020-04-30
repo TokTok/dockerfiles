@@ -24,11 +24,11 @@ workflows:
 
       - kythe-release
       - kythe-webui
-      - kythe-buildenv
+      - kythe-buildenv:
           requires: [kythe-release]
       - kythe-tables:
           requires: [kythe-buildenv]
-      - kythe-serving
+      - kythe-serving:
           requires: [kythe-release, kythe-tables, kythe-webui]
 
 jobs:
@@ -39,7 +39,7 @@ jobs:
   ##################################################
 
   builder:
-    docker: [{image: alpine:3.11.5}]
+    docker: [{ image: alpine:3.11.5 }]
 
     steps:
       - checkout
@@ -47,7 +47,7 @@ jobs:
       - run: .circleci/build-image buildfarm/builder toxchat/builder:latest
 
   buildfarm-base:
-    docker: [{image: alpine:3.11.5}]
+    docker: [{ image: alpine:3.11.5 }]
 
     steps:
       - checkout
@@ -55,7 +55,7 @@ jobs:
       - run: .circleci/build-image buildfarm/base toxchat/buildfarm-base:latest
 
   buildfarm-server:
-    docker: [{image: alpine:3.11.5}]
+    docker: [{ image: alpine:3.11.5 }]
 
     steps:
       - checkout
@@ -63,7 +63,7 @@ jobs:
       - run: .circleci/build-image buildfarm/server toxchat/buildfarm-server:latest
 
   buildfarm-worker:
-    docker: [{image: alpine:3.11.5}]
+    docker: [{ image: alpine:3.11.5 }]
 
     steps:
       - checkout
@@ -77,7 +77,7 @@ jobs:
   ##################################################
 
   ghc-base:
-    docker: [{image: alpine:3.11.5}]
+    docker: [{ image: alpine:3.11.5 }]
 
     steps:
       - checkout
@@ -85,7 +85,7 @@ jobs:
       - run: .circleci/build-image ghc/base toktoknet/ghc:8.6.5
 
   ghc-android-aarch64:
-    docker: [{image: alpine:3.11.5}]
+    docker: [{ image: alpine:3.11.5 }]
 
     steps:
       - checkout
@@ -93,7 +93,7 @@ jobs:
       - run: .circleci/build-image ghc-android/aarch64 toktoknet/ghc-android:8.6.5.aarch64
 
   ghc-android-arm:
-    docker: [{image: alpine:3.11.5}]
+    docker: [{ image: alpine:3.11.5 }]
 
     steps:
       - checkout
@@ -101,7 +101,7 @@ jobs:
       - run: .circleci/build-image ghc-android/arm toktoknet/ghc-android:8.6.5.arm
 
   ghc-android-i686:
-    docker: [{image: alpine:3.11.5}]
+    docker: [{ image: alpine:3.11.5 }]
 
     steps:
       - checkout
@@ -109,7 +109,7 @@ jobs:
       - run: .circleci/build-image ghc-android/i686 toktoknet/ghc-android:8.6.5.i686
 
   ghc-android-x86_64:
-    docker: [{image: alpine:3.11.5}]
+    docker: [{ image: alpine:3.11.5 }]
 
     steps:
       - checkout
@@ -123,7 +123,7 @@ jobs:
   ##################################################
 
   kythe-release:
-    docker: [{image: alpine:3.11.5}]
+    docker: [{ image: alpine:3.11.5 }]
 
     steps:
       - checkout
@@ -131,7 +131,7 @@ jobs:
       - run: .circleci/build-image kythe/release toxchat/kythe-release:latest
 
   kythe-webui:
-    docker: [{image: alpine:3.11.5}]
+    docker: [{ image: alpine:3.11.5 }]
 
     steps:
       - checkout
@@ -139,7 +139,7 @@ jobs:
       - run: .circleci/build-image kythe/webui toxchat/kythe-webui:latest
 
   kythe-buildenv:
-    docker: [{image: alpine:3.11.5}]
+    docker: [{ image: alpine:3.11.5 }]
 
     steps:
       - checkout
@@ -147,7 +147,7 @@ jobs:
       - run: .circleci/build-image kythe/buildenv toxchat/kythe-buildenv:latest
 
   kythe-tables:
-    docker: [{image: alpine:3.11.5}]
+    docker: [{ image: alpine:3.11.5 }]
 
     steps:
       - checkout
@@ -155,7 +155,7 @@ jobs:
       - run: .circleci/build-image kythe/tables toxchat/kythe-tables:latest
 
   kythe-serving:
-    docker: [{image: alpine:3.11.5}]
+    docker: [{ image: alpine:3.11.5 }]
 
     steps:
       - checkout

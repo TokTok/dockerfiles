@@ -3,7 +3,7 @@
 set -eux
 
 if [ "${1-}" = "/bin/sh" ]; then
-   exec "$@"
+  exec "$@"
 fi
 
 HOST="${1-code.tox.chat}"

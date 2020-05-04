@@ -13,9 +13,9 @@ bazel --bazelrc=/opt/kythe/extractors.bazelrc build \
   //toxic/...
 
 # Find the extracted .kzip files
-find -L bazel-out -name '*.cxx.kzip' | \
-  parallel -t -L4 /opt/kythe/indexers/cxx_indexer | \
-  /opt/kythe/tools/dedup_stream > cxx.entries
+find -L bazel-out -name '*.cxx.kzip' |
+  parallel -t -L4 /opt/kythe/indexers/cxx_indexer |
+  /opt/kythe/tools/dedup_stream >cxx.entries
 
 mkdir /data
 /opt/kythe/tools/write_tables --entries cxx.entries --out /data/kythe_tables

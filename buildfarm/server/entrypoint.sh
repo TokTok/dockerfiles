@@ -3,7 +3,7 @@
 set -eux
 
 if [ "${1-}" = "/bin/sh" ]; then
-   exec "$@"
+  exec "$@"
 fi
 
 PORT="${1-8980}"

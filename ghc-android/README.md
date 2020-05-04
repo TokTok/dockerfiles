@@ -48,9 +48,9 @@ Docker is great because:
     built it the first time.
 
 2) It will help _you_. This script will inevitably succumb to bitrot. It may
-fail but when it does you will not have to go all the way back to the beginning.
-You can make a change to one of the many mini-scripts in the `user-scripts/`
-directory and try again from the point of failure.
+   fail but when it does you will not have to go all the way back to the
+   beginning. You can make a change to one of the many mini-scripts in the
+   `user-scripts/` directory and try again from the point of failure.
 
 ## More information
 

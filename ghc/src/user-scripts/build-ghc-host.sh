@@ -6,12 +6,12 @@
 ./download-ghc.sh
 
 cd "$HOST_BUILD_DIR"
-tar xf ${GHC_TAR_PATH}
-mv ghc-${GHC_RELEASE} "$GHC_STAGE0_SRC"
-pushd "$GHC_STAGE0_SRC" > /dev/null
+tar xf "$GHC_TAR_PATH"
+mv ghc-"$GHC_RELEASE" "$GHC_STAGE0_SRC"
+pushd "$GHC_STAGE0_SRC" >/dev/null
 
 # Setup build.mk
-cat > mk/build.mk <<EOF
+cat >mk/build.mk <<EOF
 HADDOCK_DOCS       = NO
 BUILD_DOCBOOK_HTML = NO
 BUILD_DOCBOOK_PS   = NO
@@ -28,8 +28,8 @@ perl boot
 # This causes a conflict.
 #
 /usr/bin/install -c -m 755 -d "$GHC_STAGE0_PREFIX/lib/ghc-$GHC_RELEASE/include"
-make $MAKEFLAGS
-make $MAKEFLAGS install
+make "$MAKEFLAGS"
+make "$MAKEFLAGS" install
 
-rm -rf ${BASH_SOURCE[0]} "$GHC_STAGE0_SRC"
-rm -rf ${BASH_SOURCE[0]} "$GHC_TAR_PATH"
+rm -rf "${BASH_SOURCE[0]}" "$GHC_STAGE0_SRC"
+rm -rf "${BASH_SOURCE[0]}" "$GHC_TAR_PATH"

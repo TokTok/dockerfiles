@@ -3,11 +3,11 @@
 . set-env-android.sh
 ####################################################################################################
 
-cd $NDK_ADDON_SRC
+cd "$NDK_ADDON_SRC"
 apt-get source gsasl
 
 pushd gsasl*/
-patch -p1 < $BASEDIR/patches/gsasl-avoid-memxor-conflict.patch
+patch -p1 <"$BASEDIR"/patches/gsasl-avoid-memxor-conflict.patch
 sed -i -e 's/^dist_man_MANS/#&/' doc/Makefile.am
 autoreconf -fi
 ./configure \
@@ -17,8 +17,8 @@ autoreconf -fi
   --with-build-cc="$BUILD_GCC" \
   --enable-static \
   --disable-shared
-make $MAKEFLAGS
+make "$MAKEFLAGS"
 make install
 popd
 
-rm -rf ${BASH_SOURCE[0]} gsasl*
+rm -rf "${BASH_SOURCE[0]}" gsasl*

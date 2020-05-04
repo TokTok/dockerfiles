@@ -1,12 +1,13 @@
 # Dockerfile collection
 
 This is a collection of Dockerfiles (see
-[Wikipedia](https://en.wikipedia.org/wiki/Docker_(software))) for cross
+[Wikipedia](<https://en.wikipedia.org/wiki/Docker_(software)>)) for cross
 compilation to various platforms. Currently, we provide two basic cross compiler
 environments, each with a few platform variants. All environments are also
 rebuilt and updated regularly when the source files change.
 
 - GHC 8.0.1 on Android
+
   - `toktoknet/ghc-android:latest.aarch64`: ARM64
   - `toktoknet/ghc-android:latest.arm`: ARM EABI (32 bit)
   - `toktoknet/ghc-android:latest.i686`: Intel x86

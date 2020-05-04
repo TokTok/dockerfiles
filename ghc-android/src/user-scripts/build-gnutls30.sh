@@ -3,11 +3,11 @@
 . set-env-android.sh
 ####################################################################################################
 
-cd $NDK_ADDON_SRC
+cd "$NDK_ADDON_SRC"
 apt-get source libgnutls30
 
 pushd gnutls28*/
-patch -p1 < $BASEDIR/patches/gnutls-no-atfork.patch
+patch -p1 <"$BASEDIR"/patches/gnutls-no-atfork.patch
 export PKG_CONFIG_PATH="$NDK_ADDON_PREFIX/lib/pkgconfig"
 autoreconf -fi
 ./configure \
@@ -24,12 +24,12 @@ autoreconf -fi
   --enable-static \
   --disable-shared
 pushd gl
-make $MAKEFLAGS
+make "$MAKEFLAGS"
 popd
 pushd lib
-make $MAKEFLAGS
+make "$MAKEFLAGS"
 make install
 popd
 popd
 
-rm -rf ${BASH_SOURCE[0]} gnutls28*
+rm -rf "${BASH_SOURCE[0]}" gnutls28*

@@ -5,16 +5,16 @@
 
 ./download-ghc.sh
 
-cd $NDK_ADDON_SRC
-tar xf ${GHC_TAR_PATH}
-mv ghc-${GHC_RELEASE} "$GHC_SRC"
+cd "$NDK_ADDON_SRC"
+tar xf "$GHC_TAR_PATH"
+mv ghc-"$GHC_RELEASE" "$GHC_SRC"
 apply_patches 'ghc-*' "$GHC_SRC"
-pushd "$GHC_SRC" > /dev/null
+pushd "$GHC_SRC" >/dev/null
 
 cp libraries/base/config.sub libraries/unix/config.sub
 
 # Setup build.mk
-cat > mk/build.mk <<EOF
+cat >mk/build.mk <<EOF
 Stage1Only           = YES
 DYNAMIC_GHC_PROGRAMS = NO
 SRC_HC_OPTS          = -O -H64m
@@ -45,11 +45,11 @@ perl boot
 # before we try to "/usr/bin/install -c -m 644  utils/hsc2hs/template-hsc.h "/home/androidbuilder/.ghc/android-host/lib/ghc-8.0.1"
 # This causes a conflict.
 #
-/usr/bin/install -c -m 755 -d "$GHC_PREFIX/lib/${NDK_ABI}-ghc-${GHC_RELEASE}/include/"
-make $MAKEFLAGS
+/usr/bin/install -c -m 755 -d "$GHC_PREFIX/lib/$NDK_ABI-ghc-$GHC_RELEASE/include/"
+make "$MAKEFLAGS"
 make install
 
 popd
 
-rm -rf ${BASH_SOURCE[0]} "$GHC_SRC"
-rm -rf ${BASH_SOURCE[0]} "$GHC_TAR_PATH"
+rm -rf "${BASH_SOURCE[0]}" "$GHC_SRC"
+rm -rf "${BASH_SOURCE[0]}" "$GHC_TAR_PATH"

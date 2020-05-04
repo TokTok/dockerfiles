@@ -7,6 +7,8 @@ set -eux
 # from different repositories. E.g. both dockerfiles and toktok-stack want to
 # push this image.
 bazel --bazelrc=/opt/kythe/extractors.bazelrc build \
+  --build_tag_filters=-haskell \
+  --test_tag_filters=-haskell \
   --config=clang \
   --override_repository kythe_release=/opt/kythe \
   //c-toxcore/... \

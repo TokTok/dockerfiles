@@ -3,7 +3,7 @@
 . set-env-android.sh
 ####################################################################################################
 
-cd $NDK_ADDON_SRC
+cd "$NDK_ADDON_SRC"
 apt-get source libidn
 
 pushd libidn*/
@@ -17,8 +17,8 @@ autoreconf -fi
   --enable-static \
   --disable-shared \
   --disable-gtk-doc-html
-make $MAKEFLAGS || true
+make "$MAKEFLAGS" || true
 make install
 popd
 
-rm -rf ${BASH_SOURCE[0]} libidn*
+rm -rf "${BASH_SOURCE[0]}" libidn*

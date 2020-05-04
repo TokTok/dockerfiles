@@ -6,7 +6,7 @@
 # GHC build dependencies for the Android cross compiler.
 #
 
-. "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/set-env.sh"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/set-env.sh"
 
 # Basic parameters
 NDK_RELEASE=${NDK_RELEASE:-r12b}
@@ -32,7 +32,7 @@ GMP_MD5=e70e183609244a332d80529e7e155a35
 mkdir -p "$NDK_ADDON_SRC"
 
 # Add toolchain to path
-export PATH="$NDK/bin":$PATH
+export PATH="$NDK/bin":"$PATH"
 export CFLAGS="-fPIC"
 export CXXFLAGS="-fPIC"
 
@@ -40,14 +40,14 @@ export CXXFLAGS="-fPIC"
 NDK_PATH="$HOME/android-ndk-$NDK_RELEASE"
 
 # Unpack ncurses
-NCURSES_TAR_FILE=ncurses-${NCURSES_RELEASE}.tar.gz
-NCURSES_TAR_PATH="${TARDIR}/${NCURSES_TAR_FILE}"
-NCURSES_SRC="$NDK_ADDON_SRC/ncurses-${NCURSES_RELEASE}"
+NCURSES_TAR_FILE=ncurses-$NCURSES_RELEASE.tar.gz
+NCURSES_TAR_PATH="$TARDIR/$NCURSES_TAR_FILE"
+NCURSES_SRC="$NDK_ADDON_SRC/ncurses-$NCURSES_RELEASE"
 
 ICONV_SRC="$NDK_ADDON_SRC/iconv"
 # Last known working git commit
 ICONV_GIT_COMMIT=d5006db0ff4449b447946ab31d1a41b63078c773
 
-GMP_TAR_FILE=gmp-${GMP_RELEASE}.tar.xz
-GMP_TAR_PATH="${TARDIR}/${GMP_TAR_FILE}"
-GMP_SRC="$NDK_ADDON_SRC/gmp-${GMP_RELEASE}"
+GMP_TAR_FILE=gmp-$GMP_RELEASE.tar.xz
+GMP_TAR_PATH="$TARDIR/$GMP_TAR_FILE"
+GMP_SRC="$NDK_ADDON_SRC/gmp-$GMP_RELEASE"

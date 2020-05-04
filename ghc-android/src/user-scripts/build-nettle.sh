@@ -3,7 +3,7 @@
 . set-env-android.sh
 ####################################################################################################
 
-cd $NDK_ADDON_SRC
+cd "$NDK_ADDON_SRC"
 
 apt-get source nettle
 # curl 'https://ftp.gnu.org/gnu/nettle/nettle-3.3.tar.gz' --output nettlXe.tar.gz
@@ -20,8 +20,8 @@ autoreconf -fi
   --enable-static \
   --disable-shared \
   CFLAGS="$CFLAGS -std=c99"
-make $MAKEFLAGS
+make "$MAKEFLAGS"
 make install
 popd
 
-rm -rf ${BASH_SOURCE[0]} nettle*
+rm -rf "${BASH_SOURCE[0]}" nettle*

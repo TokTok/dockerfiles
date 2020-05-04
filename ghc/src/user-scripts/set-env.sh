@@ -53,7 +53,7 @@ function check_md5() {
 
 function apply_patches() {
   pushd "$2" >/dev/null
-  readarray -t PATCHES<<<"$(find "$BASEDIR/patches" -name "$1")"
+  readarray -t PATCHES <<<"$(find "$BASEDIR/patches" -name "$1")"
   for p in "${PATCHES[@]}"; do
     echo Applying patch "$p" in "$PWD"
     patch -p1 <"$p"

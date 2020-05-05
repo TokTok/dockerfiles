@@ -92,4 +92,4 @@ ENV \
  PLATFORM_PREFIX=$HOME/.ghc/android-$NDK_API/$NDK_TOOLCHAIN
 
 COPY user-scripts/README $HOME/
-RUN eval "echo \"$(cat \"$HOME/README\")\""
+RUN eval "echo \"$(cat $HOME/README)\""

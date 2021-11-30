@@ -9,7 +9,7 @@ use Makefile;
 
 makefile {
    tag => 'ghc',
-   version => '8.6.5',
+   version => '8.10.3',
 
    targets => {
       base => {

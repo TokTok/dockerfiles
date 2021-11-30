@@ -13,14 +13,14 @@ diff -ru a/libraries/base/GHC/Event/EPoll.hsc b/libraries/base/GHC/Event/EPoll.h
 diff -ru a/llvm-targets b/llvm-targets
 --- a/llvm-targets	2019-04-07 19:39:58.000000000 +0000
 +++ b/llvm-targets	2020-04-03 21:46:46.238673727 +0000
-@@ -13,6 +13,7 @@
- ,("i386-unknown-linux", ("e-m:e-p:32:32-f64:32:64-f80:32-n8:16:32-S128", "pentium4", ""))
- ,("x86_64-unknown-linux-gnu", ("e-m:e-i64:64-f80:128-n8:16:32:64-S128", "x86-64", ""))
+@@ -27,6 +27,7 @@
+ ,("x86_64-unknown-linux-musl", ("e-m:e-i64:64-f80:128-n8:16:32:64-S128", "x86-64", ""))
  ,("x86_64-unknown-linux", ("e-m:e-i64:64-f80:128-n8:16:32:64-S128", "x86-64", ""))
-+,("arm-unknown-linux-androideabi", ("e-m:e-p:32:32-i64:64-v128:64:128-a:0:32-n32-S64", "generic", ""))
- ,("armv7-unknown-linux-androideabi", ("e-m:e-p:32:32-i64:64-v128:64:128-a:0:32-n32-S64", "generic", ""))
+ ,("x86_64-unknown-linux-android", ("e-m:e-i64:64-f80:128-n8:16:32:64-S128", "x86-64", "+sse4.2 +popcnt +cx16"))
++,("arm-unknown-linux-androideabi", ("e-m:e-p:32:32-Fi8-i64:64-v128:64:128-a:0:32-n32-S64", "generic", "+fpregs +vfp2 +vfp2d16 +vfp2d16sp +vfp2sp +vfp3 +vfp3d16 +vfp3d16sp +vfp3sp -fp16 -vfp4 -vfp4d16 -vfp4d16sp -vfp4sp -fp-armv8 -fp-armv8d16 -fp-armv8d16sp -fp-armv8sp -fullfp16 +fp64 +d32 +neon -crypto -fp16fml"))
+ ,("armv7-unknown-linux-androideabi", ("e-m:e-p:32:32-Fi8-i64:64-v128:64:128-a:0:32-n32-S64", "generic", "+fpregs +vfp2 +vfp2d16 +vfp2d16sp +vfp2sp +vfp3 +vfp3d16 +vfp3d16sp +vfp3sp -fp16 -vfp4 -vfp4d16 -vfp4d16sp -vfp4sp -fp-armv8 -fp-armv8d16 -fp-armv8d16sp -fp-armv8sp -fullfp16 +fp64 +d32 +neon -crypto -fp16fml"))
  ,("aarch64-unknown-linux-android", ("e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128", "generic", "+neon"))
- ,("powerpc64le-unknown-linux", ("e-m:e-i64:64-n32:64", "ppc64le", ""))
+ ,("armv7a-unknown-linux-androideabi", ("e-m:e-p:32:32-Fi8-i64:64-v128:64:128-a:0:32-n32-S64", "generic", "+fpregs +vfp2 +vfp2d16 +vfp2d16sp +vfp2sp +vfp3 +vfp3d16 +vfp3d16sp +vfp3sp -fp16 -vfp4 -vfp4d16 -vfp4d16sp -vfp4sp -fp-armv8 -fp-armv8d16 -fp-armv8d16sp -fp-armv8sp -fullfp16 +fp64 +d32 +neon -crypto -fp16fml"))
 diff -ru a/mk/warnings.mk b/mk/warnings.mk
 --- a/mk/warnings.mk	2019-04-07 19:39:58.000000000 +0000
 +++ b/mk/warnings.mk	2020-04-03 21:47:13.878616492 +0000
@@ -34,12 +34,11 @@ diff -ru a/mk/warnings.mk b/mk/warnings.mk
 diff -ru a/utils/llvm-targets/gen-data-layout.sh b/utils/llvm-targets/gen-data-layout.sh
 --- a/utils/llvm-targets/gen-data-layout.sh	2019-04-07 19:39:58.000000000 +0000
 +++ b/utils/llvm-targets/gen-data-layout.sh	2020-04-03 21:46:32.610701898 +0000
-@@ -28,7 +28,7 @@
-     # Linux x86
-     "i386-unknown-linux-gnu" "i386-unknown-linux" "x86_64-unknown-linux-gnu" "x86_64-unknown-linux"
+@@ -63,6 +63,7 @@
+     "x86_64-unknown-linux"
      # Linux Android
--    "armv7-unknown-linux-androideabi" "aarch64-unknown-linux-android"
-+    "arm-unknown-linux-androideabi" "armv7-unknown-linux-androideabi" "aarch64-unknown-linux-android"
-     # Linux ppc64le
-     "powerpc64le-unknown-linux"
- 
+     "x86_64-unknown-linux-android"
++    "arm-unknown-linux-androideabi"
+     "armv7-unknown-linux-androideabi"
+     "aarch64-unknown-linux-android"
+     "armv7a-unknown-linux-androideabi"

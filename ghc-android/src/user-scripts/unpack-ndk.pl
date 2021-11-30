@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-my ($NDK_RELEASE, $NDK_PACKAGE, $NDK_TARGET) = @ARGV;
+my ($NDK_RELEASE, $NDK_PACKAGE, $NDK_TOOLCHAIN) = @ARGV;
 
 sub show {
    local $Data::Dumper::Indent = 0;
@@ -27,41 +27,27 @@ sub must_popen {
 }
 
 my @common = qw(
-   build
-   sources/android/cpufeatures
-   sources/cxx-stl/gnu-libstdc++/4.9/include
-   prebuilt/linux-x86_64
-   prebuilt/darwin-x86_64
    toolchains/llvm
 );
 
 my %NDK_FILES = (
    'aarch64-linux-android' => [@common, qw(
-      platforms/android-21/arch-arm64
       prebuilt/android-arm64
-      sources/cxx-stl/gnu-libstdc++/4.9/libs/arm64-v8a
-      toolchains/aarch64-linux-android-4.9
    )],
-   'arm-linux-androideabi' => [@common, qw(
-      platforms/android-9
-      sources/cxx-stl/gnu-libstdc++/4.9/libs/armeabi*
-      toolchains/arm-linux-androideabi-4.9
+   'armv7a-linux-androideabi' => [@common, qw(
+      prebuilt/android-arm
    )],
    'i686-linux-android' => [@common, qw(
-      platforms/android-9
-      sources/cxx-stl/gnu-libstdc++/4.9/libs/x86
-      toolchains/x86-4.9
+      prebuilt/android-x86
    )],
    'x86_64-linux-android' => [@common, qw(
-      platforms/android-21
-      sources/cxx-stl/gnu-libstdc++/4.9/libs/x86_64
-      toolchains/x86_64-4.9
+      prebuilt/android-x86_64
    )],
 );
 
 print "Extracting $NDK_PACKAGE...\n";
 my @lines = do {
-   my @files = map { "android-ndk-$NDK_RELEASE/$_" } @{ $NDK_FILES{$NDK_TARGET} };
+   my @files = map { "android-ndk-$NDK_RELEASE/$_" } @{ $NDK_FILES{$NDK_TOOLCHAIN} };
    must_popen "7z", "x", $NDK_PACKAGE, "-o$ENV{HOME}", map { "-ir!$_" } @files
 };
 

@@ -17,10 +17,10 @@ cp libraries/base/config.sub libraries/unix/config.sub
 cat >mk/build.mk <<EOF
 Stage1Only           = YES
 DYNAMIC_GHC_PROGRAMS = NO
-SRC_HC_OPTS          = -O -H64m
-GhcStage1HcOpts      = -O2 -fasm
-GhcStage2HcOpts      = -O2 $ARCH_OPTS
-GhcHcOpts            = -Rghc-timing
+SRC_HC_OPTS          = -O -fPIC -H64m
+GhcStage1HcOpts      = -O2 -fPIC -fasm
+GhcStage2HcOpts      = -O2 -fPIC $ARCH_OPTS
+GhcHcOpts            = -fPIC -Rghc-timing
 GhcLibHcOpts         = -O2 -fPIC
 GhcLibWays           = v
 STRIP_CMD            = $NDK/bin/$NDK_TARGET-strip
@@ -31,14 +31,16 @@ BUILD_DOCBOOK_PDF    = NO
 EOF
 
 # Configure
-perl boot
+./boot
 ./configure \
+  AS="$NDK_TOOLCHAIN-clang" \
+  CC="$NDK_TOOLCHAIN-clang" \
+  CXX="$NDK_TOOLCHAIN-clang++" \
   --enable-bootstrap-with-devel-snapshot \
   --prefix="$GHC_PREFIX" \
-  --target="$NDK_TARGET" \
+  --target="$NDK_TOOLCHAIN" \
   GHC="$GHC_STAGE0" \
-  CC="$NDK/bin/$NDK_TARGET-gcc" \
-  CFLAGS="$CFLAGS -std=c99"
+  CFLAGS="$CFLAGS -std=c99" || (cat config.log && false)
 
 #
 # The nature of parallel builds that once in a blue moon this directory does not get created

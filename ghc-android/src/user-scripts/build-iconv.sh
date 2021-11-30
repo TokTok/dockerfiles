@@ -16,9 +16,22 @@ cp "$CONFIG_SUB_SRC/config.guess" "$ICONV_SRC/libcharset/build-aux"
 
 apply_patches 'iconv-*' "$ICONV_SRC"
 
+set -x
+
 pushd "$ICONV_SRC"
-./configure --prefix="$NDK_ADDON_PREFIX" --host="$NDK_TARGET" --build="$BUILD_ARCH" \
-  --with-build-cc="$BUILD_GCC" --enable-static --disable-shared
+./configure \
+  AS="$NDK_TOOLCHAIN-clang" \
+  CC="$NDK_TOOLCHAIN-clang" \
+  CXX="$NDK_TOOLCHAIN-clang++" \
+  AR=llvm-ar \
+  RANLIB=llvm-ranlib \
+  STRIP=llvm-strip \
+  --prefix="$NDK_ADDON_PREFIX" \
+  --host="$NDK_TARGET" \
+  --build="$BUILD_ARCH" \
+  --with-build-cc="$BUILD_GCC" \
+  --enable-static \
+  --disable-shared || (cat config.log && false)
 make "$MAKEFLAGS"
 make install
 popd

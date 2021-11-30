@@ -1,5 +1,5 @@
 # vim:ft=dockerfile
-FROM ubuntu:19.10
+FROM ubuntu:20.04
 LABEL maintainer="@MAINTAINER@"
 
 # Install required packages

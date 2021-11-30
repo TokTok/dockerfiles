@@ -11,7 +11,5 @@ branches:
     protection:
       required_status_checks:
         contexts:
-          - Codacy/PR Quality Review
           - CodeFactor
-          - Travis CI - Pull Request
           - code-review/reviewable

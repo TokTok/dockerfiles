@@ -9,33 +9,33 @@ use Makefile;
 
 makefile {
    tag => 'ghc-android',
-   version => '8.6.5',
+   version => '8.10.3',
 
    targets => {
       'aarch64' => {
-         NDK_API       => '21',
-         NDK_TOOLCHAIN => 'aarch64-linux-android-4.9',
+         NDK_API       => '31',
+         NDK_TOOLCHAIN => 'aarch64-linux-android',
          NDK_TARGET    => 'aarch64-linux-android',
          NDK_ABI       => 'aarch64-linux-android',
          ARCH_OPTS     => '-fllvm',
       },
       'arm' => {
-         NDK_API       => '9',
-         NDK_TOOLCHAIN => 'arm-linux-androideabi-4.9',
+         NDK_API       => '31',
+         NDK_TOOLCHAIN => 'armv7a-linux-androideabi',
          NDK_TARGET    => 'arm-linux-androideabi',
          NDK_ABI       => 'arm-unknown-linux-androideabi',
          ARCH_OPTS     => '-fllvm',
       },
       'i686' => {
-         NDK_API       => '9',
-         NDK_TOOLCHAIN => 'x86-4.9',
+         NDK_API       => '31',
+         NDK_TOOLCHAIN => 'i686-linux-android',
          NDK_TARGET    => 'i686-linux-android',
          NDK_ABI       => 'i686-linux-android',
          ARCH_OPTS     => '-fasm',
       },
       'x86_64' => {
-         NDK_API       => '21',
-         NDK_TOOLCHAIN => 'x86_64-4.9',
+         NDK_API       => '31',
+         NDK_TOOLCHAIN => 'x86_64-linux-android',
          NDK_TARGET    => 'x86_64-linux-android',
          NDK_ABI       => 'x86_64-linux-android',
          ARCH_OPTS     => '-fasm',

@@ -2,6 +2,8 @@
 
 set -eux
 
+export DEBIAN_FRONTEND="noninteractive"
+
 apt-get update
 apt-get -y --no-install-recommends install \
   autoconf \
@@ -15,7 +17,7 @@ apt-get -y --no-install-recommends install \
   ghc \
   git \
   libtool \
-  llvm-6.0 \
+  llvm-9 \
   p7zip-full \
   pkg-config \
   python3 \

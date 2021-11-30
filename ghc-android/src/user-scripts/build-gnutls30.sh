@@ -7,10 +7,16 @@ cd "$NDK_ADDON_SRC"
 apt-get source libgnutls30
 
 pushd gnutls28*/
-patch -p1 <"$BASEDIR"/patches/gnutls-no-atfork.patch
+sed -i -e 's/^\(bin\|noinst\)_PROGRAMS/#&/' src/Makefile.am
 export PKG_CONFIG_PATH="$NDK_ADDON_PREFIX/lib/pkgconfig"
 autoreconf -fi
 ./configure \
+  AS="$NDK_TOOLCHAIN-clang" \
+  CC="$NDK_TOOLCHAIN-clang" \
+  CXX="$NDK_TOOLCHAIN-clang++" \
+  AR=llvm-ar \
+  RANLIB=llvm-ranlib \
+  STRIP=llvm-strip \
   --disable-tests \
   --disable-doc \
   --disable-guile \
@@ -20,9 +26,9 @@ autoreconf -fi
   --prefix="$NDK_ADDON_PREFIX" \
   --host="$NDK_TARGET" \
   --build="$BUILD_ARCH" \
-  CC="$NDK_TARGET-gcc -fgnu89-inline" \
   --enable-static \
-  --disable-shared
+  --disable-shared \
+  CFLAGS="$CFLAGS -fgnu89-inline"
 pushd gl
 make "$MAKEFLAGS"
 popd

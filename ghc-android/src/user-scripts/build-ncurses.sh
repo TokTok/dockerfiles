@@ -12,7 +12,21 @@ tar xf "$TARDIR/$NCURSES_TAR_FILE"
 popd
 
 pushd "$NCURSES_SRC"
-./configure --prefix="$NDK_ADDON_PREFIX" --host="$NDK_TARGET" --build="$BUILD_ARCH" --with-build-cc="$BUILD_GCC" --enable-static --disable-shared --includedir="$NDK_ADDON_PREFIX/include" --without-manpages
+./configure \
+  AS="$NDK_TOOLCHAIN-clang" \
+  CC="$NDK_TOOLCHAIN-clang" \
+  CXX="$NDK_TOOLCHAIN-clang++" \
+  AR=llvm-ar \
+  RANLIB=llvm-ranlib \
+  STRIP=llvm-strip \
+  --prefix="$NDK_ADDON_PREFIX" \
+  --host="$NDK_TARGET" \
+  --build="$BUILD_ARCH" \
+  --with-build-cc="$BUILD_GCC" \
+  --enable-static \
+  --disable-shared \
+  --includedir="$NDK_ADDON_PREFIX/include" \
+  --without-manpages
 echo '#undef HAVE_LOCALE_H' >>"$NCURSES_SRC/include/ncurses_cfg.h" # TMP hack
 make "$MAKEFLAGS"
 make install

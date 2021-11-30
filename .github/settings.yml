@@ -13,5 +13,4 @@ branches:
         contexts:
           - Codacy/PR Quality Review
           - CodeFactor
-          - Travis CI - Pull Request
           - code-review/reviewable

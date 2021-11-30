@@ -6,20 +6,22 @@
 cd "$NDK_ADDON_SRC"
 
 apt-get source nettle
-# curl 'https://ftp.gnu.org/gnu/nettle/nettle-3.3.tar.gz' --output nettlXe.tar.gz
-# tar -xzvf nettlXe.tar.gz
 
 pushd nettle*/
-sed -i -e 's/__gmpz_mpz_powm/__gmpz_powm/' configure.ac
 autoreconf -fi
 ./configure \
+  AS="$NDK_TOOLCHAIN-clang" \
+  CC="$NDK_TOOLCHAIN-clang" \
+  CXX="$NDK_TOOLCHAIN-clang++" \
+  AR=llvm-ar \
+  RANLIB=llvm-ranlib \
+  STRIP=llvm-strip \
   --prefix="$NDK_ADDON_PREFIX" \
   --host="$NDK_TARGET" \
   --build="$BUILD_ARCH" \
-  --with-build-cc="$BUILD_GCC" \
   --enable-static \
   --disable-shared \
-  CFLAGS="$CFLAGS -std=c99"
+  CFLAGS="$CFLAGS -std=gnu99"
 make "$MAKEFLAGS"
 make install
 popd

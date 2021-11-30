@@ -4,11 +4,10 @@
 ####################################################################################################
 
 cd "$NDK_ADDON_SRC"
-apt-get source libidn
+apt-get source libgpg-error
 
-pushd libidn*/
-sed -i -e 's/^dist_man_MANS/#&/' doc/Makefile.am
-autoreconf -fi
+pushd libgpg-error*/
+#autoreconf -fi
 ./configure \
   AS="$NDK_TOOLCHAIN-clang" \
   CC="$NDK_TOOLCHAIN-clang" \
@@ -19,12 +18,14 @@ autoreconf -fi
   --prefix="$NDK_ADDON_PREFIX" \
   --host="$NDK_TARGET" \
   --build="$BUILD_ARCH" \
-  --with-build-cc="$BUILD_GCC" \
   --enable-static \
   --disable-shared \
-  --disable-gtk-doc-html
-make "$MAKEFLAGS" || true
+  --disable-threads \
+  --disable-tests
+cp src/syscfg/lock-obj-pub.arm-unknown-linux-androideabi.h src/syscfg/lock-obj-pub.linux-androideabi.h
+cp src/syscfg/lock-obj-pub.aarch64-unknown-linux-gnu.h src/syscfg/lock-obj-pub.linux-android.h
+make "$MAKEFLAGS"
 make install
 popd
 
-rm -rf "${BASH_SOURCE[0]}" libidn*
+rm -rf "${BASH_SOURCE[0]}" libgpg-error*

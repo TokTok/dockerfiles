@@ -13,7 +13,20 @@ popd
 
 pushd "$GMP_SRC"
 autoreconf -fi
-./configure --prefix="$NDK_ADDON_PREFIX" --host="$NDK_TARGET" --build="$BUILD_ARCH" --with-build-cc="$BUILD_GCC" --enable-static --disable-shared
+./configure \
+  AS="$NDK_TOOLCHAIN-clang" \
+  CC="$NDK_TOOLCHAIN-clang" \
+  CXX="$NDK_TOOLCHAIN-clang++" \
+  AR=llvm-ar \
+  RANLIB=llvm-ranlib \
+  STRIP=llvm-strip \
+  --prefix="$NDK_ADDON_PREFIX" \
+  --host="$NDK_TARGET" \
+  --build="$BUILD_ARCH" \
+  --enable-static \
+  --disable-shared \
+  --with-pic \
+  CFLAGS="$CFLAGS -fPIC"
 make "$MAKEFLAGS"
 make install
 popd

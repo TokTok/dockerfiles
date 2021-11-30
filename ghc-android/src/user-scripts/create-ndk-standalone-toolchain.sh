@@ -4,7 +4,7 @@
 ####################################################################################################
 
 echo Preparing the Android NDK toolchain in "$NDK"
-"$NDK_PATH/build/tools/make-standalone-toolchain.sh" --toolchain="$NDK_TOOLCHAIN" \
+"$NDK_PATH/build/tools/make-standalone-toolchain.pl" --toolchain="$NDK_TOOLCHAIN" \
   --platform="$NDK_PLATFORM" --install-dir="$NDK"
 
 #TMP hack, fake pthread library for ghc linker

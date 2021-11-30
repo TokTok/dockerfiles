@@ -9,14 +9,14 @@
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/set-env.sh"
 
 # Basic parameters
-NDK_RELEASE=${NDK_RELEASE:-r12b}
-NDK_MD5=1d1a5ee71a5123be01e0dd9adb5df80d
-NDK_API=${NDK_API:-14}
-NDK_TOOLCHAIN=${NDK_TOOLCHAIN:-arm-linux-androideabi-4.9}
+NDK_RELEASE=r23b
+
+# Download and configure the Android NDK toolchain
+NDK_PATH="$HOME/android-ndk-$NDK_RELEASE"
 
 NDK_PLATFORM=android-$NDK_API
 NDK_DESC=$NDK_PLATFORM-$NDK_TOOLCHAIN
-NDK="$GHCHOME/$NDK_PLATFORM/$NDK_TOOLCHAIN"
+NDK="$NDK_PATH/toolchains/llvm/prebuilt/linux-x86_64"
 NDK_ADDON_SRC="$BASEDIR/build-$NDK_DESC"
 NDK_ADDON_PREFIX="$NDK/sysroot/usr"
 
@@ -35,9 +35,6 @@ mkdir -p "$NDK_ADDON_SRC"
 export PATH="$NDK/bin":"$PATH"
 export CFLAGS="-fPIC"
 export CXXFLAGS="-fPIC"
-
-# Download and configure the Android NDK toolchain
-NDK_PATH="$HOME/android-ndk-$NDK_RELEASE"
 
 # Unpack ncurses
 NCURSES_TAR_FILE=ncurses-$NCURSES_RELEASE.tar.gz

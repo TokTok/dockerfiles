@@ -5,10 +5,10 @@
 
 # Add target bindir links
 bindir_link() {
-  [ -e "$GHC_PREFIX/$NDK_TARGET/bin/$1" ] ||
+  [ -e "$GHC_PREFIX/$NDK_ABI/bin/$1" ] ||
     (
-      echo ln -s "$GHC_PREFIX"/bin/*-"$1" "$GHC_PREFIX/$NDK_TARGET/bin/$1"
-      ln -s "$GHC_PREFIX"/bin/*-"$1" "$GHC_PREFIX/$NDK_TARGET/bin/$1"
+      echo ln -s "$GHC_PREFIX"/bin/*-"$1" "$GHC_PREFIX/$NDK_ABI/bin/$1"
+      ln -s "$GHC_PREFIX"/bin/*-"$1" "$GHC_PREFIX/$NDK_ABI/bin/$1"
     )
 }
 bindir_link ghc

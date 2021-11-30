@@ -14,13 +14,13 @@ rm "$NDK_TAR_PATH"
 
 TOOLCHAIN="$HOME/android-ndk-$NDK_RELEASE/toolchains/llvm/prebuilt/linux-x86_64"
 
-ln "$TOOLCHAIN/bin/$NDK_TOOLCHAIN$NDK_API-clang"   "$TOOLCHAIN/bin/$NDK_TOOLCHAIN-clang"
+ln "$TOOLCHAIN/bin/$NDK_TOOLCHAIN$NDK_API-clang" "$TOOLCHAIN/bin/$NDK_TOOLCHAIN-clang"
 ln "$TOOLCHAIN/bin/$NDK_TOOLCHAIN$NDK_API-clang++" "$TOOLCHAIN/bin/$NDK_TOOLCHAIN-clang++"
 
-ln "$TOOLCHAIN/bin/llvm-ar"     "$TOOLCHAIN/bin/$NDK_TOOLCHAIN-ar"
-ln "$TOOLCHAIN/bin/llvm-nm"     "$TOOLCHAIN/bin/$NDK_TOOLCHAIN-nm"
+ln "$TOOLCHAIN/bin/llvm-ar" "$TOOLCHAIN/bin/$NDK_TOOLCHAIN-ar"
+ln "$TOOLCHAIN/bin/llvm-nm" "$TOOLCHAIN/bin/$NDK_TOOLCHAIN-nm"
 ln "$TOOLCHAIN/bin/llvm-ranlib" "$TOOLCHAIN/bin/$NDK_TOOLCHAIN-ranlib"
-ln "$TOOLCHAIN/bin/llvm-strip"  "$TOOLCHAIN/bin/$NDK_TOOLCHAIN-strip"
-ln "$TOOLCHAIN/bin/ld"          "$TOOLCHAIN/bin/$NDK_TOOLCHAIN-ld"
+ln "$TOOLCHAIN/bin/llvm-strip" "$TOOLCHAIN/bin/$NDK_TOOLCHAIN-strip"
+ln "$TOOLCHAIN/bin/ld" "$TOOLCHAIN/bin/$NDK_TOOLCHAIN-ld"
 
 rm -f "${BASH_SOURCE[0]}"

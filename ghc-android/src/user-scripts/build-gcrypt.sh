@@ -24,9 +24,9 @@ pushd libgcrypt20*/
   --with-libgpg-error-prefix="$NDK_ADDON_PREFIX"
 
 case $NDK_TOOLCHAIN in
-  i686*|x86*)
-    echo '#define PIC 1' > mpi/sysdep.h
-    echo '#define C_SYMBOL_NAME(name) name' >> mpi/sysdep.h
+  i686* | x86*)
+    echo '#define PIC 1' >mpi/sysdep.h
+    echo '#define C_SYMBOL_NAME(name) name' >>mpi/sysdep.h
     ;;
 esac
 

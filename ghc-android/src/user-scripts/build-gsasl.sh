@@ -25,9 +25,9 @@ pushd gsasl*/
   --no-recursion
 pushd lib
 ./configure \
-  AS=$NDK_TOOLCHAIN-clang \
-  CC=$NDK_TOOLCHAIN-clang \
-  CXX=$NDK_TOOLCHAIN-clang++ \
+  AS="$NDK_TOOLCHAIN"-clang \
+  CC="$NDK_TOOLCHAIN"-clang \
+  CXX="$NDK_TOOLCHAIN"-clang++ \
   AR=llvm-ar \
   RANLIB=llvm-ranlib \
   STRIP=llvm-strip \

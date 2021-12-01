@@ -2,6 +2,10 @@
 
 set -eux
 
+# Android SDK is needed even when we don't build Android stuff because WORKSPACE
+# configuration fails otherwise.
+tools/prepare_android_sdk.sh
+
 # We list the packages to build here instead of in the "tables" image, because
 # we should never build a different set of paths in that image when building
 # from different repositories. E.g. both dockerfiles and toktok-stack want to

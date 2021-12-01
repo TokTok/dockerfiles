@@ -18,9 +18,9 @@ RUN apt-get update \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-RUN wget https://github.com/bazelbuild/bazel/releases/download/3.1.0/bazel_3.1.0-linux-x86_64.deb \
- && dpkg -i bazel_3.1.0-linux-x86_64.deb \
- && rm bazel_3.1.0-linux-x86_64.deb
+RUN wget -q https://github.com/bazelbuild/bazel/releases/download/4.2.1/bazel_4.2.1-linux-x86_64.deb \
+ && dpkg -i bazel_4.2.1-linux-x86_64.deb \
+ && rm bazel_4.2.1-linux-x86_64.deb
 
 WORKDIR /src/kythe
 RUN git clone --depth=1 https://github.com/kythe/kythe /src/kythe

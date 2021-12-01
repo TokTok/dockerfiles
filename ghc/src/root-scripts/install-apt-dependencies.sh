@@ -17,7 +17,7 @@ apt-get -y --no-install-recommends install \
   ghc \
   git \
   libtool \
-  llvm-9 \
+  llvm-11 \
   p7zip-full \
   pkg-config \
   python3 \

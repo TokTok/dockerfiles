@@ -9,7 +9,7 @@ build-serving: build-tables build-release build-webui
 build-tables: build-buildenv
 	$(DOCKER_BUILD) tables -t toxchat/kythe-tables
 
-build-buildenv:
+build-buildenv: build-release
 	$(DOCKER_BUILD) buildenv -t toxchat/kythe-buildenv
 
 build-release:

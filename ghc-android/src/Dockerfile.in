@@ -1,5 +1,5 @@
 # vim:ft=dockerfile
-FROM toktoknet/ghc:8.10.3
+FROM toktoknet/ghc:8.10.7
 LABEL maintainer="@MAINTAINER@"
 
 #

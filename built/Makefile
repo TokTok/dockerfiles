@@ -1,2 +1,2 @@
 build:
-	docker build -t toktok-stack:built .
+	docker build -t toxchat/toktok-stack:built .

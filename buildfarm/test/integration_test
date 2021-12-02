@@ -22,7 +22,7 @@ sub start {
 
    while (my $line = <$worker>) {
       print "<worker> $line";
-      last if $line =~ 'INFO: .* Starting';
+      last if $line =~ 'INFO: Startup Time';
    }
 
    ($server, $worker)

@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
  g++ \
  git \
  openjdk-8-jdk-headless \
+ python \
  unzip \
  wget \
  zlib1g-dev \
@@ -12,9 +13,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
  && rm -rf /var/lib/apt/lists/*
 
 # Install bazel.
-RUN wget -q https://github.com/bazelbuild/bazel/releases/download/3.1.0/bazel_3.1.0-linux-x86_64.deb \
- && dpkg -i bazel_3.1.0-linux-x86_64.deb \
- && rm bazel_3.1.0-linux-x86_64.deb
+RUN wget -q https://github.com/bazelbuild/bazel/releases/download/4.0.0/bazel_4.0.0-linux-x86_64.deb \
+ && dpkg -i bazel_4.0.0-linux-x86_64.deb \
+ && rm bazel_4.0.0-linux-x86_64.deb
 
 # Download and build buildfarm.
 RUN ["git", "clone", "--depth=1",\
@@ -22,11 +23,11 @@ RUN ["git", "clone", "--depth=1",\
 WORKDIR /src/bazel-buildfarm
 RUN ["bazel", "build",\
  "//src/main/java/build/buildfarm:buildfarm-server_deploy.jar",\
- "//src/main/java/build/buildfarm:buildfarm-operationqueue-worker_deploy.jar",\
+ "//src/main/java/build/buildfarm:buildfarm-memory-worker_deploy.jar",\
  "//src/main/java/build/buildfarm:buildfarm-shard-worker_deploy.jar"]
 RUN ["cp",\
  "bazel-bin/src/main/java/build/buildfarm/buildfarm-server_deploy.jar",\
- "bazel-bin/src/main/java/build/buildfarm/buildfarm-operationqueue-worker_deploy.jar",\
+ "bazel-bin/src/main/java/build/buildfarm/buildfarm-memory-worker_deploy.jar",\
  "bazel-bin/src/main/java/build/buildfarm/buildfarm-shard-worker_deploy.jar",\
  "/"]
 
@@ -34,6 +35,6 @@ RUN ["cp",\
 FROM scratch
 COPY --from=build \
        /buildfarm-server_deploy.jar \
-       /buildfarm-operationqueue-worker_deploy.jar \
+       /buildfarm-memory-worker_deploy.jar \
        /buildfarm-shard-worker_deploy.jar \
        /

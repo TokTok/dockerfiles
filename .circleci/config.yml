@@ -5,6 +5,8 @@ workflows:
   version: 2
   build:
     jobs:
+      - infer
+
       - builder
       - buildfarm-base
       - buildfarm-server:
@@ -32,6 +34,20 @@ workflows:
           requires: [kythe-release, kythe-tables, kythe-webui]
 
 jobs:
+  ##################################################
+  #
+  # :: Static analysis images
+  #
+  ##################################################
+
+  infer:
+    docker: [{ image: alpine:3.11.5 }]
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image infer toxchat/infer:latest
+
   ##################################################
   #
   # :: Bazel docker-sandbox and buildfarm images

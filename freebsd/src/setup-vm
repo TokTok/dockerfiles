@@ -1,0 +1,43 @@
+#!/bin/bash
+# Copyright (C) 2018-2021 nurupo
+
+# Initial setup of the FreeBSD VM
+
+set -eux
+
+. cmake-freebsd-env.sh
+
+NPROC="$NPROC" SSH_PORT="$SSH_PORT" IMAGE_NAME="$IMAGE_NAME" screen "/work/setup-vm.expect"
+
+start_vm
+
+# Update system
+RUN env PAGER=cat env ASSUME_ALWAYS_YES=YES freebsd-update --not-running-from-cron fetch
+# It fails if there is nothing to install, so we make it always succeed with true
+RUN env PAGER=cat env ASSUME_ALWAYS_YES=YES freebsd-update --not-running-from-cron install || true
+
+# Update packages
+RUN env PAGER=cat env ASSUME_ALWAYS_YES=YES pkg upgrade
+
+# Install and set bash as the default shell for the root user
+RUN env PAGER=cat env ASSUME_ALWAYS_YES=YES pkg install bash
+RUN chsh -s /usr/local/bin/bash root
+
+# Install required toxcore dependencies
+RUN PAGER=cat ASSUME_ALWAYS_YES=YES pkg install \
+  git \
+  opus \
+  libconfig \
+  libvpx \
+  libsodium \
+  gmake \
+  cmake \
+  pkgconf \
+  portaudio \
+  libsndfile \
+  texinfo \
+  autotools
+
+# === Cache the VM image ===
+
+stop_vm

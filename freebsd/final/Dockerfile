@@ -16,4 +16,3 @@ RUN apt-get update \
 
 WORKDIR /work
 COPY --from=build /work /work
-COPY cmake-freebsd-stage2 /work

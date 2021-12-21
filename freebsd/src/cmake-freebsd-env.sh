@@ -20,8 +20,11 @@ RUN() {
 start_vm() {
   screen -d -m qemu-system-x86_64 -curses -m 2048 -smp "$NPROC" -net user,hostfwd=tcp::"$SSH_PORT"-:22 -net nic "$IMAGE_NAME"
 
-  # Wait for ssh to start listening on the port
-  while ! echo "exit" | nc localhost "$SSH_PORT" | grep 'OpenSSH'; do
+  # Wait for 5 minutes for ssh to start listening on the port
+  for i in $(seq 1 60); do
+    if echo "exit" | nc localhost "$SSH_PORT" | grep 'OpenSSH'; then
+      break
+    fi
     sleep 5
   done
 
@@ -37,8 +40,11 @@ stop_vm() {
   # machine though)
   RUN "shutdown -p +5sec && sleep 30" || true
 
-  # Wait for the qemu process to terminate
-  while pgrep qemu; do
+  # Wait for 5 minutes for the qemu process to terminate
+  for i in $(seq 1 60); do
+    if ! pgrep qemu; then
+      break
+    fi
     sleep 5
   done
 }

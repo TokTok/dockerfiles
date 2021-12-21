@@ -5,6 +5,8 @@ workflows:
   version: 2
   build:
     jobs:
+      - freebsd
+
       - infer
 
       - builder
@@ -34,6 +36,24 @@ workflows:
           requires: [kythe-release, kythe-tables, kythe-webui]
 
 jobs:
+  ##################################################
+  #
+  # :: VM images
+  #
+  ##################################################
+
+  freebsd:
+    docker: [{ image: alpine:3.11.5 }]
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      # Install docker.
+      - run: apk add make perl docker-cli
+      - run: echo "$DOCKER_PASS" | docker login --username "$DOCKER_USER" --password-stdin
+      - run: make -C freebsd build
+      - run: docker push toxchat/freebsd:latest
+
   ##################################################
   #
   # :: Static analysis images

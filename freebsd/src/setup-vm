@@ -5,7 +5,12 @@
 
 set -eux
 
-. cmake-freebsd-env.sh
+. cmake-freebsd-run.sh
+
+unxz -T0 "$IMAGE_NAME.xz"
+
+# The downloaded image has little free disk space
+qemu-img resize -f raw "$IMAGE_NAME" +1G
 
 NPROC="$NPROC" SSH_PORT="$SSH_PORT" IMAGE_NAME="$IMAGE_NAME" screen "/work/setup-vm.expect"
 
@@ -38,6 +43,8 @@ RUN PAGER=cat ASSUME_ALWAYS_YES=YES pkg install \
   texinfo \
   autotools
 
-# === Cache the VM image ===
+# === Compress the VM image ===
 
 stop_vm
+
+gzip "$IMAGE_NAME"

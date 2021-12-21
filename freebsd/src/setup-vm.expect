@@ -11,7 +11,7 @@ expect "FreeBSD/amd64 (freebsd) (ttyv0)"
 send -- "root\r"
 
 # Setup DHCP networking and passwordless ssh
-expect "root@freebsd:~ # "
+expect "Welcome to FreeBSD!"
 send -- "echo \"ifconfig_em0=DHCP\"          >> /etc/rc.conf\r"
 expect "root@freebsd:~ # "
 send -- "echo \"Port 22\"                    >> /etc/ssh/sshd_config\r"

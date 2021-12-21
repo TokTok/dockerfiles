@@ -16,4 +16,6 @@ if [ ! -f "$BUILD/.nocache" ]; then
   docker pull "$IMAGE" || true
 fi
 docker build --cache-from "$IMAGE" --tag "$IMAGE" "$BUILD"
-docker push "$IMAGE"
+if [ ! -f "$BUILD/.nopush" ]; then
+  docker push "$IMAGE"
+fi

@@ -1,4 +1,4 @@
-FROM toxchat/freebsd-layered:latest as build
+FROM toxchat/freebsd:layered as build
 FROM ubuntu:20.04
 
 RUN apt-get update \

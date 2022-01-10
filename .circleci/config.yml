@@ -7,6 +7,7 @@ workflows:
     jobs:
       - freebsd
 
+      - compcert
       - infer
 
       - builder
@@ -59,6 +60,14 @@ jobs:
   # :: Static analysis images
   #
   ##################################################
+
+  compcert:
+    docker: [{ image: alpine:3.11.5 }]
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image compcert toxchat/compcert:latest
 
   infer:
     docker: [{ image: alpine:3.11.5 }]

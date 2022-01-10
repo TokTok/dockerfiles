@@ -7,10 +7,11 @@ RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
  build-essential \
  clang \
- default-jdk \
+ default-jdk-headless \
  git \
  libasound-dev \
  libncurses-dev \
+ libomp-dev \
  libssl-dev \
  libx11-dev \
  parallel \

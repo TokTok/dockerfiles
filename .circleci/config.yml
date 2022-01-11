@@ -14,6 +14,8 @@ workflows:
           requires: [buildfarm-base]
       - buildfarm-worker:
           requires: [builder, buildfarm-base]
+      - bazel:
+          requires: [builder]
 
       - ghc-base
       - ghc-android-aarch64:
@@ -100,6 +102,15 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: .circleci/build-image buildfarm/worker toxchat/buildfarm-worker:latest
+
+  bazel:
+    docker: [{ image: alpine:3.11.5 }]
+
+    steps:
+      - run: apk add git openssh-client
+      - checkout
+      - setup_remote_docker
+      - run: .circleci/build-image buildfarm/bazel toxchat/bazel:latest
 
   ##################################################
   #

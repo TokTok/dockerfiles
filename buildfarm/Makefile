@@ -12,6 +12,9 @@ build-buildfarm-server:
 build-buildfarm-worker:
 	docker build worker -t toxchat/buildfarm-worker:latest
 
+build-bazel:
+	docker build bazel -t toxchat/bazel:latest
+
 
 push: push-builder push-buildfarm-base push-buildfarm-server push-buildfarm-worker
 
@@ -27,6 +30,9 @@ push-buildfarm-server: build-buildfarm-server
 push-buildfarm-worker: build-buildfarm-worker
 	docker push toxchat/buildfarm-worker:latest
 
+push-bazel: build-bazel
+	docker push toxchat/bazel:latest
+
 
 .INTERMEDIATE: rbe_configs_gen
 rbe_configs_gen:
@@ -36,7 +42,7 @@ rbe_configs_gen:
 test/tools/toolchain/LICENSE: rbe_configs_gen
 	$(MAKE) push-builder
 	./rbe_configs_gen \
-	  --bazel_version="4.2.2" \
+	  --bazel_version="$(shell cat test/.bazelversion)" \
 	  --toolchain_container=toxchat/builder:latest \
 	  --output_src_root="$(realpath test)" \
 	  --output_config_path=tools/toolchain \

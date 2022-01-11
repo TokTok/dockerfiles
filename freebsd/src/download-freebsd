@@ -36,3 +36,10 @@ if ! (echo "$IMAGE_SHA512  $IMAGE_NAME.xz" | sha512sum -c --status -); then
   echo "Error: sha512 of $IMAGE_NAME.xz doesn't match the known one"
   exit 1
 fi
+
+unxz -T0 "$IMAGE_NAME.xz"
+
+# The downloaded image has little free disk space
+qemu-img resize -f raw "$IMAGE_NAME" +1G
+
+gzip "$IMAGE_NAME"

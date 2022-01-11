@@ -9,6 +9,7 @@ RUN apt-get update \
  libstdc++-7-dev \
  default-jdk-headless \
  libc6-dev \
+ python \
  python3 \
  python3-dev \
  && apt-get clean \

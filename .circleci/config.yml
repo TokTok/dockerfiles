@@ -30,7 +30,7 @@ workflows:
       - kythe-release
       - kythe-webui
       - kythe-buildenv:
-          requires: [kythe-release]
+          requires: [bazel, kythe-release]
       - kythe-tables:
           requires: [kythe-buildenv]
       - kythe-serving:

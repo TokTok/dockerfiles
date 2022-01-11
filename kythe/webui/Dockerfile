@@ -1,5 +1,5 @@
 # Build webui.
-FROM debian:stretch as webui
+FROM debian:stretch
 
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -10,6 +10,7 @@ RUN apt-get update \
  flex \
  git \
  graphviz \
+ python3 \
  ruby \
  source-highlight \
  unzip \

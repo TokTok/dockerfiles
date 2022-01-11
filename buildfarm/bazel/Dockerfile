@@ -1,19 +1,31 @@
 FROM toxchat/builder:latest
 
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
-# Install Bazel.
+# Install Bazel and toktok-stack dependencies.
 RUN apt-get update \
  && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
- apt-transport-https \
- apt-utils \
  git \
- gnupg \
+ libasound2-dev \
+ libgmp-dev \
+ libncurses5-dev \
+ libncursesw5-dev \
+ libqt5opengl5-dev \
+ libqt5svg5-dev \
+ libssl-dev \
+ libtinfo5 \
+ libx264-dev \
+ libxcb-xfixes0-dev \
+ libxss-dev \
+ libxxf86vm-dev \
+ make \
+ maven \
+ qtmultimedia5-dev \
+ qttools5-dev \
+ qttools5-dev-tools \
+ unzip \
  wget \
- && curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg \
- && mv bazel.gpg /etc/apt/trusted.gpg.d/ \
- && echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list \
- && apt-get update && apt-get install -y --no-install-recommends \
- bazel=4.2.2 \
  && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* \
+ && wget -nv https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64 \
+ && chmod 755 bazelisk-linux-amd64 \
+ && mv bazelisk-linux-amd64 /usr/local/bin/bazel \
+ && bazel --version

@@ -27,3 +27,5 @@ COPY src/cmake-freebsd-env.sh \
      src/setup-vm \
      src/setup-vm.expect \
      /work/
+
+RUN ["./setup-vm"]

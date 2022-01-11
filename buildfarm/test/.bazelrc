@@ -1,2 +1,11 @@
 build --remote_executor=grpc://localhost:8980
-build --crosstool_top=@bazel_toolchains//configs/ubuntu16_04_clang/11.0.0/bazel_4.0.0/cc:toolchain
+
+# Java toolchain.
+build --extra_toolchains=//tools/toolchain/java:all
+build --host_javabase=//tools/toolchain/java:jdk
+build --javabase=//tools/toolchain/java:jdk
+
+# C/C++ toolchain.
+build --extra_toolchains=//tools/toolchain/config:cc-toolchain
+build --crosstool_top=//tools/toolchain/cc:toolchain
+build --platforms=//tools/toolchain/config:platform

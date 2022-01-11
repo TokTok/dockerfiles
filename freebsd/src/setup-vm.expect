@@ -26,11 +26,9 @@ send -- "echo \"sshd_enable=YES\"            >> /etc/rc.conf\r"
 expect "root@freebsd:~ # "
 
 # Set the empty password
-send -- "passwd\r"
-expect "New Password:"
-send -- "\r"
-expect "Retype New Password:"
-send -- "\r"
+send -- "pw mod user root -w none\r"
+expect "root@freebsd:~ # "
+send -- "pw mod user root -h 0 < /dev/null\r"
 expect "root@freebsd:~ # "
 
 # Done

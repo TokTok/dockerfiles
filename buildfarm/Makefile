@@ -28,5 +28,21 @@ push-buildfarm-worker: build-buildfarm-worker
 	docker push toxchat/buildfarm-worker:latest
 
 
-check: build-buildfarm-server build-buildfarm-worker test/integration_test
+.INTERMEDIATE: rbe_configs_gen
+rbe_configs_gen:
+	wget -O $@ https://github.com/bazelbuild/bazel-toolchains/releases/download/v5.1.1/rbe_configs_gen_linux_amd64
+	chmod +x $@
+
+test/tools/toolchain/LICENSE: rbe_configs_gen
+	$(MAKE) push-builder
+	./rbe_configs_gen \
+	  --bazel_version="4.2.2" \
+	  --toolchain_container=toxchat/builder:latest \
+	  --output_src_root="$(realpath test)" \
+	  --output_config_path=tools/toolchain \
+	  --exec_os=linux \
+	  --target_os=linux
+
+
+check: build-buildfarm-base build-buildfarm-server build-buildfarm-worker test/integration_test test/tools/toolchain/LICENSE
 	test/integration_test

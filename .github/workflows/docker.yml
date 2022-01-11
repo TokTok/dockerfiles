@@ -4,8 +4,8 @@ name: docker
 on:
   push:
     branches: [master]
-  pull_request:
-    branches: [master]
+  #pull_request:
+    #branches: [master]
 
 jobs:
   freebsd:
@@ -22,6 +22,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build freebsd image
+        shell: 'script -q -e -c "bash {0}"'
         run: make -C freebsd build
       - name: Push images to DockerHub
         if: github.event_name == 'push'

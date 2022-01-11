@@ -28,7 +28,7 @@ while true; do
   # Make sure there are no partial downloads from the previous loop iterations
   rm -rf ./*
 
-  wget --tries 1 "$DL_URL" && break
+  wget -q --tries 1 "$DL_URL" && break
 done
 
 sha512sum "$IMAGE_NAME.xz"

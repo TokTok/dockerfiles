@@ -1,8 +1,9 @@
 FROM toxchat/builder:latest
 
-# Install Bazel and toktok-stack dependencies.
+# Install Bazelisk, some debugging tools, and all toktok-stack system dependencies.
 RUN apt-get update \
  && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
+ gdb \
  git \
  libasound2-dev \
  libgmp-dev \
@@ -18,9 +19,12 @@ RUN apt-get update \
  libxxf86vm-dev \
  make \
  maven \
+ openssh-client \
  qtmultimedia5-dev \
  qttools5-dev \
  qttools5-dev-tools \
+ strace \
+ sudo \
  unzip \
  valgrind \
  wget \

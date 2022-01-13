@@ -22,6 +22,7 @@ RUN apt-get update \
  qttools5-dev \
  qttools5-dev-tools \
  unzip \
+ valgrind \
  wget \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* \

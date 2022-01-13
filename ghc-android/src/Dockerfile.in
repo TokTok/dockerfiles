@@ -50,7 +50,6 @@ RUN ["./build-gpg-error.sh"]
 COPY user-scripts/build-gcrypt.sh $BASE/
 RUN ["./build-gcrypt.sh"]
 
-COPY patches/gsasl-* $BASE/patches/
 COPY user-scripts/build-gsasl.sh $BASE/
 RUN ["./build-gsasl.sh"]
 

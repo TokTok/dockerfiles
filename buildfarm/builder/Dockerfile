@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -6,7 +6,7 @@ RUN apt-get update \
  && apt-get install --no-install-recommends -y \
  binutils \
  curl \
- libstdc++-7-dev \
+ libstdc++-10-dev \
  default-jdk-headless \
  libc6-dev \
  python \

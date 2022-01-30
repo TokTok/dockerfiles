@@ -16,6 +16,8 @@ workflows:
           requires: [builder, buildfarm-base]
       - bazel:
           requires: [builder]
+      - toolchain:
+          requires: [bazel]
 
       - kythe-release
       - kythe-webui
@@ -101,6 +103,16 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: .circleci/build-image buildfarm/bazel toxchat/bazel:latest
+
+  toolchain:
+    docker: [{ image: alpine:3.11.5 }]
+
+    steps:
+      - run: apk add git openssh-client
+      - checkout
+      - setup_remote_docker
+      - run: buildfarm/toolchain/prepare_toolchain.sh buildfarm/toolchain
+      - run: .circleci/build-image buildfarm/toolchain toxchat/toolchain:latest
 
   ##################################################
   #

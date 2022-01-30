@@ -8,9 +8,6 @@ RUN apt-get update \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-# hadolint ignore=SC3001
-RUN bash <(curl https://raw.githubusercontent.com/TokTok/toktok-stack/master/tools/prepare_android_sdk.sh)
-
 COPY --from=release /opt/kythe /opt/kythe
 COPY build_index.sh /opt/
 

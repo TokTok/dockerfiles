@@ -24,6 +24,258 @@ jobs:
 
   ##################################################
   #
+  # :: Bazel docker-sandbox and buildfarm images
+  #
+  ##################################################
+
+  builder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: buildfarm/builder
+          push: true
+          tags: toxchat/builder:latest
+          cache-from: type=registry,ref=toxchat/builder:latest
+          cache-to: type=inline
+
+  buildfarm-base:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: buildfarm/base
+          push: true
+          tags: toxchat/buildfarm-base:latest
+          cache-from: type=registry,ref=toxchat/buildfarm-base:latest
+          cache-to: type=inline
+
+  buildfarm-server:
+    runs-on: ubuntu-latest
+    needs: [buildfarm-base]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: buildfarm/server
+          push: true
+          tags: toxchat/buildfarm-server:latest
+          cache-from: type=registry,ref=toxchat/buildfarm-server:latest
+          cache-to: type=inline
+
+  buildfarm-worker:
+    runs-on: ubuntu-latest
+    needs: [buildfarm-base, builder]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: buildfarm/worker
+          push: true
+          tags: toxchat/buildfarm-worker:latest
+          cache-from: type=registry,ref=toxchat/buildfarm-worker:latest
+          cache-to: type=inline
+
+  bazel:
+    runs-on: ubuntu-latest
+    needs: [builder]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: buildfarm/bazel
+          push: true
+          tags: toxchat/bazel:latest
+          cache-from: type=registry,ref=toxchat/bazel:latest
+          cache-to: type=inline
+
+  toolchain:
+    runs-on: ubuntu-latest
+    needs: [bazel]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Generate toolchain configs
+        run: cd buildfarm/toolchain && ./prepare_toolchain.sh
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: buildfarm/toolchain
+          push: true
+          tags: toxchat/toolchain:latest
+          cache-from: type=registry,ref=toxchat/toolchain:latest
+          cache-to: type=inline
+
+  ##################################################
+  #
+  # :: Kythe code indexing
+  #
+  ##################################################
+
+  kythe-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: kythe/release
+          push: true
+          tags: toxchat/kythe-release:latest
+          cache-from: type=registry,ref=toxchat/kythe-release:latest
+          cache-to: type=inline
+
+  kythe-webui:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: kythe/webui
+          push: true
+          tags: toxchat/kythe-webui:latest
+          cache-from: type=registry,ref=toxchat/kythe-webui:latest
+          cache-to: type=inline
+
+  kythe-buildenv:
+    runs-on: ubuntu-latest
+    needs: [bazel, kythe-release]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: kythe/buildenv
+          push: true
+          tags: toxchat/kythe-buildenv:latest
+          cache-from: type=registry,ref=toxchat/kythe-buildenv:latest
+          cache-to: type=inline
+
+  kythe-tables:
+    runs-on: ubuntu-latest
+    needs: [kythe-buildenv]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: kythe/tables
+          push: true
+          tags: toxchat/kythe-tables:latest
+          cache-from: type=registry,ref=toxchat/kythe-tables:latest
+          cache-to: type=inline
+
+  kythe-serving:
+    runs-on: ubuntu-latest
+    needs: [kythe-release, kythe-tables, kythe-webui]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: kythe/serving
+          push: true
+          tags: toxchat/kythe-serving:latest
+          cache-from: type=registry,ref=toxchat/kythe-serving:latest
+          cache-to: type=inline
+
+  ##################################################
+  #
   # :: GHC for Android
   #
   ##################################################
@@ -33,6 +285,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
@@ -43,10 +297,12 @@ jobs:
 
   ghc-android-aarch64:
     runs-on: ubuntu-latest
-    needs: ghc-base
+    needs: [ghc-base]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
@@ -57,10 +313,12 @@ jobs:
 
   ghc-android-arm:
     runs-on: ubuntu-latest
-    needs: ghc-base
+    needs: [ghc-base]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
@@ -71,10 +329,12 @@ jobs:
 
   ghc-android-i686:
     runs-on: ubuntu-latest
-    needs: ghc-base
+    needs: [ghc-base]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
@@ -85,10 +345,12 @@ jobs:
 
   ghc-android-x86_64:
     runs-on: ubuntu-latest
-    needs: ghc-base
+    needs: [ghc-base]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:

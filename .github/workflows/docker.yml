@@ -41,7 +41,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: flutter/web
+          context: "{{defaultContext}}:flutter/web"
           push: true
           tags: toxchat/flutter-web:latest
           cache-from: type=registry,ref=toxchat/flutter-web:latest
@@ -66,7 +66,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: buildfarm/builder
+          context: "{{defaultContext}}:buildfarm/builder"
           push: true
           tags: toxchat/builder:latest
           cache-from: type=registry,ref=toxchat/builder:latest
@@ -85,7 +85,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: buildfarm/base
+          context: "{{defaultContext}}:buildfarm/base"
           push: true
           tags: toxchat/buildfarm-base:latest
           cache-from: type=registry,ref=toxchat/buildfarm-base:latest
@@ -105,7 +105,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: buildfarm/server
+          context: "{{defaultContext}}:buildfarm/server"
           push: true
           tags: toxchat/buildfarm-server:latest
           cache-from: type=registry,ref=toxchat/buildfarm-server:latest
@@ -125,7 +125,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: buildfarm/worker
+          context: "{{defaultContext}}:buildfarm/worker"
           push: true
           tags: toxchat/buildfarm-worker:latest
           cache-from: type=registry,ref=toxchat/buildfarm-worker:latest
@@ -145,7 +145,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: buildfarm/bazel
+          context: "{{defaultContext}}:buildfarm/bazel"
           push: true
           tags: toxchat/bazel:latest
           cache-from: type=registry,ref=toxchat/bazel:latest
@@ -167,7 +167,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: buildfarm/toolchain
+          context: "{{defaultContext}}:buildfarm/toolchain"
           push: true
           tags: toxchat/toolchain:latest
           cache-from: type=registry,ref=toxchat/toolchain:latest
@@ -192,7 +192,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: kythe/release
+          context: "{{defaultContext}}:kythe/release"
           push: true
           tags: toxchat/kythe-release:latest
           cache-from: type=registry,ref=toxchat/kythe-release:latest
@@ -211,7 +211,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: kythe/webui
+          context: "{{defaultContext}}:kythe/webui"
           push: true
           tags: toxchat/kythe-webui:latest
           cache-from: type=registry,ref=toxchat/kythe-webui:latest
@@ -231,7 +231,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: kythe/buildenv
+          context: "{{defaultContext}}:kythe/buildenv"
           push: true
           tags: toxchat/kythe-buildenv:latest
           cache-from: type=registry,ref=toxchat/kythe-buildenv:latest
@@ -251,7 +251,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: kythe/tables
+          context: "{{defaultContext}}:kythe/tables"
           push: true
           tags: toxchat/kythe-tables:latest
           cache-from: type=registry,ref=toxchat/kythe-tables:latest
@@ -271,7 +271,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: kythe/serving
+          context: "{{defaultContext}}:kythe/serving"
           push: true
           tags: toxchat/kythe-serving:latest
           cache-from: type=registry,ref=toxchat/kythe-serving:latest

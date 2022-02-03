@@ -162,12 +162,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Generate toolchain configs
         run: cd buildfarm/toolchain && ./prepare_toolchain.sh
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: "{{defaultContext}}:buildfarm/toolchain"
+          context: "buildfarm/toolchain"
           push: true
           tags: toxchat/toolchain:latest
           cache-from: type=registry,ref=toxchat/toolchain:latest

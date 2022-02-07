@@ -3,10 +3,8 @@
 
 . cmake-freebsd-env.sh
 
-SSH_KEY="$PWD/id_freebsd"
-
 RUN() {
-  ssh -i "$SSH_KEY" -t -o ConnectionAttempts=120 -o ConnectTimeout=2 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@localhost -p "$SSH_PORT" "$@"
+  ssh -t -o ConnectionAttempts=120 -o ConnectTimeout=2 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@localhost -p "$SSH_PORT" "$@"
 }
 
 start_vm() {
@@ -19,9 +17,6 @@ start_vm() {
     fi
     sleep 5
   done
-
-  # Test that the ssh key exists.
-  ls -l "$SSH_KEY"
 
   # Test that ssh works
   RUN uname -a

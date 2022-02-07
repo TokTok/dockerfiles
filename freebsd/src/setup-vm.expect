@@ -6,6 +6,9 @@ set timeout -1
 # Note: doesn't work if -nographic is used instead of -curses
 spawn qemu-system-x86_64 -curses -m 2048 -smp $env(NPROC) -net user,hostfwd=tcp::$env(SSH_PORT)-:22 -net nic -drive "format=raw,file=$env(IMAGE_NAME)"
 
+expect "Autoboot"
+send -- "\r"
+
 # We may never actually see "login:" appear, but we see this intro message.
 expect "FreeBSD/amd64 (freebsd) (ttyv0)"
 send "root\r"
@@ -13,41 +16,32 @@ send "root\r"
 # Setup DHCP networking and public key authenticated ssh
 expect "Welcome to FreeBSD!"
 
-send -- "echo 'ifconfig_em0=DHCP'                           >> /etc/rc.conf\r"
+send -- "echo 'ifconfig_em0=DHCP'          >> /etc/rc.conf\r"
 expect "root@freebsd:~ # "
-send -- "echo 'sshd_enable=YES'                             >> /etc/rc.conf\r"
-expect "root@freebsd:~ # "
-
-send -- "echo 'Port 22'                                     >> /etc/ssh/sshd_config\r"
-expect "root@freebsd:~ # "
-send -- "echo 'PermitRootLogin yes'                         >> /etc/ssh/sshd_config\r"
-expect "root@freebsd:~ # "
-send -- "echo 'PubkeyAuthentication yes'                    >> /etc/ssh/sshd_config\r"
-expect "root@freebsd:~ # "
-send -- "echo 'AuthorizedKeysFile /etc/ssh/authorized_keys' >> /etc/ssh/sshd_config\r"
+send -- "echo 'sshd_enable=YES'            >> /etc/rc.conf\r"
 expect "root@freebsd:~ # "
 
-set fp [open "id_freebsd.pub" r]
-while {![eof $fp]} {
-  set chunk [string trim [read $fp 20]]
-  send -- "printf '%s' \"$chunk\" >> /etc/ssh/authorized_keys\r"
-  expect "root@freebsd:~ # "
-}
-close $fp
-
-send -- "echo >> /etc/ssh/authorized_keys\r"
+send -- "echo 'Port 22'                    >> /etc/ssh/sshd_config\r"
+expect "root@freebsd:~ # "
+send -- "echo 'PermitRootLogin yes'        >> /etc/ssh/sshd_config\r"
+expect "root@freebsd:~ # "
+send -- "echo 'PermitEmptyPasswords yes'   >> /etc/ssh/sshd_config\r"
+expect "root@freebsd:~ # "
+send -- "echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config\r"
 expect "root@freebsd:~ # "
 
-send -- "cat /etc/ssh/authorized_keys\r"
-expect "root@freebsd:~ # "
-
-send -- "cat /etc/ssh/sshd_config\r"
-expect "root@freebsd:~ # "
-
-send -- "# Setup complete\r"
-expect "root@freebsd:~ # "
+# Set the empty password
+#send -- "pw mod user root -w none\r"
+#expect "root@freebsd:~ # "
+#send -- "pw mod user root -h 0 < /dev/null\r"
+#expect "root@freebsd:~ # "
+send -- "passwd\r"
+expect "Changing local password for root"
+send -- "\r"
+expect "New Password:"
+send -- "\r"
 
 # Done
-send "poweroff\r"
+send -- "poweroff\r"
 wait
 exit 0

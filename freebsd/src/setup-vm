@@ -9,7 +9,6 @@ set -eux
 
 gunzip "$IMAGE_NAME.gz"
 
-ssh-keygen -N "" -f id_freebsd
 NPROC="$NPROC" SSH_PORT="$SSH_PORT" IMAGE_NAME="$IMAGE_NAME" script -c "TERM=screen screen /work/setup-vm.expect"
 
 start_vm
@@ -33,6 +32,7 @@ RUN PAGER=cat ASSUME_ALWAYS_YES=YES pkg install \
   libconfig \
   libvpx \
   libsodium \
+  msgpack \
   gmake \
   cmake \
   pkgconf \

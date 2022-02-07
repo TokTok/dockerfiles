@@ -9,6 +9,7 @@ RUN apt-get update \
  git \
  libconfig-dev \
  libmenhir-ocaml-dev \
+ libmsgpack-dev \
  libopus-dev \
  libsodium-dev \
  libvpx-dev \

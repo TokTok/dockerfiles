@@ -9,6 +9,7 @@ RUN apt-get update \
  curl \
  libc6-dev \
  libconfig-dev \
+ libmsgpack-dev \
  libopus-dev \
  libsodium-dev \
  libvpx-dev \

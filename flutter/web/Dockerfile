@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
  && rm -rf /var/lib/apt/lists/*
 
 # Clone the flutter repo
-RUN git clone --depth=1 https://github.com/flutter/flutter.git /usr/local/flutter
+RUN git clone https://github.com/flutter/flutter.git /usr/local/flutter
 
 # Set flutter path
 # RUN /usr/local/flutter/bin/flutter doctor -v

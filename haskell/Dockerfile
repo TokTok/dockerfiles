@@ -12,4 +12,9 @@ RUN apt-get update \
 
 WORKDIR /work
 COPY stack.yaml /root/.stack/global-project/
+# Install some tools.
 RUN ["stack", "install", "hlint", "stylish-haskell"]
+# Install commonly used libraries (every package needs tests).
+RUN ["stack", "install", "QuickCheck", "hspec"]
+# Install web frontend libraries (most packages have a web api).
+RUN ["stack", "install", "servant", "servant-server"]

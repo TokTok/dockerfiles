@@ -5,6 +5,7 @@ RUN apt-get update \
  ca-certificates \
  curl \
  git \
+ libtinfo-dev \
  && curl -sSL https://get.haskellstack.org/ | sh \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*

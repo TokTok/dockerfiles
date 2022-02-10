@@ -3,18 +3,40 @@ FROM ubuntu:20.04
 RUN apt-get update \
  && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
  ca-certificates \
+ cmake \
  curl \
  git \
+ libmsgpack-dev \
+ libopus-dev \
+ libsodium-dev \
  libtinfo-dev \
+ libvpx-dev \
+ ninja-build \
+ pkg-config \
  && curl -sSL https://get.haskellstack.org/ | sh \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /work
-COPY stack.yaml /root/.stack/global-project/
-# Install some tools.
-RUN ["stack", "install", "hlint", "stylish-haskell"]
-# Install commonly used libraries (every package needs tests).
-RUN ["stack", "install", "QuickCheck", "hspec"]
-# Install web frontend libraries (most packages have a web api).
-RUN ["stack", "install", "servant", "servant-server"]
+RUN git clone https://github.com/TokTok/c-toxcore /work \
+ && cmake -B_build -H. -GNinja -DCMAKE_INSTALL_PREFIX:PATH="/usr/local" \
+ && cmake --build _build --parallel "$(nproc)" --target install \
+ && rm -rf /work
+
+RUN useradd -m -g users -G sudo -u 1001 builder \
+ && chown builder:users /work \
+ && echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+USER builder
+
+COPY --chown=builder:users stack.yaml /work/
+RUN ["stack", "install", "hlint"]
+RUN ["stack", "install", \
+ "cimple", \
+ "github-tools", \
+ "msgpack-binary", \
+ "msgpack-rpc-conduit", \
+ "msgpack-types", \
+ "schema", \
+ "tokstyle", \
+ "toxcore", \
+ "toxcore-c"]

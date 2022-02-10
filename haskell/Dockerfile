@@ -19,9 +19,10 @@ RUN apt-get update \
 
 WORKDIR /work
 RUN git clone https://github.com/TokTok/c-toxcore /work \
- && cmake -B_build -H. -GNinja -DCMAKE_INSTALL_PREFIX:PATH="/usr/local" \
+ && cmake -B_build -H. -GNinja -DCMAKE_INSTALL_PREFIX:PATH="/usr" \
  && cmake --build _build --parallel "$(nproc)" --target install \
- && rm -rf /work
+ && rm -rf /work \
+ && ldconfig
 
 RUN useradd -m -g users -G sudo -u 1001 builder \
  && chown builder:users /work \

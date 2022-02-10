@@ -29,14 +29,8 @@ RUN useradd -m -g users -G sudo -u 1001 builder \
 USER builder
 
 COPY --chown=builder:users stack.yaml /work/
-RUN ["stack", "install", "hlint"]
-RUN ["stack", "install", \
- "cimple", \
- "github-tools", \
- "msgpack-binary", \
- "msgpack-rpc-conduit", \
- "msgpack-types", \
- "schema", \
- "tokstyle", \
- "toxcore", \
- "toxcore-c"]
+RUN grep '^  -.*/' stack.yaml \
+ | awk '{print $2}' \
+ | grep -o '[^/]*' \
+ | xargs -P8 -n1 -I '{}' git clone --depth=1 'https://github.com/TokTok/{}'
+RUN ["stack", "install"]

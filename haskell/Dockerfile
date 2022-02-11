@@ -18,17 +18,18 @@ RUN apt-get update \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /github
+WORKDIR /work
 RUN useradd \
- --home-dir /github/home \
  --create-home \
  --gid users \
  --groups sudo \
  --uid 1001 \
  builder \
- && mkdir /work && chown builder:users /work \
+ && chown builder:users /work \
  && echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 USER builder
 
-COPY --chown=builder:users stack.yaml /github/home/.stack/global-project/
+ENV STACK_ROOT=/.stack
+
+COPY --chown=builder:users stack.yaml $STACK_ROOT/global-project/
 RUN ["stack", "install", "base"]

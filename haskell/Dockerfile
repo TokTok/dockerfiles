@@ -32,4 +32,8 @@ USER builder
 ENV STACK_ROOT=/.stack
 
 COPY --chown=builder:users stack.yaml $STACK_ROOT/global-project/
-RUN ["stack", "install", "base"]
+# hadolint ignore=DL3003
+RUN git clone --depth=1 --recurse-submodules --shallow-submodules https://github.com/TokTok/toktok-stack /work/toktok-stack \
+ && cd /work/toktok-stack \
+ && stack build --test --only-dependencies \
+ && rm -rf /work/toktok-stack

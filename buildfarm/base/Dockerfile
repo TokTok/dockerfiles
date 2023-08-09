@@ -13,9 +13,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
  && rm -rf /var/lib/apt/lists/*
 
 # Install bazel.
-RUN wget -q https://github.com/bazelbuild/bazel/releases/download/4.0.0/bazel_4.0.0-linux-x86_64.deb \
- && dpkg -i bazel_4.0.0-linux-x86_64.deb \
- && rm bazel_4.0.0-linux-x86_64.deb
+RUN wget -q https://github.com/bazelbuild/bazel/releases/download/6.1.2/bazel_6.1.2-linux-x86_64.deb \
+ && dpkg -i bazel_6.1.2-linux-x86_64.deb \
+ && rm bazel_6.1.2-linux-x86_64.deb
 
 # Download and build buildfarm.
 RUN ["git", "clone", "--depth=1",\

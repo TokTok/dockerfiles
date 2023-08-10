@@ -17,7 +17,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:freebsd"
           push: true
@@ -36,7 +36,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:nacl"
           push: true
@@ -61,7 +61,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:haskell"
           push: true
@@ -86,7 +86,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:flutter/web"
           push: true
@@ -111,7 +111,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:buildfarm/builder"
           push: true
@@ -130,7 +130,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:buildfarm/base"
           push: true
@@ -150,7 +150,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:buildfarm/server"
           push: true
@@ -170,7 +170,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:buildfarm/worker"
           push: true
@@ -190,7 +190,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:buildfarm/bazel"
           push: true
@@ -209,7 +209,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:buildfarm/cache"
           push: true
@@ -233,7 +233,7 @@ jobs:
       - name: Generate toolchain configs
         run: cd buildfarm/toolchain && ./prepare_toolchain.sh
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "buildfarm/toolchain"
           push: true
@@ -257,7 +257,7 @@ jobs:
       - name: Generate toolchain configs
         run: cd buildfarm/toolchain && ./prepare_toolchain.sh 6.3.2
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "buildfarm/toolchain"
           push: true
@@ -282,7 +282,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:kythe/release"
           push: true
@@ -301,7 +301,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:kythe/webui"
           push: true
@@ -321,7 +321,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:kythe/buildenv"
           push: true
@@ -341,7 +341,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:kythe/tables"
           push: true
@@ -361,7 +361,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:kythe/serving"
           push: true
@@ -390,7 +390,7 @@ jobs:
       - name: Generate configs
         run: cd ghc && ./configure
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "ghc/base"
           push: true
@@ -414,7 +414,7 @@ jobs:
       - name: Generate configs
         run: cd ghc-android && ./configure
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "ghc-android/aarch64"
           push: true
@@ -438,7 +438,7 @@ jobs:
       - name: Generate configs
         run: cd ghc-android && ./configure
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "ghc-android/arm"
           push: true
@@ -462,7 +462,7 @@ jobs:
       - name: Generate configs
         run: cd ghc-android && ./configure
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "ghc-android/i686"
           push: true
@@ -486,7 +486,7 @@ jobs:
       - name: Generate configs
         run: cd ghc-android && ./configure
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: "ghc-android/x86_64"
           push: true

@@ -1,4 +1,4 @@
-# Build webui.
+# Build webui on ubuntu 20.04 because we need Java 8, not newer.
 FROM ubuntu:20.04
 
 RUN apt-get update \

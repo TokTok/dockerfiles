@@ -30,6 +30,6 @@ RUN apt-get update \
  wget \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* \
- && wget -nv https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64 \
+ && wget -nv https://github.com/bazelbuild/bazelisk/releases/download/v1.17.0/bazelisk-linux-amd64 \
  && chmod 755 bazelisk-linux-amd64 \
  && mv bazelisk-linux-amd64 /usr/local/bin/bazel

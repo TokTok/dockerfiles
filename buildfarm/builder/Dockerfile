@@ -1,20 +1,20 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 RUN apt-get update \
  && apt-get install --no-install-recommends -y \
  binutils \
  curl \
- libstdc++-10-dev \
+ libstdc++-12-dev \
  default-jdk-headless \
  libc6-dev \
- python \
+ python2 \
  python3 \
  python3-dev \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-RUN BASE_URL=https://storage.googleapis.com/clang-builds-stable/clang-ubuntu18_04 \
-    VERSION=$(curl https://storage.googleapis.com/clang-builds-stable/clang-ubuntu18_04/latest.txt) \
+RUN BASE_URL=https://storage.googleapis.com/clang-builds-stable/clang-ubuntu20_04 \
+    VERSION=$(curl https://storage.googleapis.com/clang-builds-stable/clang-ubuntu20_04/latest.txt) \
  && bash -c "tar -C /usr/local/ -zxf <(curl '$BASE_URL/clang_r$VERSION.tar.gz')" \
  && bash -c "tar -C /usr/local/ -zxf <(curl '$BASE_URL/libcxx-msan_r$VERSION.tar.gz')" \
  && bash -c "tar -C /usr/local/ -zxf <(curl '$BASE_URL/lld_r$VERSION.tar.gz')"

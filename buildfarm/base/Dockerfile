@@ -23,11 +23,9 @@ RUN ["git", "clone", "--depth=1",\
 WORKDIR /src/bazel-buildfarm
 RUN ["bazel", "build",\
  "//src/main/java/build/buildfarm:buildfarm-server_deploy.jar",\
- "//src/main/java/build/buildfarm:buildfarm-memory-worker_deploy.jar",\
  "//src/main/java/build/buildfarm:buildfarm-shard-worker_deploy.jar"]
 RUN ["cp",\
  "bazel-bin/src/main/java/build/buildfarm/buildfarm-server_deploy.jar",\
- "bazel-bin/src/main/java/build/buildfarm/buildfarm-memory-worker_deploy.jar",\
  "bazel-bin/src/main/java/build/buildfarm/buildfarm-shard-worker_deploy.jar",\
  "/"]
 
@@ -35,6 +33,5 @@ RUN ["cp",\
 FROM scratch
 COPY --from=build \
        /buildfarm-server_deploy.jar \
-       /buildfarm-memory-worker_deploy.jar \
        /buildfarm-shard-worker_deploy.jar \
        /

@@ -41,6 +41,7 @@ RUN ["./build-gmp.sh"]
 COPY user-scripts/build-nettle.sh $BASE/
 RUN ["./build-nettle.sh"]
 
+COPY patches/gnutls* $BASE/patches/
 COPY user-scripts/build-gnutls30.sh $BASE/
 RUN ["./build-gnutls30.sh"]
 

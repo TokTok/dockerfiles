@@ -6,6 +6,8 @@
 cd "$NDK_ADDON_SRC"
 apt-get source libgnutls30
 
+apply_patches 'gnutls.patch' gnutls28*/
+
 pushd gnutls28*/
 sed -i -e 's/^\(bin\|noinst\)_PROGRAMS/#&/' src/Makefile.am
 export PKG_CONFIG_PATH="$NDK_ADDON_PREFIX/lib/pkgconfig"

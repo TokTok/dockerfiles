@@ -1,0 +1,24 @@
+diff -u -r a/lib/accelerated/aarch64/Makefile.am b/lib/accelerated/aarch64/Makefile.am
+--- a/lib/accelerated/aarch64/Makefile.am	2021-10-18 14:19:40.000000000 +0000
++++ b/lib/accelerated/aarch64/Makefile.am	2023-09-01 16:24:38.932944082 +0000
+@@ -34,7 +34,7 @@
+ endif
+ 
+ #ensure that we have all aarch64 instruction sets enabled for the assembler
+-AM_CCASFLAGS = -Wa,-march=all
++AM_CCASFLAGS = 
+ 
+ EXTRA_DIST = README
+ 
+diff -u -r a/lib/accelerated/aarch64/Makefile.in b/lib/accelerated/aarch64/Makefile.in
+--- a/lib/accelerated/aarch64/Makefile.in	2022-01-18 07:08:01.000000000 +0000
++++ b/lib/accelerated/aarch64/Makefile.in	2023-09-01 16:24:38.902943863 +0000
+@@ -2102,7 +2102,7 @@
+ 	-I$(srcdir)/../../ -I$(srcdir)/../ $(am__append_1)
+ 
+ #ensure that we have all aarch64 instruction sets enabled for the assembler
+-AM_CCASFLAGS = -Wa,-march=all
++AM_CCASFLAGS = 
+ EXTRA_DIST = README
+ noinst_LTLIBRARIES = libaarch64.la
+ libaarch64_la_SOURCES = aarch64-common.c aarch64-common.h \

@@ -3,8 +3,8 @@
 . set-env.sh
 ####################################################################################################
 
-NDK_RELEASE=r23b
-NDK_MD5=30d1ad013b98a503275f6d01d4e79eef
+NDK_RELEASE=r25c
+NDK_MD5=7845ab5be16149828ebac818a087d4ab
 
 NDK_TAR_FILE="android-ndk-$NDK_RELEASE-linux.zip"
 NDK_TAR_PATH="$TARDIR/$NDK_TAR_FILE"

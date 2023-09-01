@@ -7,6 +7,7 @@ cd "$NDK_ADDON_SRC"
 apt-get source libxml2
 
 pushd libxml2*/
+aclocal
 ./configure \
   --prefix="$NDK_ADDON_PREFIX" \
   --host="$NDK_TARGET" \

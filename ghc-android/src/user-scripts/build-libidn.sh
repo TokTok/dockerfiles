@@ -23,7 +23,7 @@ autoreconf -fi
   --enable-static \
   --disable-shared \
   --disable-gtk-doc-html
-make "$MAKEFLAGS" || true
+make "$MAKEFLAGS" GNULIBHEADERS_OVERRIDE_WINT_T=1 || true
 make install
 popd
 

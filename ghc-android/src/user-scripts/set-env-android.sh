@@ -9,7 +9,7 @@
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/set-env.sh"
 
 # Basic parameters
-NDK_RELEASE=r23b
+NDK_RELEASE=r25c
 
 # Download and configure the Android NDK toolchain
 NDK_PATH="$HOME/android-ndk-$NDK_RELEASE"

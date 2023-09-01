@@ -16,6 +16,7 @@ apt-get -y --no-install-recommends install \
   curl \
   ghc \
   git \
+  gtk-doc-tools \
   libtool \
   llvm-11 \
   p7zip-full \

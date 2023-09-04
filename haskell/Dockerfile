@@ -28,6 +28,7 @@ RUN useradd \
  && chown builder:users /work \
  && echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 USER builder
+RUN mkdir /tmp/cirrus-ci-build
 
 ENV STACK_ROOT=/.stack
 

@@ -13,3 +13,4 @@ USER 1000
 ENTRYPOINT ["/bazel-remote", "--port", "9090", "--dir", "/cache", "--max_size", "10"]
 
 EXPOSE 9090/tcp
+EXPOSE 9092/tcp

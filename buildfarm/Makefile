@@ -1,25 +1,38 @@
 build: build-builder build-buildfarm-base build-buildfarm-server build-buildfarm-worker
 
-build-builder:
+build-nix:
+	docker build nix -t toxchat/nix:built
+	id=$$(docker create toxchat/nix:built) && \
+	   (docker cp -L $$id:/root/nix/nix.tar.gz nix.tar.gz && docker load -i nix.tar.gz; \
+	   rm -f nix.tar.gz; \
+	   docker rm -v $$id)
+
+build-builder: build-nix
 	docker build builder -t toxchat/builder:latest
+
+build-bazel: build-builder
+	docker build bazel -t toxchat/bazel:latest
 
 build-buildfarm-base:
 	docker build base -t toxchat/buildfarm-base:latest
 
-build-buildfarm-server:
+build-buildfarm-server: build-buildfarm-base
 	docker build server -t toxchat/buildfarm-server:latest
 
-build-buildfarm-worker:
+build-buildfarm-worker: build-buildfarm-base
 	docker build worker -t toxchat/buildfarm-worker:latest
-
-build-bazel:
-	docker build bazel -t toxchat/bazel:latest
 
 
 push: push-builder push-buildfarm-base push-buildfarm-server push-buildfarm-worker
 
+push-nix: build-nix
+	docker push toxchat/nix:latest
+
 push-builder: build-builder
 	docker push toxchat/builder:latest
+
+push-bazel: build-bazel
+	docker push toxchat/bazel:latest
 
 push-buildfarm-base: build-buildfarm-base
 	docker push toxchat/buildfarm-base:latest
@@ -29,25 +42,6 @@ push-buildfarm-server: build-buildfarm-server
 
 push-buildfarm-worker: build-buildfarm-worker
 	docker push toxchat/buildfarm-worker:latest
-
-push-bazel: build-bazel
-	docker push toxchat/bazel:latest
-
-
-.INTERMEDIATE: rbe_configs_gen
-rbe_configs_gen:
-	wget -O $@ https://github.com/bazelbuild/bazel-toolchains/releases/download/v5.1.1/rbe_configs_gen_linux_amd64
-	chmod +x $@
-
-test/tools/toolchain/LICENSE: rbe_configs_gen
-	$(MAKE) push-builder
-	./rbe_configs_gen \
-	  --bazel_version="$(shell cat test/.bazelversion)" \
-	  --toolchain_container=toxchat/builder:latest \
-	  --output_src_root="$(realpath test)" \
-	  --output_config_path=tools/toolchain \
-	  --exec_os=linux \
-	  --target_os=linux
 
 
 check: build-buildfarm-base build-buildfarm-server build-buildfarm-worker test/integration_test test/tools/toolchain/LICENSE

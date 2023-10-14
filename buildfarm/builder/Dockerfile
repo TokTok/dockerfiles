@@ -1,24 +1,7 @@
-FROM ubuntu:22.04
+FROM toxchat/nix:latest
 
-RUN apt-get update \
- && apt-get install --no-install-recommends -y \
- binutils \
- curl \
- libstdc++-12-dev \
- default-jdk-headless \
- libc6-dev \
- python2 \
- python3 \
- python3-dev \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
-
-RUN BASE_URL=https://storage.googleapis.com/clang-builds-stable/clang-ubuntu20_04 \
-    VERSION=$(curl https://storage.googleapis.com/clang-builds-stable/clang-ubuntu20_04/latest.txt) \
- && bash -c "tar -C /usr/local/ -zxf <(curl '$BASE_URL/clang_r$VERSION.tar.gz')" \
- && bash -c "tar -C /usr/local/ -zxf <(curl '$BASE_URL/libcxx-msan_r$VERSION.tar.gz')" \
- && bash -c "tar -C /usr/local/ -zxf <(curl '$BASE_URL/lld_r$VERSION.tar.gz')"
-
-ENV CC=/usr/local/bin/clang \
-    CXX=/usr/local/bin/clang++ \
-    JAVA_HOME=/usr/lib/jvm/default-java
+WORKDIR /root
+COPY ghc.nix /root
+RUN ["nix-build", "ghc.nix"]
+RUN ["nix-shell", "-p", "qt5.qtbase.dev", "qt5.qtmultimedia.dev", "qt5.qttools.dev", "qt5.qtsvg.dev", "--run", "moc --version"]
+RUN ["nix-shell", "-p", "go", "--run", "go version"]

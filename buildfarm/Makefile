@@ -1,16 +1,12 @@
 build: build-builder build-buildfarm-base build-buildfarm-server build-buildfarm-worker
 
 build-nix:
-	docker build nix -t toxchat/nix:built
-	id=$$(docker create toxchat/nix:built) && \
-	   (docker cp -L $$id:/root/nix/nix.tar.gz nix.tar.gz && docker load -i nix.tar.gz; \
-	   rm -f nix.tar.gz; \
-	   docker rm -v $$id)
+	docker build nix -t toxchat/nix:latest
 
 build-builder: build-nix
 	docker build builder -t toxchat/builder:latest
 
-build-bazel: build-builder
+build-bazel:
 	docker build bazel -t toxchat/bazel:latest
 
 build-buildfarm-base:

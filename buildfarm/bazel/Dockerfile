@@ -1,30 +1,24 @@
-FROM alpine:3.18.2
+# Build the base image in a single layer instead of 100 as done by arion.
+FROM scratch
+ADD squashed.tar /
+# Reinstate the CMD directive from the squashed image.
+CMD ["/usr/sbin/init"]
 
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
- && echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
- && apk add \
- bazel \
- coreutils \
- ca-certificates \
- curl \
- git \
- python3 \
- python3-dev \
- shadow \
- sudo \
- xz
+# Using WORKDIR as a built-in "mkdir", because the symlinks to mkdir aren't
+# set up yet.
+WORKDIR /run/wrappers
 
-WORKDIR /src/workspace
-RUN useradd -m -p "*" -g users -u 1000 builder \
- && chown builder:users /src/workspace \
- && echo "builder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+ENV PATH="/nix/store/ahkfdxq8mcpsb5kvdvgqr1wv8zjngbh4-coreutils-9.1/bin"
+
+# Required by the activation script
+RUN ["install", "-m", "0755", "-d", "/etc", "/etc/nixos"]
+RUN ["install", "-m", "01777", "-d", "/tmp"]
+
+# Run the script that performs all configuration activation that does
+# not have to be done at boot time.
+RUN ["cut", "-d\n", "-f3", "/usr/sbin/init"]
+RUN ["/nix/store/v94y1gv5bzyjm5k9d2ngc0712s1da5jc-nixos-system-unnamed-23.05pre-git/activate"]
+
 USER builder
-
-RUN curl -Lo install.sh https://nixos.org/nix/install \
- && sh install.sh --no-daemon --no-channel-add --yes \
- && rm install.sh
-
-ENV NIX_SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt" \
-    NIX_PROFILES="/nix/var/nix/profiles/default /home/builder/.nix-profile" \
-    PATH="/home/builder/.nix-profile/bin:$PATH" \
-    USER="builder"
+ENV USER="builder" \
+    PATH="/run/wrappers/bin:/etc/profiles/per-user/builder/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin"

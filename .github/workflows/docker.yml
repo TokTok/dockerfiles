@@ -27,24 +27,25 @@ jobs:
 #         cache-from: type=registry,ref=toxchat/freebsd:latest
 #         cache-to: type=inline
 
-# nacl:
-#   runs-on: ubuntu-latest
-#   steps:
-#     - name: Set up Docker Buildx
-#       uses: docker/setup-buildx-action@v2
-#     - name: Login to DockerHub
-#       uses: docker/login-action@v2
-#       with:
-#         username: ${{ secrets.DOCKERHUB_USERNAME }}
-#         password: ${{ secrets.DOCKERHUB_TOKEN }}
-#     - name: Build and push
-#       uses: docker/build-push-action@v4
-#       with:
-#         context: "{{defaultContext}}:nacl"
-#         push: true
-#         tags: toxchat/nacl:latest
-#         cache-from: type=registry,ref=toxchat/nacl:latest
-#         cache-to: type=inline
+  nacl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to DockerHub
+        if: ${{ github.event_name == 'push' }}
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: "{{defaultContext}}:nacl"
+          tags: toxchat/nacl:latest
+          cache-from: type=registry,ref=toxchat/nacl:latest
+          cache-to: type=inline
+          push: ${{ github.event_name == 'push' }}
 
 # ##################################################
 # #
@@ -52,24 +53,25 @@ jobs:
 # #
 # ##################################################
 
-# haskell:
-#   runs-on: ubuntu-latest
-#   steps:
-#     - name: Set up Docker Buildx
-#       uses: docker/setup-buildx-action@v2
-#     - name: Login to DockerHub
-#       uses: docker/login-action@v2
-#       with:
-#         username: ${{ secrets.DOCKERHUB_USERNAME }}
-#         password: ${{ secrets.DOCKERHUB_TOKEN }}
-#     - name: Build and push
-#       uses: docker/build-push-action@v4
-#       with:
-#         context: "{{defaultContext}}:haskell"
-#         push: true
-#         tags: toxchat/haskell:latest
-#         cache-from: type=registry,ref=toxchat/haskell:latest
-#         cache-to: type=inline
+  haskell:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to DockerHub
+        if: ${{ github.event_name == 'push' }}
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: "{{defaultContext}}:haskell"
+          tags: toxchat/haskell:latest
+          cache-from: type=registry,ref=toxchat/haskell:latest
+          cache-to: type=inline
+          push: ${{ github.event_name == 'push' }}
 
 # ##################################################
 # #
@@ -77,24 +79,25 @@ jobs:
 # #
 # ##################################################
 
-# frama-c:
-#   runs-on: ubuntu-latest
-#   steps:
-#     - name: Set up Docker Buildx
-#       uses: docker/setup-buildx-action@v2
-#     - name: Login to DockerHub
-#       uses: docker/login-action@v2
-#       with:
-#         username: ${{ secrets.DOCKERHUB_USERNAME }}
-#         password: ${{ secrets.DOCKERHUB_TOKEN }}
-#     - name: Build and push
-#       uses: docker/build-push-action@v4
-#       with:
-#         context: "{{defaultContext}}:frama-c"
-#         push: true
-#         tags: toxchat/frama-c:latest
-#         cache-from: type=registry,ref=toxchat/frama-c:latest
-#         cache-to: type=inline
+  frama-c:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to DockerHub
+        if: ${{ github.event_name == 'push' }}
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: "{{defaultContext}}:frama-c"
+          tags: toxchat/frama-c:latest
+          cache-from: type=registry,ref=toxchat/frama-c:latest
+          cache-to: type=inline
+          push: ${{ github.event_name == 'push' }}
 
 # ##################################################
 # #
@@ -102,24 +105,25 @@ jobs:
 # #
 # ##################################################
 
-# flutter-web:
-#   runs-on: ubuntu-latest
-#   steps:
-#     - name: Set up Docker Buildx
-#       uses: docker/setup-buildx-action@v2
-#     - name: Login to DockerHub
-#       uses: docker/login-action@v2
-#       with:
-#         username: ${{ secrets.DOCKERHUB_USERNAME }}
-#         password: ${{ secrets.DOCKERHUB_TOKEN }}
-#     - name: Build and push
-#       uses: docker/build-push-action@v4
-#       with:
-#         context: "{{defaultContext}}:flutter/web"
-#         push: true
-#         tags: toxchat/flutter-web:latest
-#         cache-from: type=registry,ref=toxchat/flutter-web:latest
-#         cache-to: type=inline
+  flutter-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to DockerHub
+        if: ${{ github.event_name == 'push' }}
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: "{{defaultContext}}:flutter/web"
+          tags: toxchat/flutter-web:latest
+          cache-from: type=registry,ref=toxchat/flutter-web:latest
+          cache-to: type=inline
+          push: ${{ github.event_name == 'push' }}
 
   ##################################################
   #
@@ -127,25 +131,25 @@ jobs:
   #
   ##################################################
 
-# bazel-cache:
-#   runs-on: ubuntu-latest
-#   steps:
-#     - name: Set up Docker Buildx
-#       uses: docker/setup-buildx-action@v2
-#     - name: Login to DockerHub
-#       if: ${{ github.event_name == 'push' }}
-#       uses: docker/login-action@v2
-#       with:
-#         username: ${{ secrets.DOCKERHUB_USERNAME }}
-#         password: ${{ secrets.DOCKERHUB_TOKEN }}
-#     - name: Build and push
-#       uses: docker/build-push-action@v4
-#       with:
-#         context: "{{defaultContext}}:buildfarm/cache"
-#         tags: toxchat/bazel-cache:latest
-#         cache-from: type=registry,ref=toxchat/bazel-cache:latest
-#         cache-to: type=inline
-#         push: ${{ github.event_name == 'push' }}
+  bazel-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to DockerHub
+        if: ${{ github.event_name == 'push' }}
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: "{{defaultContext}}:buildfarm/cache"
+          tags: toxchat/bazel-cache:latest
+          cache-from: type=registry,ref=toxchat/bazel-cache:latest
+          cache-to: type=inline
+          push: ${{ github.event_name == 'push' }}
 
   bazel:
     runs-on: ubuntu-latest
@@ -166,10 +170,10 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: "buildfarm/bazel"
-          push: ${{ github.event_name == 'push' }}
           tags: toxchat/bazel:latest
           cache-from: type=registry,ref=toxchat/bazel:latest
           cache-to: type=inline
+          push: ${{ github.event_name == 'push' }}
 
 # buildfarm-base:
 #   runs-on: ubuntu-latest

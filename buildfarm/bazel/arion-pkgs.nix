@@ -1,13 +1,7 @@
 let
-  flake = if builtins ? getFlake
-    then (builtins.getFlake (toString ./.)).pkgs
-    else (import flake-compat { src = ./.; }).defaultNix;
-  # NB: this is lazy
-  lock = builtins.fromJSON (builtins.readFile ./flake.lock);
-  inherit (lock.nodes.flake-compat.locked) owner repo rev narHash;
-  flake-compat = builtins.fetchTarball {
-    url = "https://github.com/${owner}/${repo}/archive/${rev}.tar.gz";
-    sha256 = narHash;
+  nixpkgs = builtins.fetchTarball {
+    url = "https://github.com/NixOS/nixpkgs/archive/refs/tags/23.05.tar.gz";
+    sha256 = "sha256:10wn0l08j9lgqcw8177nh2ljrnxdrpri7bp0g7nvrsn9rkawvlbf";
   };
 in
-  flake.pkgs
+  (import nixpkgs { system = "x86_64-linux"; }).pkgs

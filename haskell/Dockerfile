@@ -1,4 +1,6 @@
-FROM ubuntu:22.04
+# Don't upgrade this until render.com runs a newer ubuntu.
+# Otherwise, glibc won't be recent enough and our binaries won't run.
+FROM ubuntu:20.04
 
 RUN apt-get update \
  && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \

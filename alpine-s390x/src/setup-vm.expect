@@ -4,8 +4,7 @@ set timeout -1
 
 set alpine_repo "https://dl-cdn.alpinelinux.org/alpine/v3.19/main"
 set modloop "https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/s390x/netboot/modloop-lts"
-# TODO(iphydf): Once merged, change this to point at TokTok master.
-set ssh_key "https://raw.githubusercontent.com/iphydf/dockerfiles/s390x/alpine-s390x/src/id_rsa.pub"
+set ssh_key "https://raw.githubusercontent.com/TokTok/dockerfiles/master/alpine-s390x/src/id_rsa.pub"
 
 # We disable Kernel-ASLR because there's no hardware RNG.
 spawn qemu-system-s390x \

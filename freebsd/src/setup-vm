@@ -11,7 +11,6 @@ gunzip "$IMAGE_NAME.gz"
 
 NPROC="$NPROC" SSH_PORT="$SSH_PORT" IMAGE_NAME="$IMAGE_NAME" script -c "TERM=screen screen /work/setup-vm.expect"
 
-reset || true
 start_vm
 
 # Update system

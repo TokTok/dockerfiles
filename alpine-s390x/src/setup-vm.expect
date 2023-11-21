@@ -1,0 +1,30 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+
+# We disable Kernel-ASLR because there's no hardware RNG.
+spawn qemu-system-s390x \
+  -nographic \
+  -m 2048 \
+  -net user,hostfwd=tcp::$env(SSH_PORT)-:22 \
+  -net nic \
+  -hda hda.qcow \
+  -kernel vmlinuz-lts \
+  -initrd initramfs-lts \
+  -append "nokaslr alpine_repo=https://dl-cdn.alpinelinux.org/alpine/v3.19/main modloop=https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/s390x/netboot/modloop-lts"
+
+expect "localhost login:"
+send -- "root\r"
+
+expect "localhost:~#"
+send -- "apk add gcc libsodium-dev linux-headers musl-dev perl\r"
+
+expect "localhost:~#"
+# ctrl-a c (switch to qemu monitor console)
+send -- "\001c"
+
+expect "(qemu)"
+send -- "savevm login\r"
+
+expect "(qemu)"
+exit 0

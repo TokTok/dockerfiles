@@ -40,6 +40,6 @@ fi
 unxz -T0 "$IMAGE_NAME.xz"
 
 # The downloaded image has little free disk space
-qemu-img resize -f raw "$IMAGE_NAME" +1G
+qemu-img resize -f qcow2 "$IMAGE_NAME" +1G
 
 gzip "$IMAGE_NAME"

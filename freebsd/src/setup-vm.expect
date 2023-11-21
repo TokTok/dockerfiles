@@ -1,10 +1,10 @@
 #!/usr/bin/expect -f
-# Copyright (C) 2018-2022 nurupo
+# Copyright (C) 2018-2023 nurupo
 
 set timeout -1
 
-# Note: doesn't work if -nographic is used instead of -curses
-spawn qemu-system-x86_64 -curses -m 2048 -smp $env(NPROC) -net user,hostfwd=tcp::$env(SSH_PORT)-:22 -net nic -drive "format=raw,file=$env(IMAGE_NAME)"
+# Note: doesn't work if -nographic is used instead of -display curses
+spawn qemu-system-x86_64 -display curses -m 2048 -smp $env(NPROC) -net user,hostfwd=tcp::$env(SSH_PORT)-:22 -net nic -hda $env(IMAGE_NAME)
 
 expect "Autoboot"
 send -- "\r"

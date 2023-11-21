@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -eux
+
+script -c "TERM=screen screen /work/setup-vm.expect"

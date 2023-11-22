@@ -11,7 +11,7 @@ start_vm() {
   if [ -e /dev/kvm ]; then
     screen -d -m qemu-system-x86_64 --enable-kvm -curses -m 2048 -smp "$NPROC" -net user,hostfwd=tcp::"$SSH_PORT"-:22 -net nic "$IMAGE_NAME"
   else
-    screen -d -m qemu-system-x86_64              -curses -m 2048 -smp "$NPROC" -net user,hostfwd=tcp::"$SSH_PORT"-:22 -net nic "$IMAGE_NAME"
+    screen -d -m qemu-system-x86_64 -curses -m 2048 -smp "$NPROC" -net user,hostfwd=tcp::"$SSH_PORT"-:22 -net nic "$IMAGE_NAME"
   fi
 
   # Wait for 5 minutes for ssh to start listening on the port

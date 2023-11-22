@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (C) 2018-2021 nurupo
+# Copyright (C) 2018-2023 nurupo
 
 # Initial setup of the FreeBSD VM
 
@@ -7,7 +7,42 @@ set -eux
 
 . cmake-freebsd-run.sh
 
-gunzip "$IMAGE_NAME.gz"
+while true; do
+  # Selecting random mirror from https://www.freebsd.org/doc/handbook/mirrors-ftp.html
+  # Note that not all mirrors listed on that page are working, so we have removed them
+  # There are no arrays in sh so we get a bit clever
+  DL_MIRROR_1=1
+  DL_MIRROR_2=2
+  DL_MIRROR_3=3
+  DL_MIRROR_4=4
+  DL_MIRROR_5=5
+  DL_MIRROR_6=6
+  DL_MIRROR_7=7
+  DL_MIRROR_8=10
+  DL_MIRROR_9=11
+  DL_MIRROR_10=13
+  DL_MIRROR_11=14
+
+  # There are 11 mirrors
+  DL_MIRROR_RANDOM=$(("$(date +%s)" % 11 + 1))
+  DL_URL="ftp://ftp$(eval echo \$DL_MIRROR_"$DL_MIRROR_RANDOM").us.freebsd.org/pub/FreeBSD/releases/VM-IMAGES/$FREEBSD_VERSION-RELEASE/amd64/Latest/$IMAGE_NAME.xz"
+
+  # Make sure there are no partial downloads from the previous loop iterations
+  rm -f "$IMAGE_NAME"*
+
+  wget -q --tries 1 "$DL_URL" && break
+done
+
+sha512sum "$IMAGE_NAME.xz"
+if ! (echo "$IMAGE_SHA512  $IMAGE_NAME.xz" | sha512sum -c --status -); then
+  echo "Error: sha512 of $IMAGE_NAME.xz doesn't match the known one"
+  exit 1
+fi
+
+unxz -T0 "$IMAGE_NAME.xz"
+
+# The downloaded image has little free disk space
+qemu-img resize -f qcow2 "$IMAGE_NAME" +1G
 
 NPROC="$NPROC" SSH_PORT="$SSH_PORT" IMAGE_NAME="$IMAGE_NAME" script -c "TERM=screen screen /work/setup-vm.expect"
 

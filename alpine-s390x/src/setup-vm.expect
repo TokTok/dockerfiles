@@ -20,8 +20,9 @@ spawn qemu-system-s390x \
 expect "localhost login:"
 send -- "root\r"
 
+# Install compiler and other dependencies to build toxcore.
 expect "localhost:~#"
-send -- "apk add gcc libsodium-dev linux-headers musl-dev perl\r"
+send -- "apk add cmake gcc g++ libsodium-dev linux-headers musl-dev ninja perl\r"
 
 expect "localhost:~#"
 # ctrl-a c (switch to qemu monitor console)

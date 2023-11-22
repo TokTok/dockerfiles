@@ -28,7 +28,7 @@ while true; do
   DL_URL="ftp://ftp$(eval echo \$DL_MIRROR_"$DL_MIRROR_RANDOM").us.freebsd.org/pub/FreeBSD/releases/VM-IMAGES/$FREEBSD_VERSION-RELEASE/amd64/Latest/$IMAGE_NAME.xz"
 
   # Make sure there are no partial downloads from the previous loop iterations
-  rm -f $IMAGE_NAME*
+  rm -f "$IMAGE_NAME"*
 
   wget -q --tries 1 "$DL_URL" && break
 done

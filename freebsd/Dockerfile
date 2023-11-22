@@ -18,10 +18,6 @@ RUN apt-get update \
 
 WORKDIR /work
 
-COPY src/cmake-freebsd-env.sh /work
-COPY src/download-freebsd /work
-RUN ["./download-freebsd"]
-
 COPY src/cmake-freebsd-env.sh \
      src/cmake-freebsd-run.sh \
      src/setup-vm \

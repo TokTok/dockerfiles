@@ -16,7 +16,7 @@ jobs:
   ##################################################
 
   compcert:
-    docker: [{ image: alpine:3.11.5 }]
+    docker: [{ image: alpine:3.19.0 }]
 
     steps:
       - run: apk add git openssh-client
@@ -25,7 +25,7 @@ jobs:
       - run: .circleci/build-image compcert toxchat/compcert:latest
 
   infer:
-    docker: [{ image: alpine:3.11.5 }]
+    docker: [{ image: alpine:3.19.0 }]
 
     steps:
       - run: apk add git openssh-client

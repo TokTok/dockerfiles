@@ -4,8 +4,21 @@
 apk add make perl docker-cli
 
 # Run this before set -eux so we don't print credentials to the CI logs.
-echo "$DOCKER_PASS" | docker login --username "$DOCKER_USER" --password-stdin
+if [ -n "$DOCKER_USER" ]; then
+  echo "$DOCKER_PASS" | docker login --username "$DOCKER_USER" --password-stdin
+else
+  DOCKER_USER=
+  DOCKER_PASS=
+fi
 
 set -eux
 
-.github/scripts/build-image "$@"
+BUILD="$1"
+IMAGE="$2"
+
+make
+docker pull "$IMAGE" || true
+docker build --cache-from "$IMAGE" --tag "$IMAGE" "$BUILD"
+if [ -n "$DOCKER_USER" ]; then
+  docker push "$IMAGE"
+fi

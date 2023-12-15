@@ -1,11 +1,15 @@
 ---
 name: docker
 
+# Run on push and once a week to keep the images from bitrotting and to
+# identify issues while no commits are being pushed.
 on:
   push:
     branches: [master]
   pull_request:
     branches: [master]
+  schedule:
+    - cron: "52 2 * * 0"
 
 # Cancel old PR builds when pushing new commits.
 concurrency:

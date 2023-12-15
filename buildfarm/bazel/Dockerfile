@@ -17,7 +17,7 @@ RUN ["install", "-m", "01777", "-d", "/tmp"]
 # Run the script that performs all configuration activation that does
 # not have to be done at boot time.
 RUN ["cut", "-d\n", "-f3", "/usr/sbin/init"]
-RUN ["/nix/store/v94y1gv5bzyjm5k9d2ngc0712s1da5jc-nixos-system-unnamed-23.05pre-git/activate"]
+RUN ["/nix/store/y3xwfp77dy7g0lm33dahfbnggvnwbj1p-nixos-system-unnamed-23.05pre-git/activate"]
 
 USER builder
 ENV USER="builder" \

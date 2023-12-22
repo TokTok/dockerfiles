@@ -4,21 +4,21 @@ ADD squashed.tar /
 # Reinstate the CMD directive from the squashed image.
 CMD ["/usr/sbin/init"]
 
-# Using WORKDIR as a built-in "mkdir", because the symlinks to mkdir aren't
-# set up yet.
+# We need to know where our bash is, because we haven't set up /bin/sh yet.
+SHELL ["/nix/store/x88ivkf7rmrhd5x3cvyv5vh3zqqdnhsk-bash-interactive-5.2-p15/bin/bash", "-o", "pipefail", "-c"]
+
+# Run activation script (init knows where it is).
+RUN /usr/sbin/init || true
+ENV PATH="/etc/profiles/per-user/builder/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin"
+
+# Create suid/sgid wrappers so sudo works in the rest of the docker build.
 WORKDIR /run/wrappers
+RUN "$(grep -o '/nix/store/.*/suid-sgid-wrappers-start' /etc/systemd/system/suid-sgid-wrappers.service)"
 
-ENV PATH="/nix/store/ahkfdxq8mcpsb5kvdvgqr1wv8zjngbh4-coreutils-9.1/bin"
-
-# Required by the activation script
-RUN ["install", "-m", "0755", "-d", "/etc", "/etc/nixos"]
-RUN ["install", "-m", "01777", "-d", "/tmp"]
-
-# Run the script that performs all configuration activation that does
-# not have to be done at boot time.
-RUN ["cut", "-d\n", "-f3", "/usr/sbin/init"]
-RUN ["/nix/store/y3xwfp77dy7g0lm33dahfbnggvnwbj1p-nixos-system-unnamed-23.05pre-git/activate"]
-
+WORKDIR /home/builder
 USER builder
-ENV USER="builder" \
-    PATH="/run/wrappers/bin:/etc/profiles/per-user/builder/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin"
+ENV USER="builder" PATH="/run/wrappers/bin:$PATH"
+
+# Test whether the suid/sgid wrapper script worked.
+RUN sudo true
+RUN bazel --version

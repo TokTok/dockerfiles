@@ -11,5 +11,17 @@ branches:
     protection:
       required_status_checks:
         contexts:
-          - CodeFactor
-          - code-review/reviewable
+          - "build (alpine-s390x)"
+          - "build (bazel)"
+          - "build (bazel-cache)"
+          - "build (flutter-web)"
+          - "build (frama-c)"
+          - "build (freebsd)"
+          - "build (haskell)"
+          - "ci/circleci: compcert"
+          - "ci/circleci: infer"
+          - "CodeFactor"
+          - "code-review/reviewable"
+          - "ghc-base"
+          - "ghc-android (aarch64)"
+          - "ghc-android (arm)"

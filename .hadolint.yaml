@@ -1,5 +1,6 @@
 ---
 ignored:
+  - DL3004  # we use sudo for now (TODO(iphydf): investigate gosu)
   - DL3007
   - DL3008
   - DL3018

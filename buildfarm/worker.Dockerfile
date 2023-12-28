@@ -22,3 +22,7 @@ RUN . "$HOME/.nix-profile/etc/profile.d/nix.sh" \
  && nix-build
 
 COPY config.yml /app/build_buildfarm/examples/config.minimal.yml
+
+# Go back to root; buildfarm-worker takes care of security.
+WORKDIR /
+USER root

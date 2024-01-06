@@ -6,7 +6,6 @@ workflows:
   build:
     jobs:
       - compcert
-      - infer
 
 jobs:
   ##################################################
@@ -23,12 +22,3 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: .circleci/build-image compcert toxchat/compcert:latest
-
-  infer:
-    docker: [{ image: alpine:3.19.0 }]
-
-    steps:
-      - run: apk add git openssh-client
-      - checkout
-      - setup_remote_docker
-      - run: .circleci/build-image infer toxchat/infer:latest

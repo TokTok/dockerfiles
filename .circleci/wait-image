@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -eux
+
+BUILD="$1"
+
+readarray -t WAITS <<<"$(seq 1 10)"
+
+for i in "${WAITS[@]}"; do
+  if [ -f "/tmp/docker-build-$BUILD.done" ]; then
+    break
+  fi
+
+  tail -f "/tmp/docker-build-$BUILD.log" &
+  sleep 300
+done

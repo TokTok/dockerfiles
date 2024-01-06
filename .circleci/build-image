@@ -22,3 +22,5 @@ docker build --cache-from "$IMAGE" --tag "$IMAGE" "$BUILD"
 if [ -n "$DOCKER_USER" ]; then
   docker push "$IMAGE"
 fi
+
+touch "/tmp/docker-build-$BUILD.done"

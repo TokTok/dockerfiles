@@ -20,7 +20,7 @@ jobs:
   build:
     strategy:
       matrix:
-        image: [alpine-s390x, bazel, bazel-cache, flutter-web, frama-c, freebsd, haskell]
+        image: [alpine-s390x, bazel, bazel-cache, compcert, flutter-web, frama-c, freebsd, haskell]
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker Buildx

@@ -1,30 +1,30 @@
-FROM debian:bullseye-slim
+FROM ubuntu:22.04
 
-LABEL maintainer "Infer team"
-
-# mkdir the man/man1 directory due to Debian bug #863199
+ENV DEBIAN_FRONTEND="noninteractive"
 RUN apt-get update \
- && mkdir -p /usr/share/man/man1 \
- && apt-get install --yes --no-install-recommends \
+ && apt-get install --no-install-recommends -y \
+ autoconf \
+ automake \
+ ca-certificates \
+ cmake \
  curl \
- libc6-dev \
+ git \
  libconfig-dev \
- libmsgpack-dev \
+ libgmp-dev \
  libopus-dev \
  libsodium-dev \
+ libsqlite3-dev \
  libvpx-dev \
- openjdk-11-jdk-headless \
+ opam \
+ ninja-build \
+ pkg-config \
+ python3 \
  sqlite3 \
- xz-utils \
  zlib1g-dev \
+ && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-# Download the Infer release
-WORKDIR /opt
-ENV INFER_VERSION=v1.1.0
-RUN bash -c "tar Jxf <(curl -sL 'https://github.com/facebook/infer/releases/download/$INFER_VERSION/infer-linux64-$INFER_VERSION.tar.xz')" \
- && rm -f /infer \
- && ln -s "$PWD/infer-linux64-$INFER_VERSION" /infer
-
-# Install infer
-ENV PATH /infer/bin:$PATH
+# https://github.com/facebook/infer/blob/main/INSTALL.md#install-infer-from-source
+RUN git clone --depth=1 https://github.com/facebook/infer.git /work/infer
+WORKDIR /work/infer
+RUN yes | ./build-infer.sh clang && make install && rm -rf /work/infer/*

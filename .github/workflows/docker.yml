@@ -21,7 +21,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [alpine-s390x, bazel, bazel-cache, compcert, doxygen, flutter-web, frama-c, freebsd, haskell, pkgsrc]
+        image:
+          [
+            alpine-s390x,
+            bazel,
+            compcert,
+            doxygen,
+            flutter-web,
+            frama-c,
+            freebsd,
+            haskell,
+            pkgsrc,
+          ]
+        include:
+          - image: bazel
+            base: true
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker Buildx
@@ -34,12 +48,23 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Build image
-        if: hashFiles('${{ matrix.image }}/build.sh') != ''
+      - name: Build base image
+        if: ${{ matrix.base }}
         run: |
-          cd ${{ matrix.image }} && [ ! -e build.sh ] || ./build.sh
+          cd ${{ matrix.image }} && ./build.sh
+      - name: Build and push (with base image)
+        if: ${{ matrix.base }}
+        uses: docker/build-push-action@v6
+        with:
+          context: "${{ matrix.image }}"
+          build-contexts: "base=oci-layout://${{ matrix.image }}/layers:base"
+          tags: toxchat/${{ matrix.image }}:latest
+          cache-from: type=registry,ref=toxchat/${{ matrix.image }}:latest
+          cache-to: type=inline
+          push: ${{ github.event_name == 'push' }}
       - name: Build and push
-        uses: docker/build-push-action@v5
+        if: ${{ !matrix.base }}
+        uses: docker/build-push-action@v6
         with:
           context: "${{ matrix.image }}"
           tags: toxchat/${{ matrix.image }}:latest

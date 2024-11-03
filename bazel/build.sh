@@ -12,17 +12,11 @@ if ! which nix-shell; then
   nix-channel --update
 fi
 
-# Build a docker image and squash all the layers.
+# Build a docker image.
 nix-shell -p arion --run 'arion build'
-IMAGE=$(nix-shell -p arion --run 'arion config' | grep -o 'toxchat/bazel:.*')
-mkdir layers
-docker save "$IMAGE" | tar x -C layers
-tar cf squashed.tar README.md
-for i in layers/*/layer.tar; do
-  tar -Af squashed.tar "$i"
-done
-# Delete the separate layers after squashing them.
-rm -r layers
+IMAGE="$(nix-shell -p arion --run 'arion config' | grep -o 'toxchat/bazel:.*')"
 
-# Run docker build, then clean up if we built the tarball above.
-docker build -t toxchat/bazel:latest .
+docker tag "$IMAGE" "toxchat/bazel:base"
+
+mkdir layers
+docker save "toxchat/bazel:base" | tar -x -C layers

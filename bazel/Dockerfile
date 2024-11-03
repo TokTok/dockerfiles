@@ -1,6 +1,7 @@
 # Build the base image in a single layer instead of 100 as done by arion.
 FROM scratch
-ADD squashed.tar /
+# hadolint ignore=DL3022
+COPY --from=base / /
 # Reinstate the CMD directive from the squashed image.
 CMD ["/usr/sbin/init"]
 

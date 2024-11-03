@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Install docker.
-apk add make perl docker-cli
+apk add docker-cli
 
 # Run this before set -eux so we don't print credentials to the CI logs.
 if [ -n "$DOCKER_USER" ]; then
@@ -16,7 +16,6 @@ set -eux
 BUILD="$1"
 IMAGE="$2"
 
-make
 docker pull "$IMAGE" || true
 docker build --cache-from "$IMAGE" --tag "$IMAGE" "$BUILD"
 if [ -n "$DOCKER_USER" ]; then

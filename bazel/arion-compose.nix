@@ -11,6 +11,7 @@ in {
       configuration = {
         boot.tmp.useTmpfs = true;
         nix.settings.sandbox = false;
+        nix.settings.auto-optimise-store = true;
 
         services.openssh.enable = true;
         services.nscd.enable = false;
@@ -26,7 +27,7 @@ in {
           pkgs.coreutils
           pkgs.git
           # Needed because coursier (for Kotlin) requires that java is in $PATH.
-          pkgs.jdk11
+          pkgs.jdk11_headless
         ];
 
         security.sudo.wheelNeedsPassword = false;

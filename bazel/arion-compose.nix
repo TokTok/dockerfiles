@@ -15,7 +15,7 @@ in {
         services.openssh.enable = true;
         services.nscd.enable = false;
 
-        system.stateVersion = "23.11";
+        system.stateVersion = "24.05";
         system.nssModules = lib.mkForce [];
 
         systemd.sockets.nix-daemon.enable = true;

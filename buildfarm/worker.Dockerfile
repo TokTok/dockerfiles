@@ -1,4 +1,4 @@
-FROM bazelbuild/buildfarm-worker:2.8.0
+FROM bazelbuild/buildfarm-worker:2.12.0
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV DEBIAN_FRONTEND="noninteractive"

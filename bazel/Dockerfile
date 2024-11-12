@@ -6,10 +6,8 @@ COPY --from=base / /
 CMD ["/usr/sbin/init"]
 
 # We need to know where our bash is, because we haven't set up /bin/sh yet.
-# ENV NIXOS_VERSION="24.05"
-# SHELL ["/nix/store/rdd4pnr4x9rqc9wgbibhngv217w2xvxl-bash-interactive-5.2p26/bin/bash", "-o", "pipefail", "-c"]
-ENV NIXOS_VERSION="23.11"
-SHELL ["/nix/store/x88ivkf7rmrhd5x3cvyv5vh3zqqdnhsk-bash-interactive-5.2-p15/bin/bash", "-o", "pipefail", "-c"]
+ENV NIXOS_VERSION="24.05"
+SHELL ["/nix/store/rdd4pnr4x9rqc9wgbibhngv217w2xvxl-bash-interactive-5.2p26/bin/bash", "-o", "pipefail", "-c"]
 
 # Run activation script (init knows where it is).
 RUN /usr/sbin/init || true

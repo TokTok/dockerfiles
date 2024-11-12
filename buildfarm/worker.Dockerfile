@@ -13,7 +13,7 @@ ENV USER=ubuntu
 
 RUN sh <(curl -L https://nixos.org/nix/install) --no-daemon --no-channel-add --yes
 RUN . "$HOME/.nix-profile/etc/profile.d/nix.sh" \
- && nix-channel --add https://github.com/NixOS/nixpkgs/archive/refs/tags/23.11.tar.gz nixpkgs \
+ && nix-channel --add https://github.com/NixOS/nixpkgs/archive/refs/tags/24.05.tar.gz nixpkgs \
  && nix-channel --update
 
 WORKDIR /home/ubuntu

@@ -23,24 +23,24 @@ RUN ["apk", "add", \
 
 ENV CC=clang CXX=clang++
 
-RUN git clone --recurse-submodules --depth=1 https://github.com/TokTok/c-toxcore /work/c-toxcore
 WORKDIR /work/c-toxcore
-RUN cmake -B_build -H. -GNinja
-RUN cmake --build _build --target install
+RUN git clone --recurse-submodules --depth=1 https://github.com/TokTok/c-toxcore /work/c-toxcore \
+ && cmake -B_build -H. -GNinja \
+ && cmake --build _build --target install \
+ && rm -rf /work/c-toxcore
 
-RUN git clone --recurse-submodules --depth=1 https://github.com/toxext/toxext /work/toxext
 WORKDIR /work/toxext
 # Tests enable asan unconditionally, which doesn't work on Alpine.
-RUN sed -i -e 's/add_subdirectory(test)/#\1/' CMakeLists.txt
-RUN cmake -B_build -H. -GNinja
-RUN cmake --build _build --target install
+RUN git clone --recurse-submodules --depth=1 https://github.com/toxext/toxext /work/toxext \
+ && sed -i -e 's/add_subdirectory(test)/#\1/' CMakeLists.txt \
+ && cmake -B_build -H. -GNinja \
+ && cmake --build _build --target install \
+ && rm -rf /work/toxext
 
-RUN git clone --recurse-submodules --depth=1 https://github.com/toxext/tox_extension_messages /work/tox_extension_messages
 WORKDIR /work/tox_extension_messages
-RUN cmake -B_build -H. -GNinja
-RUN cmake --build _build --target install
+RUN git clone --recurse-submodules --depth=1 https://github.com/toxext/tox_extension_messages /work/tox_extension_messages \
+ && cmake -B_build -H. -GNinja \
+ && cmake --build _build --target install \
+ && rm -rf /work/tox_extension_messages
 
-COPY . /work/qtox
-WORKDIR /work/qtox
-RUN cmake -B_build -H. -GNinja
-RUN cmake --build _build --target install
+WORKDIR /qtox

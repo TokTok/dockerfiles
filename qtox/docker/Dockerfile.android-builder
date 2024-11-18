@@ -1,0 +1,241 @@
+FROM alpine:edge
+
+RUN ["apk", "add", \
+ "autoconf", \
+ "automake", \
+ "bash", \
+ "clang", \
+ "cmake", \
+ "diffutils", \
+ "gcompat", \
+ "git", \
+ "libtool", \
+ "make", \
+ "openjdk17", \
+ "qt6-qtbase~6.8.0", \
+ "qt6-qttools~6.8.0", \
+ "qt6-qttools-dev~6.8.0", \
+ "samurai", \
+ "tcl"]
+
+WORKDIR /work/android/sdk
+RUN wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
+ && unzip commandlinetools-linux-11076708_latest.zip \
+ && rm commandlinetools-linux-11076708_latest.zip \
+ && mv cmdline-tools tools \
+ && mkdir cmdline-tools \
+ && mv tools cmdline-tools
+
+ENV ANDROID_SDK_HOME=/work/android/sdk
+ENV PATH=$ANDROID_SDK_HOME/cmdline-tools/tools/bin:$PATH
+
+RUN yes | sdkmanager --licenses
+RUN ["sdkmanager", "platform-tools", "platforms;android-34", "build-tools;34.0.0"]
+RUN ["sdkmanager", "ndk;26.1.10909125"]
+
+ENV ANDROID_NDK_ROOT=$ANDROID_SDK_HOME/ndk/26.1.10909125
+ENV TOOLCHAIN=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64
+ENV PATH=$TOOLCHAIN/bin:$PATH
+ENV SYSROOT=$TOOLCHAIN/sysroot
+ENV PKG_CONFIG_PATH=$SYSROOT/usr/lib/pkgconfig
+ENV CC=$TOOLCHAIN/bin/aarch64-linux-android23-clang
+ENV CXX=$TOOLCHAIN/bin/aarch64-linux-android23-clang++
+
+WORKDIR /work/openssl
+RUN wget https://github.com/openssl/openssl/releases/download/openssl-3.4.0/openssl-3.4.0.tar.gz \
+ && tar zxf openssl-3.4.0.tar.gz \
+ && cd openssl-3.4.0 \
+ && ./Configure android-arm64 --prefix=$SYSROOT/usr \
+ && make -j$(nproc) \
+ && make install_sw \
+ && rm -rf /work/openssl
+
+WORKDIR /work
+RUN wget https://download.qt.io/archive/qt/6.8/6.8.0/single/qt-everywhere-src-6.8.0.tar.xz \
+ && tar Jxf qt-everywhere-src-6.8.0.tar.xz \
+ && rm qt-everywhere-src-6.8.0.tar.xz \
+ && cd /work/qt-everywhere-src-6.8.0 \
+ && ./configure -prefix "/work/android/qt" \
+    -qt-host-path /usr \
+    -android-abis arm64-v8a \
+    -android-sdk "$ANDROID_SDK_HOME" \
+    -android-ndk "$ANDROID_NDK_ROOT" \
+    -openssl-linked \
+    -nomake examples \
+    -nomake tests \
+    -submodules qtbase,qtsvg,qttools \
+    -skip qtactiveqt \
+    -skip qtdeclarative \
+    -skip qtlanguageserver \
+    -skip qtshadertools \
+    -no-feature-assistant \
+    -no-feature-designer \
+ && cmake --build . \
+ && cmake --install . \
+ && cd - \
+ && rm -rf /work/qt-everywhere-src-6.8.0
+
+WORKDIR /work/ffmpeg
+RUN wget https://www.ffmpeg.org/releases/ffmpeg-7.1.tar.xz \
+ && tar Jxf ffmpeg-7.1.tar.xz \
+ && cd ffmpeg-7.1 \
+ && ./configure \
+ --prefix=$SYSROOT/usr \
+ --ar=$TOOLCHAIN/bin/llvm-ar \
+ --nm=$TOOLCHAIN/bin/llvm-nm \
+ --ranlib=$TOOLCHAIN/bin/llvm-ranlib \
+ --cross-prefix=$TOOLCHAIN/bin/aarch64-linux-android23- \
+ --target-os=android \
+ --arch=arm64 \
+ --disable-debug \
+ --disable-programs \
+ --disable-protocols \
+ --disable-doc \
+ --disable-sdl2 \
+ --disable-avfilter \
+ --disable-filters \
+ --disable-iconv \
+ --disable-network \
+ --disable-muxers \
+ --disable-postproc \
+ --disable-swresample \
+ --disable-swscale-alpha \
+ --disable-dwt \
+ --disable-lsp \
+ --disable-faan \
+ --disable-vaapi \
+ --disable-vdpau \
+ --disable-zlib \
+ --disable-xlib \
+ --disable-bzlib \
+ --disable-lzma \
+ --disable-encoders \
+ --disable-decoders \
+ --disable-demuxers \
+ --disable-parsers \
+ --disable-bsfs \
+ --enable-demuxer=h264 \
+ --enable-demuxer=mjpeg \
+ --enable-parser=h264 \
+ --enable-parser=mjpeg \
+ --enable-decoder=h264 \
+ --enable-decoder=mjpeg \
+ --enable-decoder=rawvideo \
+ --sysroot=$SYSROOT \
+ && make -j$(nproc) \
+ && make install \
+ && rm -rf /work/ffmpeg
+
+WORKDIR /work/libexif
+RUN wget https://github.com/libexif/libexif/releases/download/v0.6.24/libexif-0.6.24.tar.bz2 \
+ && tar jxf libexif-0.6.24.tar.bz2 \
+ && cd libexif-0.6.24 \
+ && ./configure --prefix=$SYSROOT/usr --host=aarch64-linux-android --with-sysroot=$SYSROOT --disable-shared \
+ && make -j$(nproc) \
+ && make install \
+ && rm -rf /work/libexif
+
+WORKDIR /work/libqrencode
+RUN wget https://github.com/fukuchi/libqrencode/archive/refs/tags/v4.1.1.tar.gz \
+ && tar zxf v4.1.1.tar.gz \
+ && cd libqrencode-4.1.1 \
+ && autoreconf -fi \
+ && ./configure --prefix=$SYSROOT/usr --host=aarch64-linux-android --with-sysroot=$SYSROOT --disable-shared --without-png CFLAGS=-fPIC \
+ && make -j$(nproc) \
+ && make install \
+ && rm -rf /work/libqrencode
+
+WORKDIR /work/libsodium
+RUN wget https://github.com/jedisct1/libsodium/releases/download/1.0.20-RELEASE/libsodium-1.0.20.tar.gz \
+ && tar zxf libsodium-1.0.20.tar.gz \
+ && cd libsodium-1.0.20 \
+ && ./configure --prefix=$SYSROOT/usr --host=aarch64-linux-android --with-sysroot=$SYSROOT --disable-shared \
+ && make -j$(nproc) \
+ && make install \
+ && rm -rf /work/libsodium
+
+WORKDIR /work/sqlcipher
+RUN wget https://github.com/sqlcipher/sqlcipher/archive/refs/tags/v4.6.1.tar.gz \
+ && tar zxf v4.6.1.tar.gz \
+ && cd sqlcipher-4.6.1 \
+ && ./configure --prefix=$SYSROOT/usr --host=aarch64-linux-android --with-sysroot=$SYSROOT --disable-shared CFLAGS=-fPIC \
+ && make -j$(nproc) \
+ && make install \
+ && rm -rf /work/sqlcipher
+
+WORKDIR /work/opus
+RUN wget https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz \
+ && tar zxf opus-1.5.2.tar.gz \
+ && cd opus-1.5.2 \
+ && ./configure --prefix=$SYSROOT/usr --host=aarch64-linux-android --with-sysroot=$SYSROOT --disable-shared \
+ && make -j$(nproc) \
+ && make install \
+ && rm -rf /work/opus
+
+WORKDIR /work/libvpx
+RUN wget https://github.com/webmproject/libvpx/archive/refs/tags/v1.15.0.tar.gz \
+ && tar zxf v1.15.0.tar.gz \
+ && cd libvpx-1.15.0 \
+ && ./configure --prefix=$SYSROOT/usr --libc=$SYSROOT --target=arm64-android-gcc --disable-examples --disable-unit-tests --enable-pic \
+ && make -j$(nproc) \
+ && make install \
+ && rm -rf /work/libvpx
+
+WORKDIR /work/openal
+RUN wget https://github.com/kcat/openal-soft/releases/download/1.23.1/openal-soft-1.23.1.tar.bz2 \
+ && tar jxf openal-soft-1.23.1.tar.bz2 \
+ && cd openal-soft-1.23.1 \
+ && /work/android/qt/bin/qt-cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DLIBTYPE=STATIC \
+  -GNinja \
+  -B_build \
+  -H. \
+ && cmake --build _build \
+ && cmake --install _build \
+ && rm -rf /work/openal
+
+WORKDIR /work/toxcore
+RUN wget https://github.com/TokTok/c-toxcore/releases/download/v0.2.20/c-toxcore-0.2.20.tar.gz \
+ && tar zxf c-toxcore-0.2.20.tar.gz \
+ && cd c-toxcore-0.2.20 \
+ && /work/android/qt/bin/qt-cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX:PATH=$SYSROOT/usr \
+  -DENABLE_SHARED=OFF \
+  -GNinja \
+  -B_build \
+  -H. \
+ && cmake --build _build \
+ && cmake --install _build \
+ && rm -rf /work/toxcore
+
+WORKDIR /work/toxext
+RUN wget https://github.com/toxext/toxext/archive/refs/tags/v0.0.3.tar.gz \
+ && tar zxf v0.0.3.tar.gz \
+ && cd toxext-0.0.3 \
+ && /work/android/qt/bin/qt-cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX:PATH=$SYSROOT/usr \
+  -GNinja \
+  -H. \
+  -B_build \
+ && cmake --build _build \
+ && cmake --install _build \
+ && rm -rf /work/toxext
+
+WORKDIR /work/tox_extension_messages
+RUN wget https://github.com/toxext/tox_extension_messages/archive/refs/tags/v0.0.3.tar.gz \
+ && tar zxf v0.0.3.tar.gz \
+ && cd tox_extension_messages-0.0.3 \
+ && /work/android/qt/bin/qt-cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX:PATH=$SYSROOT/usr \
+  -GNinja \
+  -B_build \
+  -H. \
+ && cmake --build _build \
+ && cmake --install _build \
+ && rm -rf /work/tox_extension_messages
+
+WORKDIR /qtox

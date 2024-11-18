@@ -137,6 +137,6 @@ jobs:
             ARCH=${{ matrix.arch }}
             WINEARCH=${{ matrix.winearch }}
           tags: toxchat/qtox:${{ matrix.image }}
-          cache-from: type=registry,ref=toxchat/qtox-${{ matrix.image }}:latest
+          cache-from: type=registry,ref=toxchat/qtox:${{ matrix.image }}
           cache-to: type=inline
           push: ${{ github.event_name == 'push' }}

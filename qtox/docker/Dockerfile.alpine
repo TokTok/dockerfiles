@@ -1,6 +1,7 @@
 FROM alpine:3.20
 
 RUN ["apk", "add", \
+ "bash", \
  "clang", \
  "cmake", \
  "ffmpeg-dev", \

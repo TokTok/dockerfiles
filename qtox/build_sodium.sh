@@ -8,18 +8,18 @@ set -euo pipefail
 
 readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
-source "${SCRIPT_DIR}/build_utils.sh"
+source "$SCRIPT_DIR/build_utils.sh"
 
 parse_arch --dep "sodium" --supported "win32 win64 macos" "$@"
 
-"${SCRIPT_DIR}/download/download_sodium.sh"
+"$SCRIPT_DIR/download/download_sodium.sh"
 
-CFLAGS="${CROSS_CFLAG}" \
-LDFLAGS="${CROSS_LDFLAG} -fstack-protector" \
-  ./configure "${HOST_OPTION}" \
-              "--prefix=${DEP_PREFIX}" \
-              --enable-shared \
-              --disable-static
+CFLAGS="$CROSS_CFLAG" \
+  LDFLAGS="$CROSS_LDFLAG -fstack-protector" \
+  ./configure "$HOST_OPTION" \
+  "--prefix=$DEP_PREFIX" \
+  --enable-shared \
+  --disable-static
 
-make -j "${MAKE_JOBS}"
+make -j "$MAKE_JOBS"
 make install

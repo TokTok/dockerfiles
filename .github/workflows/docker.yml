@@ -17,67 +17,91 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # build:
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       image:
-  #         - alpine-s390x
-  #         - bazel
-  #         - compcert
-  #         - doxygen
-  #         - flutter-web
-  #         - frama-c
-  #         - freebsd
-  #         - haskell
-  #         - pkgsrc
-  #       include:
-  #         - image: bazel
-  #           has_base: true
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v3
-  #     - name: Login to DockerHub
-  #       if: ${{ github.event_name == 'push' }}
-  #       uses: docker/login-action@v3
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     - name: Build base image
-  #       if: ${{ matrix.has_base }}
-  #       run: |
-  #         cd ${{ matrix.image }} && ./build.sh
-  #     - name: Build and push (with base image)
-  #       if: ${{ matrix.has_base }}
-  #       uses: docker/build-push-action@v6
-  #       with:
-  #         context: "${{ matrix.image }}"
-  #         build-contexts: "base=oci-layout://${{ matrix.image }}/layers:base"
-  #         tags: toxchat/${{ matrix.image }}:latest
-  #         cache-from: type=registry,ref=toxchat/${{ matrix.image }}:latest
-  #         cache-to: type=inline
-  #         push: ${{ github.event_name == 'push' }}
-  #     - name: Build and push
-  #       if: ${{ !matrix.has_base }}
-  #       uses: docker/build-push-action@v6
-  #       with:
-  #         context: "${{ matrix.image }}"
-  #         tags: toxchat/${{ matrix.image }}:latest
-  #         cache-from: type=registry,ref=toxchat/${{ matrix.image }}:latest
-  #         cache-to: type=inline
-  #         push: ${{ github.event_name == 'push' }}
-
-  build-qtox:
+  build:
     strategy:
       fail-fast: false
       matrix:
         image:
+          - alpine-s390x
+          - bazel
+          - compcert
+          - doxygen
+          - flutter-web
+          - frama-c
+          - freebsd
+          - haskell
+          - pkgsrc
+        include:
+          - image: bazel
+            has_base: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to DockerHub
+        if: ${{ github.event_name == 'push' }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build base image
+        if: ${{ matrix.has_base }}
+        run: |
+          cd ${{ matrix.image }} && ./build.sh
+      - name: Build and push (with base image)
+        if: ${{ matrix.has_base }}
+        uses: docker/build-push-action@v6
+        with:
+          context: "${{ matrix.image }}"
+          build-contexts: "base=oci-layout://${{ matrix.image }}/layers:base"
+          tags: toxchat/${{ matrix.image }}:latest
+          cache-from: type=registry,ref=toxchat/${{ matrix.image }}:latest
+          cache-to: type=inline
+          push: ${{ github.event_name == 'push' }}
+      - name: Build and push
+        if: ${{ !matrix.has_base }}
+        uses: docker/build-push-action@v6
+        with:
+          context: "${{ matrix.image }}"
+          tags: toxchat/${{ matrix.image }}:latest
+          cache-from: type=registry,ref=toxchat/${{ matrix.image }}:latest
+          cache-to: type=inline
+          push: ${{ github.event_name == 'push' }}
+
+  buildfarm:
+    strategy:
+      matrix:
+        image: [server, worker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to DockerHub
+        if: ${{ github.event_name == 'push' }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}:buildfarm"
+          file: ${{ matrix.image }}.Dockerfile
+          tags: toxchat/buildfarm-${{ matrix.image }}:latest
+          cache-from: type=registry,ref=toxchat/buildfarm-${{ matrix.image }}:latest
+          cache-to: type=inline
+          push: ${{ github.event_name == 'push' }}
+
+  qtox:
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - android-builder
           - debian
           - fedora
-          - android-builder
           - flatpak-builder
           - ubuntu-lts
           - windows-builder.i686
@@ -115,27 +139,3 @@ jobs:
           cache-from: type=registry,ref=toxchat/qtox-${{ matrix.image }}:latest
           cache-to: type=inline
           push: ${{ github.event_name == 'push' }}
-
-  # buildfarm:
-  #   strategy:
-  #     matrix:
-  #       image: [server, worker]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v3
-  #     - name: Login to DockerHub
-  #       if: ${{ github.event_name == 'push' }}
-  #       uses: docker/login-action@v3
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
-  #     - name: Build and push
-  #       uses: docker/build-push-action@v5
-  #       with:
-  #         context: "{{defaultContext}}:buildfarm"
-  #         file: ${{ matrix.image }}.Dockerfile
-  #         tags: toxchat/buildfarm-${{ matrix.image }}:latest
-  #         cache-from: type=registry,ref=toxchat/buildfarm-${{ matrix.image }}:latest
-  #         cache-to: type=inline
-  #         push: ${{ github.event_name == 'push' }}

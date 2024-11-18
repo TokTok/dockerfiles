@@ -8,19 +8,19 @@ set -euo pipefail
 
 readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
-source "${SCRIPT_DIR}/build_utils.sh"
+source "$SCRIPT_DIR/build_utils.sh"
 
 parse_arch --dep "gdb" --supported "win32 win64" "$@"
 
-"${SCRIPT_DIR}/download/download_gdb.sh"
+"$SCRIPT_DIR/download/download_gdb.sh"
 
-CFLAGS="-O2 -g0" ./configure "${HOST_OPTION}" \
-                                --prefix="${DEP_PREFIX}" \
-                                --enable-static \
-                                --disable-shared \
-                                CFLAGS="-I/windows/include" \
-                                LDFLAGS="-L/windows/lib" \
-                                || (cat config.log && false)
+CFLAGS="-O2 -g0" ./configure "$HOST_OPTION" \
+  --prefix="$DEP_PREFIX" \
+  --enable-static \
+  --disable-shared \
+  CFLAGS="-I/windows/include" \
+  LDFLAGS="-L/windows/lib" ||
+  (cat config.log && false)
 
-make -j "${MAKE_JOBS}"
+make -j "$MAKE_JOBS"
 make install

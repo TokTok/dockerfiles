@@ -19,49 +19,49 @@ set -euo pipefail
 
 readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
-SUDO=${1:-}
+SUDO=("$@")
 
 build_toxcore() {
-    mkdir -p toxcore
-    pushd toxcore >/dev/null || exit 1
+  mkdir -p toxcore
+  pushd toxcore >/dev/null || exit 1
 
-    "${SCRIPT_DIR}/download/download_toxcore.sh"
+  "$SCRIPT_DIR/download/download_toxcore.sh"
 
-    cmake . \
-        -DBOOTSTRAP_DAEMON=OFF \
-        -DCMAKE_BUILD_TYPE=Release \
-        .
+  cmake . \
+    -DBOOTSTRAP_DAEMON=OFF \
+    -DCMAKE_BUILD_TYPE=Release \
+    .
 
-    cmake --build . -- -j$(nproc)
-    $SUDO cmake --build . --target install
+  cmake --build . -- -j"$(nproc)"
+  "${SUDO[@]}" cmake --build . --target install
 
-    popd >/dev/null
+  popd >/dev/null
 }
 
 build_toxext() {
-    mkdir -p toxext
-    pushd toxext >/dev/null || exit 1
+  mkdir -p toxext
+  pushd toxext >/dev/null || exit 1
 
-    "${SCRIPT_DIR}/download/download_toxext.sh"
+  "$SCRIPT_DIR/download/download_toxext.sh"
 
-    cmake . -DCMAKE_BUILD_TYPE=Release
-    cmake --build . -- -j$(nproc)
-    $SUDO cmake --build . --target install
+  cmake . -DCMAKE_BUILD_TYPE=Release
+  cmake --build . -- -j"$(nproc)"
+  "${SUDO[@]}" cmake --build . --target install
 
-    popd >/dev/null
+  popd >/dev/null
 }
 
 build_toxext_messages() {
-    mkdir -p toxext_messages
-    pushd toxext_messages > /dev/null || exit 1
+  mkdir -p toxext_messages
+  pushd toxext_messages >/dev/null || exit 1
 
-    "${SCRIPT_DIR}/download/download_toxext_messages.sh"
+  "$SCRIPT_DIR/download/download_toxext_messages.sh"
 
-    cmake .  -DCMAKE_BUILD_TYPE=Release
-    cmake --build . -- -j$(nproc)
-    $SUDO cmake --build . --target install
+  cmake . -DCMAKE_BUILD_TYPE=Release
+  cmake --build . -- -j"$(nproc)"
+  "${SUDO[@]}" cmake --build . --target install
 
-    popd >/dev/null
+  popd >/dev/null
 }
 
 build_toxcore

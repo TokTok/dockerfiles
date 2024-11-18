@@ -8,16 +8,16 @@ set -euo pipefail
 
 readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
-source "${SCRIPT_DIR}/build_utils.sh"
+source "$SCRIPT_DIR/build_utils.sh"
 
 parse_arch --dep "glfw" --supported "win32 win64" "$@"
 
-"${SCRIPT_DIR}/download/download_glfw.sh"
+"$SCRIPT_DIR/download/download_glfw.sh"
 
 cmake -DCMAKE_INSTALL_PREFIX=/windows/ \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_TOOLCHAIN_FILE=/build/windows-toolchain.cmake \
-      -GNinja \
-      .
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_TOOLCHAIN_FILE=/build/windows-toolchain.cmake \
+  -GNinja \
+  .
 
 cmake --build . --target install

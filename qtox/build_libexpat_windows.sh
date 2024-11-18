@@ -8,16 +8,16 @@ set -euo pipefail
 
 readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
-source "${SCRIPT_DIR}/build_utils.sh"
+source "$SCRIPT_DIR/build_utils.sh"
 
 parse_arch --dep "libexpat" --supported "win32 win64" "$@"
 
-"${SCRIPT_DIR}/download/download_libexpat.sh"
+"$SCRIPT_DIR/download/download_libexpat.sh"
 
-CFLAGS="-O2 -g0" ./configure "${HOST_OPTION}" \
-                                --prefix="${DEP_PREFIX}" \
-                                --enable-static \
-                                --disable-shared
+CFLAGS="-O2 -g0" ./configure "$HOST_OPTION" \
+  --prefix="$DEP_PREFIX" \
+  --enable-static \
+  --disable-shared
 
-make -j "${MAKE_JOBS}"
+make -j "$MAKE_JOBS"
 make install

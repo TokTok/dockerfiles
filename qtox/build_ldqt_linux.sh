@@ -17,7 +17,7 @@
 
 set -euo pipefail
 
-"$(dirname $(realpath "$0"))/download/download_ldqt.sh"
+"$(dirname "$(realpath "$0")")/download/download_ldqt.sh"
 
 cmake -B_build -Hlinuxdeployqt
 cmake --build _build --target install

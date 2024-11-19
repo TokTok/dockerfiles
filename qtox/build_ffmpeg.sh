@@ -13,13 +13,13 @@ source "$SCRIPT_DIR/build_utils.sh"
 parse_arch --dep "ffmpeg" --supported "win32 win64 macos" "$@"
 
 if [ "$SCRIPT_ARCH" == "win64" ]; then
-  FFMPEG_ARCH="--arch=x86_64"
-  TARGET_OS="--target-os=mingw32"
-  CROSS_PREFIX="--cross-prefix=$MINGW_ARCH-w64-mingw32-"
+  FFMPEG_ARCH="x86_64"
+  TARGET_OS="mingw32"
+  CROSS_PREFIX="$MINGW_ARCH-w64-mingw32-"
 elif [ "$SCRIPT_ARCH" == "win32" ]; then
-  FFMPEG_ARCH="--arch=x86"
-  TARGET_OS="--target-os=mingw32"
-  CROSS_PREFIX="--cross-prefix=$MINGW_ARCH-w64-mingw32-"
+  FFMPEG_ARCH="x86"
+  TARGET_OS="mingw32"
+  CROSS_PREFIX="$MINGW_ARCH-w64-mingw32-"
 else
   FFMPEG_ARCH=""
   TARGET_OS=""
@@ -31,13 +31,13 @@ fi
 CFLAGS="$CROSS_CFLAG" \
   CPPFLAGS="$CROSS_CPPFLAG" \
   LDFLAGS="$CROSS_LDFLAG" \
-  ./configure "$FFMPEG_ARCH" \
+  ./configure "--arch=$FFMPEG_ARCH" \
   --enable-gpl \
   --enable-shared \
   --disable-static \
   "--prefix=$DEP_PREFIX" \
-  "$TARGET_OS" \
-  "$CROSS_PREFIX" \
+  "--target-os=$TARGET_OS" \
+  "--cross-prefix=$CROSS_PREFIX" \
   --pkg-config="pkg-config" \
   --extra-cflags="-O2 -g0" \
   --disable-debug \

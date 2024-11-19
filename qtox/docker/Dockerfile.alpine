@@ -4,6 +4,7 @@ RUN ["apk", "add", \
  "bash", \
  "clang", \
  "cmake", \
+ "compiler-rt", \
  "ffmpeg-dev", \
  "git", \
  "gzip", \

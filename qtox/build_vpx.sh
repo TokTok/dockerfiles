@@ -12,32 +12,26 @@ source "$SCRIPT_DIR/build_utils.sh"
 
 parse_arch --dep "vpx" --supported "win32 win64 macos" "$@"
 
-if [[ "$SCRIPT_ARCH" == "win64" ]]; then
+if [ "$SCRIPT_ARCH" == "win64" ]; then
   # There is a bug in gcc that breaks avx512 on 64-bit Windows https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54412
   # VPX fails to build due to it.
   # This is a workaround as suggested in https://stackoverflow.com/questions/43152633
   ARCH_FLAGS="-fno-asynchronous-unwind-tables"
   CROSS_ARG="$MINGW_ARCH-w64-mingw32-"
-  TARGET_ARG=("--target=x86_64-win64-gcc")
-elif [[ "$SCRIPT_ARCH" == "win32" ]]; then
+  TARGET_ARG="x86_64-win64-gcc"
+elif [ "$SCRIPT_ARCH" == "win32" ]; then
   ARCH_FLAGS=""
   CROSS_ARG="$MINGW_ARCH-w64-mingw32-"
-  TARGET_ARG=("--target=x86-win32-gcc")
+  TARGET_ARG="x86-win32-gcc"
 elif [ "$SCRIPT_ARCH" == "macos" ]; then
   ARCH_FLAGS=""
   CROSS_ARG=""
-  TARGET_ARG=()
+  TARGET_ARG="x86_64-darwin22-gcc" # macOS 13
 else
   exit 1
 fi
 
 "$SCRIPT_DIR/download/download_vpx.sh"
-
-# if [ "${SCRIPT_ARCH}" == "macos" ]; then
-#     patch -Np1 < "${SCRIPT_DIR}/patches/vpx-macos.patch"
-# else
-#     patch -Np1 < "${SCRIPT_DIR}/patches/vpx-windows.patch"
-# fi
 
 if [ "$SCRIPT_ARCH" == "win32" ] || [ "$SCRIPT_ARCH" == "win64" ]; then
   ENABLE_STATIC="--enable-static"
@@ -52,7 +46,7 @@ CFLAGS="$ARCH_FLAGS $CROSS_CFLAG" \
   LDFLAGS="$CROSS_LDFLAG" \
   CROSS="$CROSS_ARG" \
   ./configure \
-  "${TARGET_ARG[@]}" \
+  "--target=$TARGET_ARG" \
   "--prefix=$DEP_PREFIX" \
   "$ENABLE_STATIC" \
   "$ENABLE_SHARED" \

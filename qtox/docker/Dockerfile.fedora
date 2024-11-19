@@ -18,30 +18,31 @@ FROM fedora:latest
 RUN dnf --nodocs -y install dnf-plugins-core && \
     dnf --nodocs -y install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm && \
     dnf --nodocs -y install \
-        cmake \
-        make \
         clang \
         clang-tools-extra \
+        cmake \
+        extra-cmake-modules \
+        ffmpeg-devel \
         gcc \
         gcc-c++ \
         git \
-        libvpx-devel \
-        qt6-qtbase-devel \
-        qt6-linguist \
-        qt6-qtsvg-devel \
-        extra-cmake-modules \
-        opus-devel \
-        libsodium-devel \
-        libasan \
-        ffmpeg-devel \
-        libexif-devel \
-        qrencode-devel \
-        openal-soft-devel \
         kf6-sonnet-devel \
+        libasan \
+        libexif-devel \
+        libsodium-devel \
+        libvpx-devel \
         libXScrnSaver-devel \
+        make \
+        ninja-build \
+        openal-soft-devel \
+        opus-devel \
         patch \
-        sqlite-devel \
-        sqlcipher-devel && \
+        qrencode-devel \
+        qt6-linguist \
+        qt6-qtbase-devel \
+        qt6-qtsvg-devel \
+        sqlcipher-devel \
+        sqlite-devel && \
     dnf clean all
 
 ENV PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig

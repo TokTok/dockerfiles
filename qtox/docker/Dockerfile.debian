@@ -38,6 +38,7 @@ RUN apt-get update \
  libsqlcipher-dev \
  libtool \
  libvpx-dev \
+ ninja-build \
  pkg-config \
  qt6-tools-dev \
  && apt-get clean \

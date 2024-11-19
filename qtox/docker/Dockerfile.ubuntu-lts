@@ -58,6 +58,7 @@ RUN apt-get update \
  libtool \
  libvpx-dev \
  libxss-dev \
+ ninja-build \
  patchelf \
  qt6-l10n-tools \
  qt6-tools-dev \

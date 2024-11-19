@@ -9,6 +9,7 @@ RUN ["apk", "add", \
  "git", \
  "gzip", \
  "libexif-dev", \
+ "libnotify-dev", \
  "libqrencode-dev", \
  "libsodium-dev", \
  "libvpx-dev", \

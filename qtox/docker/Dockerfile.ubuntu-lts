@@ -45,6 +45,7 @@ RUN apt-get update \
  libinotifytools0-dev \
  liblz4-dev \
  liblzma-dev \
+ libnotify-dev \
  libopenal-dev \
  libopus-dev \
  libqrencode-dev \

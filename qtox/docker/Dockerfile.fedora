@@ -29,6 +29,7 @@ RUN dnf --nodocs -y install dnf-plugins-core && \
         kf6-sonnet-devel \
         libasan \
         libexif-devel \
+        libnotify-devel \
         libsodium-devel \
         libvpx-devel \
         libXScrnSaver-devel \

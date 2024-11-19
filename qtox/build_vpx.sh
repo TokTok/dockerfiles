@@ -18,15 +18,15 @@ if [[ "$SCRIPT_ARCH" == "win64" ]]; then
   # This is a workaround as suggested in https://stackoverflow.com/questions/43152633
   ARCH_FLAGS="-fno-asynchronous-unwind-tables"
   CROSS_ARG="$MINGW_ARCH-w64-mingw32-"
-  TARGET_ARG="--target=x86_64-win64-gcc"
+  TARGET_ARG=("--target=x86_64-win64-gcc")
 elif [[ "$SCRIPT_ARCH" == "win32" ]]; then
   ARCH_FLAGS=""
   CROSS_ARG="$MINGW_ARCH-w64-mingw32-"
-  TARGET_ARG="--target=x86-win32-gcc"
+  TARGET_ARG=("--target=x86-win32-gcc")
 elif [ "$SCRIPT_ARCH" == "macos" ]; then
   ARCH_FLAGS=""
   CROSS_ARG=""
-  TARGET_ARG=""
+  TARGET_ARG=()
 else
   exit 1
 fi
@@ -52,7 +52,7 @@ CFLAGS="$ARCH_FLAGS $CROSS_CFLAG" \
   LDFLAGS="$CROSS_LDFLAG" \
   CROSS="$CROSS_ARG" \
   ./configure \
-  "$TARGET_ARG" \
+  "${TARGET_ARG[@]}" \
   "--prefix=$DEP_PREFIX" \
   "$ENABLE_STATIC" \
   "$ENABLE_SHARED" \

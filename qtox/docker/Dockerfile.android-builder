@@ -210,32 +210,4 @@ RUN wget https://github.com/TokTok/c-toxcore/releases/download/v0.2.20/c-toxcore
  && cmake --install _build \
  && rm -rf /work/toxcore
 
-WORKDIR /work/toxext
-RUN wget https://github.com/toxext/toxext/archive/refs/tags/v0.0.3.tar.gz \
- && tar zxf v0.0.3.tar.gz \
- && cd toxext-0.0.3 \
- && /work/android/qt/bin/qt-cmake \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX:PATH=$SYSROOT/usr \
-  -GNinja \
-  -H. \
-  -B_build \
- && cmake --build _build \
- && cmake --install _build \
- && rm -rf /work/toxext
-
-WORKDIR /work/tox_extension_messages
-RUN wget https://github.com/toxext/tox_extension_messages/archive/refs/tags/v0.0.3.tar.gz \
- && tar zxf v0.0.3.tar.gz \
- && cd tox_extension_messages-0.0.3 \
- && /work/android/qt/bin/qt-cmake \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX:PATH=$SYSROOT/usr \
-  -GNinja \
-  -B_build \
-  -H. \
- && cmake --build _build \
- && cmake --install _build \
- && rm -rf /work/tox_extension_messages
-
 WORKDIR /qtox

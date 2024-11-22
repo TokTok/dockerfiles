@@ -10,7 +10,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "toxcore and toxext extensions" --supported "win32 win64 macos" "$@"
+parse_arch --dep "toxcore" --supported "win32 win64 macos" "$@"
 
 build_toxcore() {
   TOXCORE_SRC="$(realpath .)/toxcore"
@@ -35,45 +35,4 @@ build_toxcore() {
   popd >/dev/null
 }
 
-build_toxext() {
-  TOXEXT_SRC="$(realpath .)/toxext"
-
-  mkdir -p "$TOXEXT_SRC"
-  pushd "$TOXEXT_SRC" >/dev/null || exit 1
-
-  "$SCRIPT_DIR/download/download_toxext.sh"
-
-  cmake "-DCMAKE_INSTALL_PREFIX=$DEP_PREFIX" \
-    -DCMAKE_BUILD_TYPE=Release \
-    "$CMAKE_TOOLCHAIN_FILE" \
-    "-DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOS_MINIMUM_SUPPORTED_VERSION" \
-    .
-
-  cmake --build . -- "-j$MAKE_JOBS"
-  cmake --build . --target install
-
-  popd >/dev/null
-}
-
-build_toxext_messages() {
-  TOXEXT_MESSAGES_SRC="$(realpath .)/toxext_messages"
-
-  mkdir -p "$TOXEXT_MESSAGES_SRC"
-  pushd "$TOXEXT_MESSAGES_SRC" >/dev/null || exit 1
-
-  "$SCRIPT_DIR/download/download_toxext_messages.sh"
-
-  cmake "-DCMAKE_INSTALL_PREFIX=$DEP_PREFIX" \
-    -DCMAKE_BUILD_TYPE=Release \
-    "$CMAKE_TOOLCHAIN_FILE" \
-    "-DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOS_MINIMUM_SUPPORTED_VERSION" \
-    .
-  cmake --build . -- "-j$MAKE_JOBS"
-  cmake --build . --target install
-
-  popd >/dev/null
-}
-
 build_toxcore
-build_toxext
-build_toxext_messages

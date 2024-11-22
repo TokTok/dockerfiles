@@ -49,14 +49,4 @@ RUN mkdir -p /src/toxcore && \
     cd /src/toxcore && \
     /build/download/download_toxcore.sh
 
-COPY download/download_toxext.sh /build/download/download_toxext.sh
-RUN mkdir -p /src/toxext && \
-    cd /src/toxext && \
-    /build/download/download_toxext.sh
-
-COPY download/download_toxext_messages.sh /build/download/download_toxext_messages.sh
-RUN mkdir -p /src/toxext_messages && \
-    cd /src/toxext_messages && \
-    /build/download/download_toxext_messages.sh
-
 WORKDIR /qtox

@@ -70,7 +70,7 @@ parse_arch() {
     CROSS_CPPFLAG=""
     MAKE_JOBS="$(nproc)"
     CMAKE_TOOLCHAIN_FILE="-DCMAKE_TOOLCHAIN_FILE=/build/windows-toolchain.cmake"
-  elif [ "$SCRIPT_ARCH" == "macos" ]; then
+  elif [ "$SCRIPT_ARCH" == "macos" ] || [ "$SCRIPT_ARCH" == "macos-x86_64" ] || [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
     DEP_PREFIX="$(realpath "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/..)/local-deps"
     mkdir -p "$DEP_PREFIX"
     HOST_OPTION=''

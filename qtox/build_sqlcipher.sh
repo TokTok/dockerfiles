@@ -12,14 +12,14 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "sqlcipher" --supported "win32 win64 macos" "$@"
+parse_arch --dep "sqlcipher" --supported "win32 win64 macos macos-x86_64 macos-arm64" "$@"
 
 "$SCRIPT_DIR/download/download_sqlcipher.sh"
 
 CFLAGS="-O2 -g0 -DSQLITE_HAS_CODEC -I$DEP_PREFIX/include/ $CROSS_CFLAG"
 LDFLAGS="-lcrypto -L$DEP_PREFIX/lib/ -L$DEP_PREFIX/lib64/ $CROSS_LDFLAG"
 
-if [ "$SCRIPT_ARCH" == "macos" ]; then
+if [ "$SCRIPT_ARCH" == "macos" ] || [ "$SCRIPT_ARCH" == "macos-x86_64" ] || [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
   LIBS=''
 else
   sed -i s/'if test "$TARGET_EXEEXT" = ".exe"'/'if test ".exe" = ".exe"'/g configure
@@ -38,7 +38,7 @@ fi
   "LDFLAGS=$LDFLAGS $CROSS_LDFLAG" \
   "LIBS=$LIBS"
 
-if [ "$SCRIPT_ARCH" != "macos" ]; then
+if [ "$SCRIPT_ARCH" != "macos" ] && [ "$SCRIPT_ARCH" != "macos-x86_64" ] && [ "$SCRIPT_ARCH" != "macos-arm64" ]; then
   sed -i s/"TEXE = $"/"TEXE = .exe"/ Makefile
 fi
 

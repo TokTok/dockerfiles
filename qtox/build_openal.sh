@@ -10,11 +10,11 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "openal" --supported "win32 win64 macos" "$@"
+parse_arch --dep "openal" --supported "win32 win64 macos macos-x86_64 macos-arm64" "$@"
 
 "$SCRIPT_DIR/download/download_openal.sh"
 
-if [ "$SCRIPT_ARCH" != "macos" ]; then
+if [ "$SCRIPT_ARCH" != "macos" ] && [ "$SCRIPT_ARCH" != "macos-x86_64" ] && [ "$SCRIPT_ARCH" != "macos-arm64" ]; then
   patch -p1 <"$SCRIPT_DIR/patches/openal-cmake-3-11.patch"
   DDSOUND="-DDSOUND_INCLUDE_DIR=/usr/$MINGW_ARCH-w64-mingw32/include \
     -DDSOUND_LIBRARY=/usr/$MINGW_ARCH-w64-mingw32/lib/libdsound.a"

@@ -10,7 +10,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "sodium" --supported "win32 win64 macos" "$@"
+parse_arch --dep "sodium" --supported "win32 win64 macos macos-x86_64 macos-arm64" "$@"
 
 "$SCRIPT_DIR/download/download_sodium.sh"
 

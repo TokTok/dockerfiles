@@ -45,7 +45,7 @@ WORKDIR /work/openssl
 RUN wget https://github.com/openssl/openssl/releases/download/openssl-3.4.0/openssl-3.4.0.tar.gz \
  && tar zxf openssl-3.4.0.tar.gz \
  && cd openssl-3.4.0 \
- && ./Configure android-arm64 --prefix=$SYSROOT/usr \
+ && ./Configure android-arm64 --prefix=$SYSROOT/usr -no-shared -no-tests -fPIC \
  && make -j$(nproc) \
  && make install_sw \
  && rm -rf /work/openssl

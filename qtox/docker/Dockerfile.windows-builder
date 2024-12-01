@@ -245,3 +245,5 @@ RUN mkdir -p /src/gdb && \
 
 RUN mkdir -p /qtox
 WORKDIR /qtox
+
+RUN chmod 0644 /build/windows-toolchain.cmake

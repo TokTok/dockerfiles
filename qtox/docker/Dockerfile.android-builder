@@ -54,13 +54,16 @@ RUN tar zxf <(wget -O- https://github.com/openssl/openssl/releases/download/open
  && make install_sw \
  && rm -rf /work/build
 
-#ARG ANDROID_ABI=armeabi-v7a
-ARG ANDROID_ABI=arm64-v8a
+#ARG QT_BUILD_TYPE=release
+ARG QT_BUILD_TYPE=debug
+#ARG ANDROID_QT_ABI=armeabi-v7a
+ARG ANDROID_QT_ABI=arm64-v8a
 RUN tar Jxf <(wget -O- https://download.qt.io/archive/qt/6.8/6.8.0/single/qt-everywhere-src-6.8.0.tar.xz) \
  && cd qt-everywhere-src-6.8.0 \
  && ./configure -prefix "/work/android/qt" \
+    "-$QT_BUILD_TYPE" \
     -qt-host-path /usr \
-    -android-abis "$ANDROID_ABI" \
+    -android-abis "$ANDROID_QT_ABI" \
     -android-sdk "$ANDROID_SDK_HOME" \
     -android-ndk "$ANDROID_NDK_ROOT" \
     -android-ndk-platform "android-$ANDROID_API" \
@@ -206,4 +209,6 @@ RUN tar zxf <(wget -O- https://github.com/TokTok/c-toxcore/releases/download/v0.
  && cmake --install _build \
  && rm -rf /work/build
 
+# Make .android world-writable (like /tmp) so debug signing works.
+RUN ["chmod", "1777", "/work/android/sdk/.android"]
 WORKDIR /qtox

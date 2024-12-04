@@ -1,3 +1,4 @@
+FROM toxchat/bazel:rr22rb2s39l0jcibw52lx7w8d993ilnv as base
 # Build the base image in a single layer instead of 100 as done by arion.
 FROM scratch
 # hadolint ignore=DL3022

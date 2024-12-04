@@ -30,7 +30,7 @@ in
             pkgs.coreutils
             pkgs.git
             # Needed because coursier (for Kotlin) requires that java is in $PATH.
-            pkgs.jdk11_headless
+            pkgs.jdk17_headless
           ];
 
           security.sudo.wheelNeedsPassword = false;

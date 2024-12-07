@@ -50,7 +50,7 @@ ARG ANDROID_OPENSSL_ASM=
 RUN tar zxf <(wget -O- https://github.com/openssl/openssl/releases/download/openssl-3.4.0/openssl-3.4.0.tar.gz) \
  && cd openssl-3.4.0 \
  && ./Configure "android-$ANDROID_OPENSSL_ABI" --prefix="$SYSROOT/usr" -no-shared -no-tests $ANDROID_OPENSSL_ASM -D__ANDROID_API__="$ANDROID_API" -fPIC \
- && make -j$(nproc) \
+ && make "-j$(nproc)" \
  && make install_sw \
  && rm -rf /work/build
 
@@ -77,6 +77,18 @@ RUN tar Jxf <(wget -O- https://download.qt.io/archive/qt/6.8/6.8.0/single/qt-eve
     -skip qtshadertools \
     -no-feature-assistant \
     -no-feature-designer \
+    -no-feature-pixeltool \
+    -no-feature-printsupport \
+    -no-feature-qdoc \
+    -no-feature-qtdiag \
+    -no-feature-qtplugininfo \
+    -no-feature-sql \
+    -no-feature-undocommand \
+    -no-feature-undogroup \
+    -no-feature-undostack \
+    -no-feature-undoview \
+    -- \
+    -Wno-dev \
  && cmake --build . \
  && cmake --install . \
  && cd - \
@@ -135,14 +147,14 @@ RUN tar Jxf <(wget -O- https://www.ffmpeg.org/releases/ffmpeg-7.1.tar.xz) \
  --enable-decoder=mjpeg \
  --enable-decoder=rawvideo \
  --sysroot="$SYSROOT" \
- && make -j$(nproc) \
+ && make "-j$(nproc)" \
  && make install \
  && rm -rf /work/build
 
 RUN tar jxf <(wget -O- https://github.com/libexif/libexif/releases/download/v0.6.24/libexif-0.6.24.tar.bz2) \
  && cd libexif-0.6.24 \
  && ./configure --prefix="$SYSROOT/usr" --host="$ANDROID_TRIPLE" --with-sysroot="$SYSROOT" --disable-shared \
- && make -j$(nproc) \
+ && make "-j$(nproc)" \
  && make install \
  && rm -rf /work/build
 
@@ -150,28 +162,28 @@ RUN tar zxf <(wget -O- https://github.com/fukuchi/libqrencode/archive/refs/tags/
  && cd libqrencode-4.1.1 \
  && autoreconf -fi \
  && ./configure --prefix="$SYSROOT/usr" --host="$ANDROID_TRIPLE" --with-sysroot="$SYSROOT" --disable-shared --without-png CFLAGS=-fPIC \
- && make -j$(nproc) \
+ && make "-j$(nproc)" \
  && make install \
  && rm -rf /work/build
 
 RUN tar zxf <(wget -O- https://github.com/jedisct1/libsodium/releases/download/1.0.20-RELEASE/libsodium-1.0.20.tar.gz) \
  && cd libsodium-1.0.20 \
  && ./configure --prefix="$SYSROOT/usr" --host="$ANDROID_TRIPLE" --with-sysroot="$SYSROOT" --disable-shared \
- && make -j$(nproc) \
+ && make "-j$(nproc)" \
  && make install \
  && rm -rf /work/build
 
 RUN tar zxf <(wget -O- https://github.com/sqlcipher/sqlcipher/archive/refs/tags/v4.6.1.tar.gz) \
  && cd sqlcipher-4.6.1 \
  && ./configure --prefix="$SYSROOT/usr" --host="$ANDROID_TRIPLE" --with-sysroot="$SYSROOT" --disable-shared CFLAGS=-fPIC \
- && make -j$(nproc) \
+ && make "-j$(nproc)" \
  && make install \
  && rm -rf /work/build
 
 RUN tar zxf <(wget -O- https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz) \
  && cd opus-1.5.2 \
  && ./configure --prefix="$SYSROOT/usr" --host="$ANDROID_TRIPLE" --with-sysroot="$SYSROOT" --disable-shared \
- && make -j$(nproc) \
+ && make "-j$(nproc)" \
  && make install \
  && rm -rf /work/build
 
@@ -180,7 +192,9 @@ ARG ANDROID_VPX_ABI=arm64-android-gcc
 RUN tar zxf <(wget -O- https://github.com/webmproject/libvpx/archive/refs/tags/v1.15.0.tar.gz) \
  && cd libvpx-1.15.0 \
  && ./configure --prefix="$SYSROOT/usr" --libc="$SYSROOT" --target="$ANDROID_VPX_ABI" --disable-examples --disable-unit-tests --enable-pic \
- && make -j$(nproc) \
+ && sed -i -e "s!^AS=as!AS=$TOOLCHAIN/bin/$ANDROID_TRIPLE_API-clang -c!" *.mk \
+ && sed -i -e "s!^STRIP=strip!STRIP=$TOOLCHAIN/bin/llvm-strip!" *.mk \
+ && make "-j$(nproc)" \
  && make install \
  && rm -rf /work/build
 
@@ -192,6 +206,7 @@ RUN tar jxf <(wget -O- https://github.com/kcat/openal-soft/releases/download/1.2
   -GNinja \
   -B_build \
   -H. \
+  -Wno-dev \
  && cmake --build _build \
  && cmake --install _build \
  && rm -rf /work/build

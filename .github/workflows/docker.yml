@@ -100,6 +100,8 @@ jobs:
       matrix:
         image:
           - alpine
+          - android-builder.armeabi-v7a.debug
+          - android-builder.armeabi-v7a.release
           - android-builder.arm64-v8a.debug
           - android-builder.arm64-v8a.release
           - debian
@@ -119,6 +121,26 @@ jobs:
             args: |
               ARCH=x86_64
               WINEARCH=win64
+          - image: android-builder.armeabi-v7a.debug
+            file: android-builder
+            args: |
+              ANDROID_FFMPEG_ABI=armv7a
+              ANDROID_OPENSSL_ABI=arm
+              ANDROID_OPENSSL_ASM=-no-asm
+              ANDROID_QT_ABI=armeabi-v7a
+              ANDROID_TRIPLE=armv7a-linux-androideabi
+              ANDROID_VPX_ABI=armv7-android-gcc
+              QT_BUILD_TYPE=debug
+          - image: android-builder.armeabi-v7a.release
+            file: android-builder
+            args: |
+              ANDROID_FFMPEG_ABI=armv7a
+              ANDROID_OPENSSL_ABI=arm
+              ANDROID_OPENSSL_ASM=-no-asm
+              ANDROID_QT_ABI=armeabi-v7a
+              ANDROID_TRIPLE=armv7a-linux-androideabi
+              ANDROID_VPX_ABI=armv7-android-gcc
+              QT_BUILD_TYPE=release
           - image: android-builder.arm64-v8a.debug
             file: android-builder
             args: |

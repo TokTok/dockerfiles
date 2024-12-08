@@ -1,22 +1,38 @@
-FROM alpine:edge
+ARG QT_VERSION=6.2.4
+#ARG QT_VERSION=6.8.1
 
-RUN ["apk", "add", \
- "autoconf", \
- "automake", \
- "bash", \
- "clang", \
- "cmake", \
- "diffutils", \
- "gcompat", \
- "git", \
- "libtool", \
- "make", \
- "openjdk17", \
- "qt6-qtbase~6.8.0", \
- "qt6-qttools~6.8.0", \
- "qt6-qttools-dev~6.8.0", \
- "samurai", \
- "tcl"]
+# Build Qt for the host system.
+FROM toxchat/qtox:host-qt_$QT_VERSION AS host-qt
+# Build the rest (including another Qt) for Android.
+FROM ubuntu:22.04 AS base
+
+# No Qt from Ubuntu here.
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install --no-install-recommends -y \
+ "autoconf" \
+ "automake" \
+ "build-essential" \
+ "bzip2" \
+ "ca-certificates" \
+ "clang" \
+ "cmake" \
+ "g++" \
+ "gcc" \
+ "git" \
+ "libtool" \
+ "make" \
+ "ninja-build" \
+ "openjdk-17-jdk-headless" \
+ "pkg-config" \
+ "tcl" \
+ "unzip" \
+ "wget" \
+ "xz-utils" \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /work/build
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 WORKDIR /work/android/sdk
 RUN wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
@@ -29,19 +45,27 @@ RUN wget https://dl.google.com/android/repository/commandlinetools-linux-1107670
 ENV ANDROID_SDK_HOME=/work/android/sdk
 ENV PATH=$ANDROID_SDK_HOME/cmdline-tools/tools/bin:$PATH
 
-RUN yes | sdkmanager --licenses
+RUN yes | sdkmanager --licenses || true
 RUN ["sdkmanager", "platform-tools", "platforms;android-34", "build-tools;34.0.0"]
-RUN ["sdkmanager", "ndk;26.1.10909125"]
 
-ENV ANDROID_NDK_ROOT=$ANDROID_SDK_HOME/ndk/26.1.10909125
+ARG NDK_VERSION=21.3.6528147
+#ARG NDK_VERSION=26.1.10909125
+RUN sdkmanager "ndk;$NDK_VERSION"
+
+ENV ANDROID_NDK_ROOT=$ANDROID_SDK_HOME/ndk/$NDK_VERSION
 ENV TOOLCHAIN=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64
 ENV PATH=$TOOLCHAIN/bin:$PATH
 ENV SYSROOT=$TOOLCHAIN/sysroot
 ENV PKG_CONFIG_PATH=$SYSROOT/usr/lib/pkgconfig
 
 ARG ANDROID_API=24
+#ARG ANDROID_API=26
 
-WORKDIR /work/build
+#ARG ANDROID_ABI=armeabi-v7a
+ARG ANDROID_ABI=arm64-v8a
+
+# OpenSSL
+#FROM base AS build-openssl
 
 #ARG ANDROID_OPENSSL_ABI=arm
 #ARG ANDROID_OPENSSL_ASM=-no-asm
@@ -54,51 +78,88 @@ RUN tar zxf <(wget -O- https://github.com/openssl/openssl/releases/download/open
  && make install_sw \
  && rm -rf /work/build
 
-#ARG QT_BUILD_TYPE=release
-ARG QT_BUILD_TYPE=debug
-#ARG ANDROID_QT_ABI=armeabi-v7a
-ARG ANDROID_QT_ABI=arm64-v8a
-RUN tar Jxf <(wget -O- https://download.qt.io/archive/qt/6.8/6.8.0/single/qt-everywhere-src-6.8.0.tar.xz) \
- && cd qt-everywhere-src-6.8.0 \
- && ./configure -prefix "/work/android/qt" \
+# zstd
+#FROM base AS build-zstd
+
+RUN tar zxf <(wget -O- https://github.com/facebook/zstd/releases/download/v1.5.6/zstd-1.5.6.tar.gz) \
+ && cd zstd-1.5.6 \
+ && cmake \
+  -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX:PATH="$SYSROOT/usr" \
+  -DANDROID_ABI="$ANDROID_ABI" \
+  -DANDROID_PLATFORM="$ANDROID_API" \
+  -DZSTD_BUILD_SHARED=OFF \
+  -GNinja \
+  -B_build \
+  -Hbuild/cmake \
+ && cmake --build _build \
+ && cmake --install _build \
+ && rm -rf /work/build
+
+# Qt
+#FROM base AS build-qt
+
+#COPY --from=build-openssl $SYSROOT/usr $SYSROOT/usr
+#COPY --from=build-zstd $SYSROOT/usr $SYSROOT/usr
+COPY --from=host-qt /work/host /work/host
+
+#ARG QT_BUILD_TYPE=debug
+ARG QT_BUILD_TYPE=release
+
+ARG QT_VERSION=6.2.4
+#ARG QT_VERSION=6.8.1
+
+RUN tar Jxf <(wget -O- "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
+ && sed -i -e 's!# *define QLOGGING_HAVE_BACKTRACE!//&!' qtbase-everywhere-src-*/src/corelib/global/qlogging.cpp \
+ && cd qtbase-everywhere-src-* && mkdir _build && cd _build \
+ && ../configure -prefix "/work/android/qt" \
     "-$QT_BUILD_TYPE" \
-    -qt-host-path /usr \
-    -android-abis "$ANDROID_QT_ABI" \
+    -qt-host-path /work/host/qt \
+    -android-abis "$ANDROID_ABI" \
     -android-sdk "$ANDROID_SDK_HOME" \
     -android-ndk "$ANDROID_NDK_ROOT" \
     -android-ndk-platform "android-$ANDROID_API" \
     -openssl-linked \
+    -feature-zstd \
     -nomake examples \
     -nomake tests \
-    -submodules qtbase,qtsvg,qttools \
-    -skip qtactiveqt \
-    -skip qtdeclarative \
-    -skip qtlanguageserver \
-    -skip qtshadertools \
-    -no-feature-assistant \
-    -no-feature-designer \
-    -no-feature-pixeltool \
-    -no-feature-printsupport \
-    -no-feature-qdoc \
-    -no-feature-qtdiag \
-    -no-feature-qtplugininfo \
+    -no-feature-sharedmemory \
     -no-feature-sql \
-    -no-feature-undocommand \
-    -no-feature-undogroup \
-    -no-feature-undostack \
-    -no-feature-undoview \
-    -- \
-    -Wno-dev \
  && cmake --build . \
  && cmake --install . \
- && cd - \
  && rm -rf /work/build
+
+RUN tar Jxf <(wget -O- "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qttools-everywhere-src-$QT_VERSION.tar.xz") \
+ && cd qttools-everywhere-src-* && mkdir _build && cd _build \
+ && /work/android/qt/bin/qt-configure-module .. \
+    -no-feature-assistant \
+    -no-feature-pixeltool \
+    -no-feature-qdbus \
+    -no-feature-qtdiag \
+    -no-feature-qtplugininfo \
+ && cmake --build . \
+ && cmake --install . \
+ && rm -rf /work/build
+
+RUN tar Jxf <(wget -O- "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtsvg-everywhere-src-$QT_VERSION.tar.xz") \
+ && cd qtsvg-everywhere-src-* && mkdir _build && cd _build \
+ && /work/android/qt/bin/qt-configure-module .. \
+ && cmake --build . \
+ && cmake --install . \
+ && rm -rf /work/build
+
+# Base for the rest of the builds
+#FROM base AS build-base
 
 #ARG ANDROID_TRIPLE=armv7a-linux-androideabi
 ARG ANDROID_TRIPLE=aarch64-linux-android
 ENV ANDROID_TRIPLE_API=$ANDROID_TRIPLE$ANDROID_API
 ENV CC=$TOOLCHAIN/bin/$ANDROID_TRIPLE_API-clang \
     CXX=$TOOLCHAIN/bin/$ANDROID_TRIPLE_API-clang++
+
+# ffmpeg
+#FROM build-base AS build-ffmpeg
 
 #ARG ANDROID_FFMPEG_ABI=armv7a
 ARG ANDROID_FFMPEG_ABI=arm64
@@ -151,12 +212,19 @@ RUN tar Jxf <(wget -O- https://www.ffmpeg.org/releases/ffmpeg-7.1.tar.xz) \
  && make install \
  && rm -rf /work/build
 
+# libexif
+#FROM build-base AS build-libexif
+
 RUN tar jxf <(wget -O- https://github.com/libexif/libexif/releases/download/v0.6.24/libexif-0.6.24.tar.bz2) \
  && cd libexif-0.6.24 \
+ && ln -s "$TOOLCHAIN/bin/llvm-ar" "$TOOLCHAIN/bin/armv7a-linux-androideabi-ar" \
  && ./configure --prefix="$SYSROOT/usr" --host="$ANDROID_TRIPLE" --with-sysroot="$SYSROOT" --disable-shared \
  && make "-j$(nproc)" \
  && make install \
  && rm -rf /work/build
+
+# libqrencode
+#FROM build-base AS build-libqrencode
 
 RUN tar zxf <(wget -O- https://github.com/fukuchi/libqrencode/archive/refs/tags/v4.1.1.tar.gz) \
  && cd libqrencode-4.1.1 \
@@ -166,6 +234,9 @@ RUN tar zxf <(wget -O- https://github.com/fukuchi/libqrencode/archive/refs/tags/
  && make install \
  && rm -rf /work/build
 
+# libsodium
+#FROM build-base AS build-libsodium
+
 RUN tar zxf <(wget -O- https://github.com/jedisct1/libsodium/releases/download/1.0.20-RELEASE/libsodium-1.0.20.tar.gz) \
  && cd libsodium-1.0.20 \
  && ./configure --prefix="$SYSROOT/usr" --host="$ANDROID_TRIPLE" --with-sysroot="$SYSROOT" --disable-shared \
@@ -173,12 +244,20 @@ RUN tar zxf <(wget -O- https://github.com/jedisct1/libsodium/releases/download/1
  && make install \
  && rm -rf /work/build
 
+# sqlcipher
+#FROM build-base AS build-sqlcipher
+
+#COPY --from=build-openssl $SYSROOT/usr $SYSROOT/usr
+
 RUN tar zxf <(wget -O- https://github.com/sqlcipher/sqlcipher/archive/refs/tags/v4.6.1.tar.gz) \
  && cd sqlcipher-4.6.1 \
  && ./configure --prefix="$SYSROOT/usr" --host="$ANDROID_TRIPLE" --with-sysroot="$SYSROOT" --disable-shared CFLAGS=-fPIC \
- && make "-j$(nproc)" \
+ && make "-j$(nproc)" BCC="/usr/bin/gcc -g -DSQLCIPHER_CRYPTO_OPENSSL" \
  && make install \
  && rm -rf /work/build
+
+# opus
+#FROM build-base AS build-opus
 
 RUN tar zxf <(wget -O- https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz) \
  && cd opus-1.5.2 \
@@ -186,6 +265,9 @@ RUN tar zxf <(wget -O- https://github.com/xiph/opus/releases/download/v1.5.2/opu
  && make "-j$(nproc)" \
  && make install \
  && rm -rf /work/build
+
+# libvpx
+#FROM build-base AS build-libvpx
 
 #ARG ANDROID_VPX_ABI=armv7-android-gcc
 ARG ANDROID_VPX_ABI=arm64-android-gcc
@@ -198,10 +280,17 @@ RUN tar zxf <(wget -O- https://github.com/webmproject/libvpx/archive/refs/tags/v
  && make install \
  && rm -rf /work/build
 
+# openal
+#FROM build-base AS build-openal
+
 RUN tar jxf <(wget -O- https://github.com/kcat/openal-soft/releases/download/1.23.1/openal-soft-1.23.1.tar.bz2) \
  && cd openal-soft-1.23.1 \
- && /work/android/qt/bin/qt-cmake \
+ && cmake \
+  -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake" \
   -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX="$SYSROOT/usr" \
+  -DANDROID_ABI="$ANDROID_ABI" \
+  -DANDROID_PLATFORM="$ANDROID_API" \
   -DLIBTYPE=STATIC \
   -GNinja \
   -B_build \
@@ -211,11 +300,22 @@ RUN tar jxf <(wget -O- https://github.com/kcat/openal-soft/releases/download/1.2
  && cmake --install _build \
  && rm -rf /work/build
 
+# toxcore
+#FROM build-base AS build-toxcore
+
+#COPY --from=build-libsodium $SYSROOT/usr $SYSROOT/usr
+#COPY --from=build-libvpx $SYSROOT/usr $SYSROOT/usr
+#COPY --from=build-opus $SYSROOT/usr $SYSROOT/usr
+
 RUN tar zxf <(wget -O- https://github.com/TokTok/c-toxcore/releases/download/v0.2.20/c-toxcore-0.2.20.tar.gz) \
  && cd c-toxcore-0.2.20 \
- && /work/android/qt/bin/qt-cmake \
+ && cmake \
+  -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake" \
   -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX:PATH="$SYSROOT/usr" \
+  -DCMAKE_INSTALL_PREFIX="$SYSROOT/usr" \
+  -DANDROID_ABI="$ANDROID_ABI" \
+  -DANDROID_PLATFORM="$ANDROID_API" \
+  -DBOOTSTRAP_DAEMON=OFF \
   -DENABLE_SHARED=OFF \
   -GNinja \
   -B_build \
@@ -223,6 +323,28 @@ RUN tar zxf <(wget -O- https://github.com/TokTok/c-toxcore/releases/download/v0.
  && cmake --build _build \
  && cmake --install _build \
  && rm -rf /work/build
+
+# Collect all the sysroot-installed builds into one directory.
+#FROM build-base AS compose
+
+#COPY --from=build-ffmpeg $SYSROOT/usr $SYSROOT/usr
+#COPY --from=build-libexif $SYSROOT/usr $SYSROOT/usr
+#COPY --from=build-libqrencode $SYSROOT/usr $SYSROOT/usr
+#COPY --from=build-openal $SYSROOT/usr $SYSROOT/usr
+#COPY --from=build-sqlcipher $SYSROOT/usr $SYSROOT/usr
+#COPY --from=build-toxcore $SYSROOT/usr $SYSROOT/usr
+
+# Final image composition (deduplicating the sysroot files).
+#FROM build-base
+
+# We need host-Qt as well here.
+#COPY --from=host-qt /work/host/qt /work/host/qt
+
+# Copy all the libraries other than Qt.
+#COPY --from=compose $SYSROOT/usr $SYSROOT/usr
+
+# Biggest build comes last. All others can be copied before Qt finishes building.
+#COPY --from=build-qt /work/android/qt /work/android/qt
 
 # Make .android world-writable (like /tmp) so debug signing works.
 RUN ["chmod", "1777", "/work/android/sdk/.android"]

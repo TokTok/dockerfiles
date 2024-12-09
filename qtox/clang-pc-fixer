@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+import subprocess
+import sys
+from typing import Optional
+
+
+def libname(arg: str) -> Optional[str]:
+    if arg.startswith("-l"):
+        return arg[2:]
+    elif arg.endswith(".a"):
+        return arg.split("/")[-1][3:-2]
+    else:
+        return None
+
+
+def fix_args(args: list[str]) -> list[str]:
+    fixed_args = []
+    for arg in args:
+        fixed_args.append(arg)
+        # TODO(iphydf): Get this from pkg-config.
+        if libname(arg) == "GL":
+            fixed_args.extend(("-lglapi", "-lz", "-ldrm", "-lXext"))
+        elif libname(arg) == "xcb":
+            fixed_args.append("-lXau")
+        elif libname(arg) == "xcb-image":
+            fixed_args.append("-lxcb-util")
+        elif libname(arg) == "wayland-client":
+            fixed_args.append("-lffi")
+    return fixed_args
+
+
+subprocess.run(["/usr/bin/clang++.real"] + fix_args(sys.argv[1:]), check=True)

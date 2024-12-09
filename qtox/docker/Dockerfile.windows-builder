@@ -192,7 +192,8 @@ RUN mkdir /export && \
   cp /windows/lib/libvpx.a /export && \
   cp -r /windows/plugins/iconengines /export && \
   cp -r /windows/plugins/imageformats /export && \
-  cp -r /windows/plugins/platforms /export
+  cp -r /windows/plugins/platforms /export && \
+  cp -r /windows/plugins/tls /export
 
 RUN mkdir -p /debug_export
 

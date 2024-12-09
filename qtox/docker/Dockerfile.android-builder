@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later.
+# Copyright © 2024 The TokTok team
+
 ARG QT_VERSION=6.2.4
 #ARG QT_VERSION=6.8.1
 
@@ -14,6 +17,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
  "build-essential" \
  "bzip2" \
  "ca-certificates" \
+ "ccache" \
  "clang" \
  "cmake" \
  "g++" \
@@ -348,4 +352,6 @@ RUN tar zxf <(wget -O- https://github.com/TokTok/c-toxcore/releases/download/v0.
 
 # Make .android world-writable (like /tmp) so debug signing works.
 RUN ["chmod", "1777", "/work/android/sdk/.android"]
+
 WORKDIR /qtox
+ENV HOME=/qtox

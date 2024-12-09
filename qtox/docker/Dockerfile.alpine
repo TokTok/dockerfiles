@@ -1,7 +1,11 @@
+# SPDX-License-Identifier: GPL-3.0-or-later.
+# Copyright © 2024 The TokTok team
+
 FROM alpine:3.20
 
 RUN ["apk", "add", \
  "bash", \
+ "ccache", \
  "clang", \
  "cmake", \
  "compiler-rt", \
@@ -33,3 +37,4 @@ RUN git clone --recurse-submodules --depth=1 https://github.com/TokTok/c-toxcore
  && rm -rf /work/c-toxcore
 
 WORKDIR /qtox
+ENV HOME=/qtox

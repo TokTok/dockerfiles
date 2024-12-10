@@ -225,6 +225,6 @@ jobs:
             QT_BUILD_TYPE=${{ matrix.build_type }}
             QT_VERSION=${{ matrix.version }}
           tags: toxchat/qtox:android-builder.${{ matrix.arch }}.${{ matrix.build_type }}_${{ matrix.version }}
-          cache-from: type=registry,ref=toxchat/qtox:${{ matrix.arch }}.${{ matrix.build_type }}_${{ matrix.version }}
+          cache-from: type=registry,ref=toxchat/qtox:android-builder.${{ matrix.arch }}.${{ matrix.build_type }}_${{ matrix.version }}
           cache-to: type=inline
           push: ${{ github.event_name == 'push' }}

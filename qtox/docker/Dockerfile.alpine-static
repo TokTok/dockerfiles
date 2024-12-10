@@ -1,39 +1,44 @@
-FROM alpine:edge AS base
+FROM alpine:edge AS common
 
 RUN ["apk", "add", \
- "autoconf", \
- "automake", \
  "bash", \
- "bison", \
+ "ccache", \
  "clang", \
  "cmake", \
  "curl", \
- "diffutils", \
  "file", \
- "flex", \
  "git", \
- "libtool", \
- "libxslt", \
  "linux-headers", \
- "make", \
- "meson", \
  "pkgconf", \
- "py3-mako", \
- "py3-packaging", \
- "py3-yaml", \
  "python3", \
- "python3-dev", \
- "samurai", \
- "tcl", \
- "yasm"]
+ "samurai"]
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV CC=clang CXX=clang++ SYSROOT=/sysroot
 ENV PKG_CONFIG_PATH=$SYSROOT/usr/lib/pkgconfig:$SYSROOT/usr/lib64/pkgconfig:$SYSROOT/usr/share/pkgconfig
 
-WORKDIR /work/build
-
 COPY toolchain/linux-static-toolchain.cmake $SYSROOT/static-toolchain.cmake
+
+FROM common AS base
+
+RUN ["apk", "add", \
+ "autoconf", \
+ "automake", \
+ "bison", \
+ "diffutils", \
+ "flex", \
+ "libtool", \
+ "libxslt", \
+ "make", \
+ "meson", \
+ "py3-mako", \
+ "py3-packaging", \
+ "py3-yaml", \
+ "python3-dev", \
+ "tcl", \
+ "yasm"]
+
+WORKDIR /work/build
 
 FROM base AS build-toxcore
 
@@ -68,6 +73,33 @@ RUN tar zxf <(curl -L https://github.com/TokTok/c-toxcore/releases/download/v0.2
   -GNinja \
   -B_build \
   -H. \
+ && cmake --build _build \
+ && cmake --install _build \
+ && rm -rf /work/build
+
+FROM base AS build-udev
+
+RUN tar zxf <(curl -L https://github.com/eudev-project/eudev/releases/download/v3.2.14/eudev-3.2.14.tar.gz) \
+ && cd eudev-* \
+ && apk add gperf \
+ && ./configure --prefix="$SYSROOT/usr" --disable-shared \
+ && make -j"$(nproc)" \
+ && make install \
+ && apk del gperf \
+ && rm -rf /work/build
+
+FROM base AS build-zstd
+
+RUN tar zxf <(wget -O- https://github.com/facebook/zstd/releases/download/v1.5.6/zstd-1.5.6.tar.gz) \
+ && cd zstd-* \
+ && cmake \
+  -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX="$SYSROOT/usr" \
+  -DZSTD_BUILD_SHARED=OFF \
+  -GNinja \
+  -B_build \
+  -Hbuild/cmake \
  && cmake --build _build \
  && cmake --install _build \
  && rm -rf /work/build
@@ -173,7 +205,66 @@ RUN tar zxf <(curl -L https://github.com/sqlcipher/sqlcipher/archive/refs/tags/v
  && make install \
  && rm -rf /work/build
 
-FROM base AS build-qt
+FROM base AS build-tslib
+
+RUN tar zxf <(curl -L https://github.com/BLAKE2/libb2/releases/download/v0.98.1/libb2-0.98.1.tar.gz) \
+ && cd libb2-* \
+ && ./configure --prefix="$SYSROOT/usr" --disable-shared \
+ && make -j"$(nproc)" \
+ && make install \
+ && rm -rf /work/build
+
+RUN tar zxf <(curl -L https://github.com/libts/tslib/releases/download/1.23/tslib-1.23.tar.gz) \
+ && cd tslib-* \
+ && ./configure --prefix="$SYSROOT/usr" --disable-shared \
+ && make -j"$(nproc)" \
+ && make install \
+ && rm -rf /work/build
+
+FROM base AS build-glib
+
+RUN tar zxf <(curl -L https://ftp.gnu.org/pub/gnu/gettext/gettext-0.22.5.tar.gz) \
+ gettext-0.22.5/build-aux \
+ gettext-0.22.5/gettext-runtime \
+ gettext-0.22.5/m4 \
+ gettext-0.22.5/.version \
+ && cd gettext-0.22.5/gettext-runtime \
+ && ./configure --prefix="$SYSROOT/usr" --disable-shared \
+ && make -j"$(nproc)" \
+ && make install \
+ && rm -rf /work/build
+
+RUN tar Jxf <(curl -L https://download.gnome.org/sources/glib/2.83/glib-2.83.0.tar.xz) \
+ && cd glib-2.83.0 \
+ && meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" -Dtests=false -Dglib_debug=disabled \
+ && ninja -C build/ install \
+ && rm -rf /work/build
+
+FROM base AS build-libxml
+
+RUN tar zxf <(curl -L https://github.com/libexpat/libexpat/releases/download/R_2_6_4/expat-2.6.4.tar.gz) \
+ && cd expat-2.6.4 \
+ && cmake \
+  -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
+  -DCMAKE_INSTALL_PREFIX="$SYSROOT/usr" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DBUILD_SHARED_LIBS=OFF \
+  -GNinja \
+  -B_build \
+  -H. \
+ && cmake --build _build \
+ && cmake --install _build \
+ && rm -rf /work/build
+
+RUN tar zxf <(curl -L https://github.com/GNOME/libxml2/archive/refs/tags/v2.13.5.tar.gz) \
+ && cd libxml2-2.13.5 \
+ && autoreconf -fi \
+ && ./configure --prefix="$SYSROOT/usr" --with-sysroot="$SYSROOT" --disable-shared \
+ && make -j"$(nproc)" \
+ && make install \
+ && rm -rf /work/build
+
+FROM base AS build-x11
 
 RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/util/util-macros-1.20.2.tar.gz) \
  && cd util-macros-1.20.2 \
@@ -231,34 +322,14 @@ RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libX11-1.
  && make install \
  && rm -rf /work/build
 
-RUN tar zxf <(curl -L https://github.com/libexpat/libexpat/releases/download/R_2_6_4/expat-2.6.4.tar.gz) \
- && cd expat-2.6.4 \
- && cmake \
-  -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
-  -DCMAKE_INSTALL_PREFIX="$SYSROOT/usr" \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DBUILD_SHARED_LIBS=OFF \
-  -GNinja \
-  -B_build \
-  -H. \
- && cmake --build _build \
- && cmake --install _build \
- && rm -rf /work/build
-
-RUN tar zxf <(curl -L https://github.com/GNOME/libxml2/archive/refs/tags/v2.13.5.tar.gz) \
- && cd libxml2-2.13.5 \
- && autoreconf -fi \
- && ./configure --prefix="$SYSROOT/usr" --with-sysroot="$SYSROOT" --disable-shared \
- && make -j"$(nproc)" \
- && make install \
- && rm -rf /work/build
-
 RUN tar zxf <(curl -L https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz) \
  && cd libffi-3.4.6 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared --enable-portable-binary --enable-pax_emutramp --disable-exec-static-tramp \
  && make -j"$(nproc)" \
  && make install \
  && rm -rf /work/build
+
+COPY --from=build-libxml $SYSROOT/usr $SYSROOT/usr
 
 RUN git clone --depth=1 https://gitlab.freedesktop.org/wayland/wayland.git \
  && cd wayland \
@@ -374,56 +445,9 @@ RUN tar zxf <(curl -L https://xorg.freedesktop.org/archive/individual/lib/libXxf
  && make install \
  && rm -rf /work/build
 
-#RUN tar zxf <(curl -L https://github.com/KhronosGroup/SPIRV-Headers/archive/refs/tags/vulkan-sdk-1.3.290.0.tar.gz) \
-# && cd SPIRV-Headers-vulkan-sdk-1.3.290.0 \
-# && cmake \
-#  -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
-#  -DCMAKE_INSTALL_PREFIX="$SYSROOT/usr" \
-#  -DCMAKE_BUILD_TYPE=Release \
-#  -DBUILD_SHARED_LIBS=OFF \
-#  -GNinja \
-#  -B_build \
-#  -H. \
-# && cmake --build _build \
-# && cmake --install _build \
-# && rm -rf /work/build
-#
-#RUN tar zxf <(curl -L https://github.com/KhronosGroup/SPIRV-Tools/archive/refs/tags/vulkan-sdk-1.3.290.0.tar.gz) \
-# && cd SPIRV-Tools-vulkan-sdk-1.3.290.0 \
-# && cmake \
-#  -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
-#  -DCMAKE_INSTALL_PREFIX="$SYSROOT/usr" \
-#  -DCMAKE_BUILD_TYPE=Release \
-#  -DBUILD_SHARED_LIBS=OFF \
-#  -DSPIRV-Headers_SOURCE_DIR="$SYSROOT/usr" \
-#  -GNinja \
-#  -B_build \
-#  -H. \
-# && cmake --build _build \
-# && cmake --install _build \
-# && rm -rf /work/build
-#
-#RUN tar zxf <(curl -L https://github.com/KhronosGroup/glslang/archive/refs/tags/vulkan-sdk-1.3.296.0.tar.gz) \
-# && cd glslang-vulkan-sdk-1.3.296.0 \
-# && cmake \
-#  -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
-#  -DCMAKE_INSTALL_PREFIX="$SYSROOT/usr" \
-#  -DCMAKE_BUILD_TYPE=Release \
-#  -DBUILD_SHARED_LIBS=OFF \
-#  -DALLOW_EXTERNAL_SPIRV_TOOLS=ON \
-#  -GNinja \
-#  -B_build \
-#  -H. \
-# && cmake --build _build \
-# && cmake --install _build \
-# && rm -rf /work/build
+FROM base AS build-qt
 
-#RUN tar zxf <(curl -L https://github.com/NVIDIA/libglvnd/archive/refs/tags/v1.7.0.tar.gz) \
-# && cd libglvnd-1.7.0 \
-# && sed -i -e "s/subdir('tests')/#&/" meson.build \
-# && LDFLAGS="-lxcb -lXau -L$SYSROOT/usr/lib" meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" \
-# && ninja -C build/ install \
-# && rm -rf /work/build
+COPY --from=build-x11 $SYSROOT/usr $SYSROOT/usr
 
 RUN tar Jxf <(curl -L https://mesa.freedesktop.org/archive/mesa-24.2.7.tar.xz) \
  && cd mesa-24.2.7 \
@@ -442,29 +466,6 @@ RUN tar Jxf <(curl -L https://mesa.freedesktop.org/archive/mesa-24.2.7.tar.xz) \
  -Dglx=xlib \
  --prefix="$SYSROOT/usr" || (cat _build/meson-logs/meson-log.txt && false) \
  && ninja -C _build install \
- && rm -rf /work/build
-
-RUN tar zxf <(curl -L https://ftp.gnu.org/pub/gnu/gettext/gettext-0.22.5.tar.gz) \
- gettext-0.22.5/build-aux \
- gettext-0.22.5/gettext-runtime \
- gettext-0.22.5/m4 \
- gettext-0.22.5/.version \
- && cd gettext-0.22.5/gettext-runtime \
- && ./configure --prefix="$SYSROOT/usr" --disable-shared \
- && make -j"$(nproc)" \
- && make install \
- && rm -rf /work/build
-
-RUN tar Jxf <(curl -L https://download.gnome.org/sources/glib/2.83/glib-2.83.0.tar.xz) \
- && cd glib-2.83.0 \
- && meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" -Dtests=false -Dglib_debug=disabled \
- && ninja -C build/ install \
- && rm -rf /work/build
-
-RUN tar Jxf <(curl -L https://dbus.freedesktop.org/releases/dbus/dbus-1.15.12.tar.xz) \
- && cd dbus-1.15.12 \
- && CFLAGS="-I$SYSROOT/usr/include" LDFLAGS="-lxcb -L$SYSROOT/usr/lib" meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" -Dtools=false \
- && ninja -C build/ install \
  && rm -rf /work/build
 
 RUN tar zxf <(curl https://xcb.freedesktop.org/dist/xcb-util-renderutil-0.3.10.tar.gz) \
@@ -509,18 +510,34 @@ RUN tar zxf <(curl https://xcb.freedesktop.org/dist/xcb-util-wm-0.4.2.tar.gz) \
  && make install \
  && rm -rf /work/build
 
-RUN tar zxf <(curl -L https://github.com/BLAKE2/libb2/releases/download/v0.98.1/libb2-0.98.1.tar.gz) \
- && cd libb2-* \
+COPY --from=build-glib $SYSROOT/usr $SYSROOT/usr
+
+RUN tar Jxf <(curl -L https://dbus.freedesktop.org/releases/dbus/dbus-1.15.12.tar.xz) \
+ && cd dbus-1.15.12 \
+ && CFLAGS="-I$SYSROOT/usr/include" LDFLAGS="-lxcb -L$SYSROOT/usr/lib" meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" -Dtools=false \
+ && ninja -C build/ install \
+ && rm -rf /work/build
+
+COPY --from=build-udev $SYSROOT/usr $SYSROOT/usr
+
+RUN tar jxf <(curl -L https://bitmath.org/code/mtdev/mtdev-1.1.6.tar.bz2) \
+ && cd mtdev-* \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
  && rm -rf /work/build
 
-RUN tar zxf <(curl -L https://github.com/libts/tslib/releases/download/1.23/tslib-1.23.tar.gz) \
- && cd tslib-* \
- && ./configure --prefix="$SYSROOT/usr" --disable-shared \
- && make -j"$(nproc)" \
- && make install \
+RUN tar Jxf <(curl -L https://www.freedesktop.org/software/libevdev/libevdev-1.12.1.tar.xz) \
+ && cd libevdev-* \
+ && meson setup build/ -Ddefault_library=static -Ddocumentation=disabled -Dtests=disabled --prefix="$SYSROOT/usr" \
+ && ninja -C build/ install \
+ && rm -rf /work/build
+
+RUN tar zxf <(curl -L https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.27.0/libinput-1.27.0.tar.gz) \
+ && cd libinput-* \
+ && sed -i -e 's/= *shared_library(/= library(/g' $(find . -name "meson.build") \
+ && meson setup build/ -Ddefault_library=static -Ddebug-gui=false -Dlibwacom=false -Dtests=false --prefix="$SYSROOT/usr" \
+ && ninja -C build/ install \
  && rm -rf /work/build
 
 # XXX: Hack to get Qt closer to being able to build with DBus support.
@@ -528,39 +545,45 @@ RUN sed -i -e 's/ -pthread//g' "$SYSROOT/usr/lib/pkgconfig/dbus-1.pc"
 
 COPY --from=build-icu $SYSROOT/usr $SYSROOT/usr
 COPY --from=build-sqlcipher $SYSROOT/usr $SYSROOT/usr
-
-RUN apk add qt6-qtbase-dev qt6-qttools-dev
+COPY --from=build-tslib $SYSROOT/usr $SYSROOT/usr
+COPY --from=build-zstd $SYSROOT/usr $SYSROOT/usr
 
 ARG QT_VERSION=6.8.0
 
 RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
  && cd qtbase-everywhere-src-* && mkdir _build && cd _build \
+ && apk add qt6-qttools-dev \
  && ../configure \
     -prefix "$SYSROOT/opt/qt" \
-    -qt-host-path "/usr" \
+    -qt-doubleconversion \
     -qt-freetype \
     -qt-harfbuzz \
     -qt-libjpeg \
     -qt-libpng \
     -qt-pcre \
     -qt-zlib \
-    -qt-doubleconversion \
     -static \
-    -no-dbus \
+    -no-egl \
     -no-glib \
+    -no-vulkan \
     -no-feature-brotli \
+    -no-feature-printsupport \
+    -no-feature-sql \
     -openssl-linked \
     -nomake examples \
     -nomake tests \
     -opengl desktop \
     -xcb \
     -- \
-    -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
+    -DCMAKE_FIND_ROOT_PATH="$SYSROOT/usr" \
+    -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+    -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
     -DTEST_xcb_syslibs=TRUE \
     -Wno-dev \
  && cat config.summary \
  && cmake --build . \
  && cmake --install . \
+ && apk del qt6-qttools-dev \
  && rm -rf /work/build
 
 RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qttools-everywhere-src-$QT_VERSION.tar.xz") \
@@ -577,6 +600,9 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
     -no-feature-qtdiag \
     -no-feature-qtplugininfo \
     -- \
+    -DCMAKE_FIND_ROOT_PATH="$SYSROOT/usr" \
+    -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+    -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
     -Wno-dev \
  && cmake --build . \
  && cmake --install . \
@@ -586,36 +612,36 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
  && cd qtsvg-everywhere-src-* && mkdir _build && cd _build \
  && "$SYSROOT/opt/qt/bin/qt-configure-module" .. \
     -- \
+    -DCMAKE_FIND_ROOT_PATH="$SYSROOT/usr" \
+    -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+    -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
     -Wno-dev \
  && cmake --build . \
  && cmake --install . \
  && rm -rf /work/build
-
-RUN tar zxf <(curl -L https://github.com/eudev-project/eudev/releases/download/v3.2.14/eudev-3.2.14.tar.gz) \
- && cd eudev-* \
- && apk add gperf \
- && ./configure --prefix="$SYSROOT/usr" --disable-shared \
- && make -j"$(nproc)" \
- && make install \
- && apk del gperf \
- && rm -rf /work/build
-
-RUN apk add qt6-qtwayland-dev
 
 RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtwayland-everywhere-src-$QT_VERSION.tar.xz") \
  && cd qtwayland-everywhere-src-* && mkdir _build && cd _build \
  && "$SYSROOT/opt/qt/bin/qt-configure-module" .. \
     -- \
+    -DCMAKE_FIND_ROOT_PATH="$SYSROOT/usr" \
+    -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+    -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
     -Wno-dev \
  && cmake --build . \
  && cmake --install . \
- && rm -rf /work/build
+ && rm -rf /work/build \
+ && ls "$SYSROOT/opt/qt/plugins/platforms/libqwayland-generic.a"
 
+# Final image
+FROM common
+
+COPY --from=build-qt $SYSROOT $SYSROOT
 COPY --from=build-ffmpeg $SYSROOT/usr $SYSROOT/usr
 COPY --from=build-openal $SYSROOT/usr $SYSROOT/usr
 COPY --from=build-toxcore $SYSROOT/usr $SYSROOT/usr
 
-RUN ["apk", "add", "ccache"]
+RUN chmod 0644 "$SYSROOT/static-toolchain.cmake"
 
 RUN mv /usr/bin/clang++ /usr/bin/clang++.real
 COPY clang-pc-fixer /usr/bin/clang++

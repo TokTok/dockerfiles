@@ -20,6 +20,8 @@ def fix_args(args: list[str]) -> list[str]:
         # TODO(iphydf): Get this from pkg-config.
         if libname(arg) == "GL":
             fixed_args.extend(("-lglapi", "-lz", "-ldrm", "-lXext"))
+        elif libname(arg) == "input":
+            fixed_args.append("-levdev")
         elif libname(arg) == "xcb":
             fixed_args.append("-lXau")
         elif libname(arg) == "xcb-image":

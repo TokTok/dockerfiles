@@ -8,11 +8,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-ARG ARCH
-ARG WINEARCH
-ENV WINEARCH=${WINEARCH}
-ARG SCRIPT_ARCH=${WINEARCH}
-
+# Install both architectures so we can share this layer between i686 and x86_64.
 RUN dpkg --add-architecture i386 \
  && apt-get update \
  && apt-get install -y --no-install-recommends \
@@ -40,8 +36,10 @@ RUN dpkg --add-architecture i386 \
  unzip \
  yasm \
  zip \
- g++-mingw-w64-${ARCH//_/-} \
- gcc-mingw-w64-${ARCH//_/-} \
+ g++-mingw-w64-i686 \
+ gcc-mingw-w64-i686 \
+ g++-mingw-w64-x86-64 \
+ gcc-mingw-w64-x86-64 \
  gdb-mingw-w64 \
  && curl -L --connect-timeout 10 https://dl.winehq.org/wine-builds/winehq.key | apt-key add - \
  && echo "deb https://dl.winehq.org/wine-builds/ubuntu/ oracular main" >> /etc/apt/sources.list.d/wine.list \
@@ -49,8 +47,15 @@ RUN dpkg --add-architecture i386 \
  && apt-get install -y --no-install-recommends \
  winbind \
  wine-stable \
+ wine32:i386 \
+ wine64 \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
+
+ARG ARCH
+ARG WINEARCH
+ENV WINEARCH=${WINEARCH}
+ARG SCRIPT_ARCH=${WINEARCH}
 
 RUN update-alternatives --set ${ARCH}-w64-mingw32-gcc /usr/bin/${ARCH}-w64-mingw32-gcc-posix && \
   update-alternatives --set ${ARCH}-w64-mingw32-g++ /usr/bin/${ARCH}-w64-mingw32-g++-posix

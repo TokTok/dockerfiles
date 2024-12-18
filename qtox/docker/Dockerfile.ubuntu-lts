@@ -8,66 +8,39 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
  && apt-get -y --force-yes --no-install-recommends install \
- autoconf \
- automake \
  build-essential \
  ca-certificates \
  ccache \
  cmake \
  curl \
- desktop-file-utils \
- extra-cmake-modules \
  git \
  lcov \
- libarchive-dev \
  libavcodec-dev \
  libavdevice-dev \
  libavfilter-dev \
  libavutil-dev \
- libcairo-dev \
  libexif-dev \
- libfuse-dev \
- libgdk-pixbuf2.0-dev \
- libgl1-mesa-dev \
- libglib2.0-dev \
- libgtk2.0-dev \
- libinotifytools0-dev \
- liblz4-dev \
- liblzma-dev \
- libnotify-dev \
  libopenal-dev \
  libopus-dev \
  libqrencode-dev \
- libqt6opengl6-dev \
  libqt6svg6-dev \
  libsodium-dev \
  libsqlcipher-dev \
- libssl-dev \
  libswresample-dev \
  libswscale-dev \
- libtool \
  libvpx-dev \
  libxss-dev \
  ninja-build \
- patchelf \
+ pkg-config \
  qt6-l10n-tools \
  qt6-tools-dev \
  qt6-tools-dev-tools \
  wget \
- xxd \
- zsync \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
 COPY download/common.sh /build/download/common.sh
 COPY build_utils.sh /build/build_utils.sh
-
-COPY download/download_ldqt.sh /build/download/download_ldqt.sh
-COPY build_ldqt_linux.sh /build/build_ldqt_linux.sh
-RUN mkdir -p /src/ldqt && \
-    cd /src/ldqt && \
-    /build/build_ldqt_linux.sh && \
-    rm -fr /src/ldqt
 
 COPY download/download_toxcore.sh /build/download/download_toxcore.sh
 COPY build_toxcore_linux.sh /build/build_toxcore_linux.sh

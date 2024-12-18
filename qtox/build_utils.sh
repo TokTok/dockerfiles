@@ -29,6 +29,8 @@ assert_supported() {
 }
 
 parse_arch() {
+  LIB_TYPE=shared
+
   while (($# > 0)); do
     case $1 in
       --arch)
@@ -37,6 +39,10 @@ parse_arch() {
         ;;
       --dep)
         DEP_NAME=$2
+        shift 2
+        ;;
+      --libtype)
+        LIB_TYPE=$2
         shift 2
         ;;
       --supported)

@@ -12,14 +12,22 @@ source "$SCRIPT_DIR/build_utils.sh"
 
 parse_arch --dep "sodium" --supported "win32 win64 macos macos-x86_64 macos-arm64" "$@"
 
+if [ "$LIB_TYPE" = "shared" ]; then
+  ENABLE_STATIC=--disable-static
+  ENABLE_SHARED=--enable-shared
+else
+  ENABLE_STATIC=--enable-static
+  ENABLE_SHARED=--disable-shared
+fi
+
 "$SCRIPT_DIR/download/download_sodium.sh"
 
 CFLAGS="$CROSS_CFLAG" \
   LDFLAGS="$CROSS_LDFLAG -fstack-protector" \
   ./configure "$HOST_OPTION" \
   "--prefix=$DEP_PREFIX" \
-  --enable-shared \
-  --disable-static
+  "$ENABLE_STATIC" \
+  "$ENABLE_SHARED"
 
 make -j "$MAKE_JOBS"
 make install

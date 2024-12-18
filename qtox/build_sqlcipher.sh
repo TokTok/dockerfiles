@@ -19,26 +19,26 @@ parse_arch --dep "sqlcipher" --supported "win32 win64 macos macos-x86_64 macos-a
 CFLAGS="-O2 -g0 -DSQLITE_HAS_CODEC -I$DEP_PREFIX/include/ $CROSS_CFLAG"
 LDFLAGS="-lcrypto -L$DEP_PREFIX/lib/ -L$DEP_PREFIX/lib64/ $CROSS_LDFLAG"
 
-if [ "$SCRIPT_ARCH" == "macos" ] || [ "$SCRIPT_ARCH" == "macos-x86_64" ] || [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
-  LIBS=''
-else
+if [ "$SCRIPT_ARCH" = "win32" ] || [ "$SCRIPT_ARCH" = "win64" ]; then
   sed -i s/'if test "$TARGET_EXEEXT" = ".exe"'/'if test ".exe" = ".exe"'/g configure
   sed -i 's|exec $PWD/mksourceid manifest|exec $PWD/mksourceid.exe manifest|g' tool/mksqlite3h.tcl
   LIBS="-lgdi32 -lws2_32"
   LDFLAGS="$LDFLAGS -lgdi32"
+else
+  LIBS=''
 fi
 
 ./configure "$HOST_OPTION" \
-  "--prefix=$DEP_PREFIX" \
-  --enable-shared \
-  --disable-static \
+  --prefix="$DEP_PREFIX" \
+  --enable-static \
+  --disable-shared \
   --disable-tcl \
   --enable-tempstore=yes \
-  "CFLAGS=$CFLAGS $CROSS_CFLAG" \
-  "LDFLAGS=$LDFLAGS $CROSS_LDFLAG" \
-  "LIBS=$LIBS"
+  CFLAGS="$CFLAGS $CROSS_CFLAG" \
+  LDFLAGS="$LDFLAGS $CROSS_LDFLAG" \
+  LIBS="$LIBS"
 
-if [ "$SCRIPT_ARCH" != "macos" ] && [ "$SCRIPT_ARCH" != "macos-x86_64" ] && [ "$SCRIPT_ARCH" != "macos-arm64" ]; then
+if [ "$SCRIPT_ARCH" = "win32" ] || [ "$SCRIPT_ARCH" = "win64" ]; then
   sed -i s/"TEXE = $"/"TEXE = .exe"/ Makefile
 fi
 

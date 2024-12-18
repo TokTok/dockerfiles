@@ -26,14 +26,21 @@ elif [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
   CROSS_COMPILE_ARCH=""
 fi
 
+if [ "$LIB_TYPE" = "static" ]; then
+  DISABLE_SHARED="-no-shared"
+else
+  DISABLE_SHARED="shared"
+fi
+
 "$SCRIPT_DIR/download/download_openssl.sh"
 
 CFLAGS="$CROSS_CFLAG" \
   LDFLAGS="$CROSS_LDFLAG" \
   ./Configure \
-  "--prefix=$DEP_PREFIX" \
-  "--openssldir=$DEP_PREFIX/ssl" \
-  shared \
+  --prefix="$DEP_PREFIX" \
+  --openssldir="$DEP_PREFIX/ssl" \
+  "$DISABLE_SHARED" \
+  -no-tests -fPIC \
   "$CROSS_COMPILE_ARCH" \
   "$OPENSSL_ARCH"
 

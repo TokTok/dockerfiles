@@ -35,23 +35,23 @@ else
   exit 1
 fi
 
-"$SCRIPT_DIR/download/download_vpx.sh"
-
-if [ "$SCRIPT_ARCH" == "win32" ] || [ "$SCRIPT_ARCH" == "win64" ] || [ "$SCRIPT_ARCH" == "macos-x86_64" ] || [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
-  ENABLE_STATIC="--enable-static"
-  ENABLE_SHARED="--disable-shared"
+if [ "$LIB_TYPE" = "shared" ] && [ "$SCRIPT_ARCH" != "win32" ] && [ "$SCRIPT_ARCH" != "win64" ]; then
+  ENABLE_STATIC=--disable-static
+  ENABLE_SHARED=--enable-shared
 else
-  ENABLE_STATIC="--disable-static"
-  ENABLE_SHARED="--enable-shared"
+  ENABLE_STATIC=--enable-static
+  ENABLE_SHARED=--disable-shared
 fi
+
+"$SCRIPT_DIR/download/download_vpx.sh"
 
 CFLAGS="$ARCH_FLAGS $CROSS_CFLAG" \
   CPPFLAGS="$CROSS_CPPFLAG" \
   LDFLAGS="$CROSS_LDFLAG" \
   CROSS="$CROSS_ARG" \
   ./configure \
-  "--target=$TARGET_ARG" \
-  "--prefix=$DEP_PREFIX" \
+  --target="$TARGET_ARG" \
+  --prefix="$DEP_PREFIX" \
   "$ENABLE_STATIC" \
   "$ENABLE_SHARED" \
   --enable-runtime-cpu-detect \

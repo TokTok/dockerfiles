@@ -26,13 +26,14 @@ cd _build
   -qt-libpng \
   -qt-pcre \
   -qt-zlib \
+  -appstore-compliant \
   -static \
   -no-feature-brotli \
   -no-feature-printsupport \
   -no-feature-sql \
   -no-feature-dbus \
   -no-opengl \
-  -openssl-linked \
+  -no-openssl \
   -- \
   -DCMAKE_FIND_ROOT_PATH="$DEP_PREFIX" \
   -Wno-dev

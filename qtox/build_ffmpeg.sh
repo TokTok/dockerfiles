@@ -26,6 +26,14 @@ else
   CROSS_PREFIX=""
 fi
 
+if [ "$LIB_TYPE" = "shared" ]; then
+  ENABLE_STATIC=--disable-static
+  ENABLE_SHARED=--enable-shared
+else
+  ENABLE_STATIC=--enable-static
+  ENABLE_SHARED=--disable-shared
+fi
+
 "$SCRIPT_DIR/download/download_ffmpeg.sh"
 
 CFLAGS="$CROSS_CFLAG" \
@@ -33,13 +41,14 @@ CFLAGS="$CROSS_CFLAG" \
   LDFLAGS="$CROSS_LDFLAG" \
   ./configure "--arch=$FFMPEG_ARCH" \
   --enable-gpl \
-  --enable-shared \
-  --disable-static \
+  "$ENABLE_STATIC" \
+  "$ENABLE_SHARED" \
   "--prefix=$DEP_PREFIX" \
   "--target-os=$TARGET_OS" \
   "--cross-prefix=$CROSS_PREFIX" \
   --pkg-config="pkg-config" \
   --extra-cflags="-O2 -g0" \
+  --disable-libxcb \
   --disable-debug \
   --disable-programs \
   --disable-protocols \

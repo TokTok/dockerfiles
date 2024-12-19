@@ -20,9 +20,11 @@ RUN apt-get update \
  libavfilter-dev \
  libavutil-dev \
  libexif-dev \
+ libgl1-mesa-dev \
  libopenal-dev \
  libopus-dev \
  libqrencode-dev \
+ libqt6opengl6-dev \
  libqt6svg6-dev \
  libsodium-dev \
  libsqlcipher-dev \

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# SPDX-License-Identifier: GPL-3.0-or-later AND MIT
-# Copyright (c) 2024 The TokTok team
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright © 2024 The TokTok team
 
 set -euo pipefail
 
@@ -13,8 +13,8 @@ parse_arch --dep "qt" --supported "macos-arm64 macos-x86_64" "$@"
 
 QT_VERSION="6.8.1"
 
-export CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
-export OBJCXXFLAGS="-DQT_MESSAGELOGCONTEXT"
+export CXXFLAGS="-DQT_MESSAGELOGCONTEXT -fsanitize=undefined,local-bounds -fsanitize-trap=all"
+export OBJCXXFLAGS="$CXXFLAGS"
 
 tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz")
 cd "qtbase-everywhere-src-$QT_VERSION"
@@ -31,8 +31,11 @@ rm -rf _build && mkdir _build && cd _build
   -qt-zlib \
   -appstore-compliant \
   -static \
+  -no-feature-androiddeployqt \
   -no-feature-brotli \
+  -no-feature-macdeployqt \
   -no-feature-printsupport \
+  -no-feature-qmake \
   -no-feature-sql \
   -no-feature-dbus \
   -no-opengl \

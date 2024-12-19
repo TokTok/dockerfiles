@@ -59,7 +59,7 @@ cd _build
   -no-feature-qtdiag \
   -no-feature-qtplugininfo \
   -- \
-  -DCMAKE_FIND_ROOT_PATH="$SYSROOT" \
+  -DCMAKE_FIND_ROOT_PATH="$DEP_PREFIX" \
   -Wno-dev
 cmake --build .
 cmake --install .
@@ -72,7 +72,7 @@ mkdir _build
 cd _build
 "$DEP_PREFIX/qt/bin/qt-configure-module" .. \
   -- \
-  -DCMAKE_FIND_ROOT_PATH="$SYSROOT" \
+  -DCMAKE_FIND_ROOT_PATH="$DEP_PREFIX" \
   -Wno-dev
 cmake --build .
 cmake --install .

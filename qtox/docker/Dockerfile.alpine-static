@@ -552,7 +552,6 @@ ARG QT_VERSION=6.8.0
 
 RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
  && cd qtbase-everywhere-src-* && mkdir _build && cd _build \
- && apk add qt6-qttools-dev \
  && ../configure \
     -prefix "$SYSROOT/opt/qt" \
     -qt-doubleconversion \
@@ -583,7 +582,6 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
  && cat config.summary \
  && cmake --build . \
  && cmake --install . \
- && apk del qt6-qttools-dev \
  && rm -rf /work/build
 
 RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qttools-everywhere-src-$QT_VERSION.tar.xz") \

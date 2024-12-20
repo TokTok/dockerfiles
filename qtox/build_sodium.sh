@@ -22,10 +22,15 @@ fi
 
 "$SCRIPT_DIR/download/download_sodium.sh"
 
-CFLAGS="$CROSS_CFLAG" \
+RENAME_CFLAGS=""
+for sym in blake2b blake2b_final blake2b_init blake2b_init_key blake2b_init_param blake2b_update; do
+  RENAME_CFLAGS="$RENAME_CFLAGS -D$sym=sodium_$sym"
+done
+
+CFLAGS="$CROSS_CFLAG $RENAME_CFLAGS" \
   LDFLAGS="$CROSS_LDFLAG -fstack-protector" \
   ./configure "$HOST_OPTION" \
-  "--prefix=$DEP_PREFIX" \
+  --prefix="$DEP_PREFIX" \
   "$ENABLE_STATIC" \
   "$ENABLE_SHARED"
 

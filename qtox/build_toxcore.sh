@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later AND MIT
-#     Copyright (c) 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
-#     Copyright (c) 2021 by The qTox Project Contributors
+# Copyright © 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
+# Copyright © 2021 by The qTox Project Contributors
+# Copyright © 2024 The TokTok team
 
 set -euo pipefail
 
@@ -30,6 +31,7 @@ build_toxcore() {
 
   cmake -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
     -DBOOTSTRAP_DAEMON=OFF \
+    -DMIN_LOGGER_LEVEL=DEBUG \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_STATIC="$ENABLE_STATIC" \
     -DENABLE_SHARED="$ENABLE_SHARED" \

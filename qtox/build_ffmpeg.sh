@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later AND MIT
-#     Copyright (c) 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
-#     Copyright (c) 2021 by The qTox Project Contributors
+# Copyright © 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
+# Copyright © 2021 by The qTox Project Contributors
+# Copyright © 2024 The TokTok team
 
 set -euo pipefail
 
@@ -39,13 +40,13 @@ fi
 CFLAGS="$CROSS_CFLAG" \
   CPPFLAGS="$CROSS_CPPFLAG" \
   LDFLAGS="$CROSS_LDFLAG" \
-  ./configure "--arch=$FFMPEG_ARCH" \
+  ./configure --arch="$FFMPEG_ARCH" \
   --enable-gpl \
   "$ENABLE_STATIC" \
   "$ENABLE_SHARED" \
-  "--prefix=$DEP_PREFIX" \
-  "--target-os=$TARGET_OS" \
-  "--cross-prefix=$CROSS_PREFIX" \
+  --prefix="$DEP_PREFIX" \
+  --target-os="$TARGET_OS" \
+  --cross-prefix="$CROSS_PREFIX" \
   --pkg-config="pkg-config" \
   --extra-cflags="-O2 -g0" \
   --disable-libxcb \

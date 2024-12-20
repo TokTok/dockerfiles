@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later AND MIT
-#     Copyright (c) 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
-#     Copyright (c) 2021 by The qTox Project Contributors
+# Copyright © 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
+# Copyright © 2021 by The qTox Project Contributors
+# Copyright © 2024 The TokTok team
 
 set -euo pipefail
 
@@ -12,14 +13,14 @@ source "$SCRIPT_DIR/build_utils.sh"
 
 parse_arch --dep "openal" --supported "win32 win64 macos macos-x86_64 macos-arm64" "$@"
 
-"$SCRIPT_DIR/download/download_openal.sh"
-
-if [ "$SCRIPT_ARCH" != "macos" ] && [ "$SCRIPT_ARCH" != "macos-x86_64" ] && [ "$SCRIPT_ARCH" != "macos-arm64" ]; then
+if [ "$SCRIPT_ARCH" = "win32" ] || [ "$SCRIPT_ARCH" = "win64" ]; then
+  "$SCRIPT_DIR/download/download_openal.sh" patched
   patch -p1 <"$SCRIPT_DIR/patches/openal-cmake-3-11.patch"
   DSOUND_INCLUDE_DIR="/usr/$MINGW_ARCH-w64-mingw32/include"
   DSOUND_LIBRARY="/usr/$MINGW_ARCH-w64-mingw32/lib/libdsound.a"
   MACOSX_RPATH="OFF"
 else
+  "$SCRIPT_DIR/download/download_openal.sh" upstream
   DSOUND_INCLUDE_DIR=""
   DSOUND_LIBRARY=""
   MACOSX_RPATH="ON"
@@ -32,6 +33,7 @@ else
 fi
 
 export CFLAGS="-fPIC"
+export CXXFLAGS="-fPIC -std=c++20"
 cmake \
   "$CMAKE_TOOLCHAIN_FILE" \
   -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
@@ -43,7 +45,9 @@ cmake \
   -DLIBTYPE="$LIBTYPE" \
   -DDSOUND_INCLUDE_DIR="$DSOUND_INCLUDE_DIR" \
   -DDSOUND_LIBRARY="$DSOUND_LIBRARY" \
+  -GNinja \
+  -B_build \
   .
 
-make -j "$MAKE_JOBS"
-make install
+cmake --build _build
+cmake --install _build

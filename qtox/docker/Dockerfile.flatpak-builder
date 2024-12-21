@@ -8,8 +8,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
  && apt-get -y --force-yes --no-install-recommends install \
- curl \
  ca-certificates \
+ ccache \
+ curl \
  elfutils \
  # flatpak-validate-icon uses gdk-pixbuf which needs an svg loader
  librsvg2-common \
@@ -39,3 +40,4 @@ RUN mkdir -p /src/toxcore && \
     /build/download/download_toxcore.sh
 
 WORKDIR /qtox
+ENV HOME=/qtox

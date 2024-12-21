@@ -46,7 +46,7 @@ CROSS_COMPILE="$MINGW_ARCH-w64-mingw32-"
   -qt-libpng \
   -qt-zlib \
   -qt-pcre \
-  -opengl desktop \
+  -no-opengl \
   -- \
   -DCMAKE_TOOLCHAIN_FILE=/build/windows-toolchain.cmake \
   -DOPENSSL_ROOT_DIR=/windows

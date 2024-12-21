@@ -449,25 +449,6 @@ FROM base AS build-qt
 
 COPY --from=build-x11 $SYSROOT/usr $SYSROOT/usr
 
-RUN tar Jxf <(curl -L https://mesa.freedesktop.org/archive/mesa-24.2.7.tar.xz) \
- && cd mesa-24.2.7 \
- && sed -i -e 's/= *shared_library(/= library(/g' $(find . -name "meson.build") \
- && LDFLAGS="-lXau -L$SYSROOT/usr/lib" meson setup _build/ \
- -Ddefault_library=static \
- -Dplatforms=x11,wayland \
- -Dgallium-vdpau=disabled \
- -Dgallium-drivers=softpipe \
- -Dvulkan-drivers= \
- -Dgles1=disabled \
- -Dgles2=disabled \
- -Dgbm=disabled \
- -Degl=disabled \
- -Dglvnd=disabled \
- -Dglx=xlib \
- --prefix="$SYSROOT/usr" || (cat _build/meson-logs/meson-log.txt && false) \
- && ninja -C _build install \
- && rm -rf /work/build
-
 RUN tar zxf <(curl https://xcb.freedesktop.org/dist/xcb-util-renderutil-0.3.10.tar.gz) \
  && cd xcb-util-renderutil-0.3.10 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
@@ -548,12 +529,19 @@ COPY --from=build-sqlcipher $SYSROOT/usr $SYSROOT/usr
 COPY --from=build-tslib $SYSROOT/usr $SYSROOT/usr
 COPY --from=build-zstd $SYSROOT/usr $SYSROOT/usr
 
-ARG QT_VERSION=6.8.0
+ARG QT_VERSION=6.8.1
+
+ENV CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
+ENV OBJCXXFLAGS="$CXXFLAGS"
 
 RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
  && cd qtbase-everywhere-src-* && mkdir _build && cd _build \
  && ../configure \
     -prefix "$SYSROOT/opt/qt" \
+    -appstore-compliant \
+    -static \
+    -release \
+    -force-asserts \
     -qt-doubleconversion \
     -qt-freetype \
     -qt-harfbuzz \
@@ -561,17 +549,19 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
     -qt-libpng \
     -qt-pcre \
     -qt-zlib \
-    -static \
+    -no-feature-androiddeployqt \
+    -no-feature-brotli \
+    -no-feature-macdeployqt \
+    -no-feature-printsupport \
+    -no-feature-qmake \
+    -no-feature-sql \
     -no-egl \
     -no-glib \
+    -no-opengl \
     -no-vulkan \
-    -no-feature-brotli \
-    -no-feature-printsupport \
-    -no-feature-sql \
     -openssl-linked \
     -nomake examples \
     -nomake tests \
-    -opengl desktop \
     -xcb \
     -- \
     -DCMAKE_FIND_ROOT_PATH="$SYSROOT/usr" \

@@ -13,7 +13,7 @@ parse_arch --dep "qt" --supported "macos-arm64 macos-x86_64" "$@"
 
 QT_VERSION="6.8.1"
 
-export CXXFLAGS="-DQT_MESSAGELOGCONTEXT -fsanitize=undefined,local-bounds -fsanitize-trap=all"
+export CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
 export OBJCXXFLAGS="$CXXFLAGS"
 
 tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz")
@@ -21,6 +21,9 @@ cd "qtbase-everywhere-src-$QT_VERSION"
 rm -rf _build && mkdir _build && cd _build
 ../configure \
   --prefix="$DEP_PREFIX/qt" \
+  -appstore-compliant \
+  -static \
+  -release \
   -force-asserts \
   -qt-doubleconversion \
   -qt-freetype \
@@ -29,8 +32,6 @@ rm -rf _build && mkdir _build && cd _build
   -qt-libpng \
   -qt-pcre \
   -qt-zlib \
-  -appstore-compliant \
-  -static \
   -no-feature-androiddeployqt \
   -no-feature-brotli \
   -no-feature-macdeployqt \

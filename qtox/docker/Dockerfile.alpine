@@ -31,7 +31,8 @@ RUN ["apk", "add", \
 ENV CC=clang CXX=clang++
 
 WORKDIR /work/c-toxcore
-RUN git clone --recurse-submodules --depth=1 https://github.com/TokTok/c-toxcore /work/c-toxcore \
+RUN git clone --recurse-submodules https://github.com/TokTok/c-toxcore /work/c-toxcore \
+ && git checkout v0.2.12 \
  && cmake -B_build -H. -GNinja \
  && cmake --build _build --target install \
  && rm -rf /work/c-toxcore

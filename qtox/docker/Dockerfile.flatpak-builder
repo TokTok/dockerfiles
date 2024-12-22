@@ -23,6 +23,7 @@ RUN apt-get update \
 
 # Pre-download kde flatpak environment to speed up flatpak builds
 RUN flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo \
+ && flatpak --system install -y --noninteractive flathub org.kde.Platform/x86_64/6.7 \
  && flatpak --system install -y --noninteractive flathub org.kde.Sdk/x86_64/6.7
 
 WORKDIR /qtox

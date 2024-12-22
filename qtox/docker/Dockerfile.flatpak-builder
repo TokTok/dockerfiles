@@ -8,10 +8,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
  && apt-get -y --force-yes --no-install-recommends install \
+ appstream-compose \
  ca-certificates \
  ccache \
  curl \
  elfutils \
+ git \
  # flatpak-validate-icon uses gdk-pixbuf which needs an svg loader
  librsvg2-common \
  flatpak \
@@ -21,23 +23,7 @@ RUN apt-get update \
 
 # Pre-download kde flatpak environment to speed up flatpak builds
 RUN flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo \
- && flatpak --system install flathub -y org.kde.Platform/x86_64/6.7
-
-COPY download/common.sh /build/download/common.sh
-COPY download/download_sodium.sh /build/download/download_sodium.sh
-RUN mkdir -p /src/libsodium && \
-    cd /src/libsodium && \
-    /build/download/download_sodium.sh
-
-COPY download/download_sqlcipher.sh /build/download/download_sqlcipher.sh
-RUN mkdir -p /src/sqlcipher && \
-    cd /src/sqlcipher && \
-    /build/download/download_sqlcipher.sh
-
-COPY download/download_toxcore.sh /build/download/download_toxcore.sh
-RUN mkdir -p /src/toxcore && \
-    cd /src/toxcore && \
-    /build/download/download_toxcore.sh
+ && flatpak --system install flathub -y org.kde.Platform/x86_64/6.8
 
 WORKDIR /qtox
 ENV HOME=/qtox

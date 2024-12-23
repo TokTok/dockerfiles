@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright © 2024 The TokTok team
 import subprocess
 import sys
 from typing import Optional
@@ -18,8 +20,8 @@ def fix_args(args: list[str]) -> list[str]:
     for arg in args:
         fixed_args.append(arg)
         # TODO(iphydf): Get this from pkg-config.
-        if libname(arg) == "GL":
-            fixed_args.extend(("-lglapi", "-lz", "-ldrm", "-lXext"))
+        if libname(arg) == "Qt6Svg":
+            fixed_args.extend(("-lz"))
         elif libname(arg) == "input":
             fixed_args.append("-levdev")
         elif libname(arg) == "xcb":

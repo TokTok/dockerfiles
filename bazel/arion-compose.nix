@@ -19,14 +19,14 @@ in
           services.openssh.enable = true;
           services.nscd.enable = false;
 
-          system.stateVersion = "24.05";
+          system.stateVersion = "24.11";
           system.nssModules = lib.mkForce [ ];
 
           systemd.sockets.nix-daemon.enable = true;
           systemd.services.nix-daemon.enable = true;
 
           environment.systemPackages = [
-            pkgs.bazel
+            pkgs.bazel_6
             pkgs.coreutils
             pkgs.git
             # Needed because coursier (for Kotlin) requires that java is in $PATH.
@@ -35,6 +35,7 @@ in
 
           security.sudo.wheelNeedsPassword = false;
 
+          programs.zsh.enable = true;
           users = {
             mutableUsers = false;
 

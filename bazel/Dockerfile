@@ -1,4 +1,4 @@
-FROM toxchat/bazel:rr22rb2s39l0jcibw52lx7w8d993ilnv as base
+FROM toxchat/bazel:mwn4qrlajnmhq2iwb741z8fi1bhc9xph as base
 # Build the base image in a single layer instead of 100 as done by arion.
 FROM scratch
 # hadolint ignore=DL3022
@@ -7,8 +7,8 @@ COPY --from=base / /
 CMD ["/usr/sbin/init"]
 
 # We need to know where our bash is, because we haven't set up /bin/sh yet.
-ENV NIXOS_VERSION="24.05"
-SHELL ["/nix/store/rdd4pnr4x9rqc9wgbibhngv217w2xvxl-bash-interactive-5.2p26/bin/bash", "-o", "pipefail", "-c"]
+ENV NIXOS_VERSION="a81bbdfb658428a45c69a42aa73d4bd18127c467"
+SHELL ["/nix/store/f33kh08pa7pmy4kvsmsibda46sh46s66-bash-interactive-5.2p37/bin/bash", "-o", "pipefail", "-c"]
 
 # Run activation script (init knows where it is).
 RUN /usr/sbin/init || true

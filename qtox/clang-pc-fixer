@@ -21,7 +21,7 @@ def fix_args(args: list[str]) -> list[str]:
         fixed_args.append(arg)
         # TODO(iphydf): Get this from pkg-config.
         if libname(arg) == "Qt6Svg":
-            fixed_args.extend(("-lz"))
+            fixed_args.append("-lz")
         elif libname(arg) == "input":
             fixed_args.append("-levdev")
         elif libname(arg) == "xcb":

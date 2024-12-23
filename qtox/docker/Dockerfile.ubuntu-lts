@@ -13,6 +13,7 @@ RUN apt-get update \
  ccache \
  cmake \
  curl \
+ file \
  git \
  lcov \
  libavcodec-dev \

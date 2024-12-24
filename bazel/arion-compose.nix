@@ -25,6 +25,11 @@ in
           systemd.sockets.nix-daemon.enable = true;
           systemd.services.nix-daemon.enable = true;
 
+          networking = {
+            useDHCP = false;
+            firewall.enable = false;
+          };
+
           environment.systemPackages = [
             pkgs.bazel_6
             pkgs.coreutils

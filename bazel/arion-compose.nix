@@ -31,11 +31,11 @@ in
           };
 
           environment.systemPackages = [
-            pkgs.bazel_6
+            pkgs.bazel_7
             pkgs.coreutils
             pkgs.git
             # Needed because coursier (for Kotlin) requires that java is in $PATH.
-            pkgs.jdk17_headless
+            pkgs.jdk21_headless
           ];
 
           security.sudo.wheelNeedsPassword = false;

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -eux
+set -euxo pipefail
 
 cmake \
   -DCMAKE_TOOLCHAIN_FILE=linux/static-toolchain.cmake \

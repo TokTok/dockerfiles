@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later AND MIT
-#     Copyright (c) 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
-#     Copyright (c) 2021 by The qTox Project Contributors
+# Copyright © 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
+# Copyright © 2021 by The qTox Project Contributors
+# Copyright © 2024 The TokTok team
 
-set -euo pipefail
+set -euxo pipefail
 
 readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
@@ -27,7 +28,7 @@ for sym in blake2b blake2b_final blake2b_init blake2b_init_key blake2b_init_para
   RENAME_CFLAGS="$RENAME_CFLAGS -D$sym=sodium_$sym"
 done
 
-CFLAGS="$CROSS_CFLAG $RENAME_CFLAGS" \
+CFLAGS="-O3 $CROSS_CFLAG $RENAME_CFLAGS" \
   LDFLAGS="$CROSS_LDFLAG -fstack-protector" \
   ./configure "$HOST_OPTION" \
   --prefix="$DEP_PREFIX" \

@@ -1,12 +1,13 @@
 #!/bin/bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later AND MIT
-#     Copyright (c) 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
-#     Copyright (c) 2021 by The qTox Project Contributors
+# Copyright © 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
+# Copyright © 2021 by The qTox Project Contributors
+# Copyright © 2024 The TokTok team
+
+set -euxo pipefail
 
 # shellcheck disable=SC2016
-
-set -euo pipefail
 
 readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 

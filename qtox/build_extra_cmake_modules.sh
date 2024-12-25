@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright © 2024 The TokTok team
 
-set -euo pipefail
+set -euxo pipefail
 
 readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 

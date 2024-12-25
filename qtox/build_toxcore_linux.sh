@@ -4,7 +4,7 @@
 # Copyright © 2021 by The qTox Project Contributors
 # Copyright © 2024 The TokTok team
 
-set -euo pipefail
+set -euxo pipefail
 
 readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 

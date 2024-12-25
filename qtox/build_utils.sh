@@ -1,11 +1,12 @@
 #!/bin/bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later
-#     Copyright (c) 2022 by The qTox Project Contributors
+# Copyright © 2022 by The qTox Project Contributors
+# Copyright © 2024 The TokTok team
 
 # shellcheck disable=SC2034
 
-set -euo pipefail
+set -euxo pipefail
 
 MACOS_MINIMUM_SUPPORTED_VERSION=12.0
 
@@ -74,6 +75,7 @@ parse_arch() {
     CROSS_LDFLAG=""
     CROSS_CFLAG=""
     CROSS_CPPFLAG=""
+    CROSS_CXXFLAG=""
     MAKE_JOBS="$(nproc)"
     CMAKE_TOOLCHAIN_FILE="-DCMAKE_TOOLCHAIN_FILE=/build/windows-toolchain.cmake"
   elif [ "$SCRIPT_ARCH" == "macos" ] || [ "$SCRIPT_ARCH" == "macos-x86_64" ] || [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
@@ -83,6 +85,7 @@ parse_arch() {
     CROSS_LDFLAG="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
     CROSS_CFLAG="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
     CROSS_CPPFLAG="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
+    CROSS_CXXFLAG="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
     MAKE_JOBS="$(sysctl -n hw.ncpu)"
     CMAKE_TOOLCHAIN_FILE=""
   else

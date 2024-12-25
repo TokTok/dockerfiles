@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later AND MIT
-#     Copyright (c) 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
-#     Copyright (c) 2021 by The qTox Project Contributors
+# Copyright © 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
+# Copyright © 2021 by The qTox Project Contributors
+# Copyright © 2024 The TokTok team
 
-set -euo pipefail
+set -euxo pipefail
 
 readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
@@ -25,7 +26,7 @@ fi
 CFLAGS="-O2 -g0 $CROSS_CFLAG" \
   LDFLAGS="$CROSS_LDFLAG" \
   ./configure "$HOST_OPTION" \
-  "--prefix=$DEP_PREFIX" \
+  --prefix="$DEP_PREFIX" \
   "$ENABLE_STATIC" \
   "$ENABLE_SHARED" \
   --disable-docs \

@@ -5,7 +5,7 @@
 # Copyright © 2021 by The qTox Project Contributors
 # Copyright © 2024 The TokTok team
 
-set -euo pipefail
+set -euxo pipefail
 
 readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
@@ -38,7 +38,7 @@ fi
 "$SCRIPT_DIR/download/download_ffmpeg.sh"
 
 CFLAGS="$CROSS_CFLAG" \
-  CPPFLAGS="$CROSS_CPPFLAG" \
+  CXXFLAGS="$CROSS_CXXFLAG" \
   LDFLAGS="$CROSS_LDFLAG" \
   ./configure --arch="$FFMPEG_ARCH" \
   --enable-gpl \

@@ -2,7 +2,7 @@
 # Copyright © 2021 by The qTox Project Contributors
 # Copyright © 2024 The TokTok team
 
-FROM ubuntu:24.10
+FROM toxchat/qtox:host-qt_6.8.1 AS base
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -14,26 +14,16 @@ RUN dpkg --add-architecture i386 \
  && apt-get install -y --no-install-recommends \
  autoconf \
  automake \
- build-essential \
- ca-certificates \
  ccache \
- cmake \
- curl \
  extra-cmake-modules \
  git \
  gnupg \
  libarchive-tools \
  libtool \
- ninja-build \
  nsis \
- pkg-config \
  python3-pefile \
- qt6-base-dev \
- qt6-base-dev-tools \
- qt6-tools-dev \
  tclsh \
  texinfo \
- unzip \
  yasm \
  zip \
  g++-mingw-w64-i686 \
@@ -65,14 +55,6 @@ COPY toolchain/windows-${ARCH}-toolchain.cmake /build/windows-toolchain.cmake
 COPY download/common.sh /build/download/common.sh
 COPY build_utils.sh /build/build_utils.sh
 
-COPY download/download_glfw.sh /build/download/download_glfw.sh
-COPY build_glfw.sh /build/build_glfw.sh
-
-RUN mkdir -p /src/glfw && \
-  cd /src/glfw && \
-  /build/build_glfw.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/glfw
-
 COPY download/download_openssl.sh /build/download/download_openssl.sh
 COPY build_openssl.sh /build/build_openssl.sh
 
@@ -81,13 +63,7 @@ RUN mkdir -p /src/openssl && \
   /build/build_openssl.sh --arch ${SCRIPT_ARCH} && \
   rm -fr /src/openssl
 
-COPY download/download_qt.sh /build/download/download_qt.sh
-COPY build_qt_windows.sh /build/build_qt_windows.sh
-
-RUN mkdir -p /src/qt && \
-  cd /src/qt && \
-  /build/build_qt_windows.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/qt
+FROM base AS non-qt
 
 COPY download/download_sqlcipher.sh /build/download/download_sqlcipher.sh
 COPY build_sqlcipher.sh /build/build_sqlcipher.sh
@@ -148,20 +124,6 @@ RUN mkdir -p /src/vpx && \
   /build/build_vpx.sh --arch ${SCRIPT_ARCH} && \
   rm -fr /src/vpx
 
-COPY download/download_mingw_ldd.sh /build/download/download_mingw_ldd.sh
-COPY build_mingw_ldd_windows.sh /build/build_mingw_ldd_windows.sh
-RUN mkdir -p /src/mingw_ldd && \
-  cd /src/mingw_ldd && \
-  /build/build_mingw_ldd_windows.sh && \
-  rm -fr /src/mingw_ldd
-
-COPY download/download_nsisshellexecasuser.sh /build/download/download_nsisshellexecasuser.sh
-COPY build_nsisshellexecasuser_windows.sh /build/build_nsisshellexecasuser_windows.sh
-RUN mkdir -p /src/nsisshellexecasuser && \
-  cd /src/nsisshellexecasuser && \
-  /build/build_nsisshellexecasuser_windows.sh && \
-  rm -fr /src/nsisshellexecasuser
-
 COPY download/download_toxcore.sh /build/download/download_toxcore.sh
 COPY build_toxcore.sh /build/build_toxcore.sh
 RUN mkdir -p /src/tox && \
@@ -169,36 +131,7 @@ RUN mkdir -p /src/tox && \
   /build/build_toxcore.sh && \
   rm -fr /src/tox
 
-RUN mkdir /export && \
-  cp /usr/${ARCH}-w64-mingw32/lib/libwinpthread-1.dll /export/ && \
-  cp /usr/lib/gcc/${ARCH}-w64-mingw32/13-posix/libgcc_s_*-1.dll /export && \
-  cp /usr/lib/gcc/${ARCH}-w64-mingw32/13-posix/libssp-0.dll /export && \
-  cp /usr/lib/gcc/${ARCH}-w64-mingw32/13-posix/libstdc++-6.dll /export && \
-  cp /windows/bin/OpenAL32.dll /export && \
-  cp /windows/bin/Qt6Core.dll /export && \
-  cp /windows/bin/Qt6Gui.dll /export && \
-  cp /windows/bin/Qt6Network.dll /export && \
-  cp /windows/bin/Qt6Svg.dll /export && \
-  cp /windows/bin/Qt6Xml.dll /export && \
-  cp /windows/bin/Qt6Widgets.dll /export && \
-  cp /windows/bin/avcodec-*.dll /export && \
-  cp /windows/bin/avdevice-*.dll /export && \
-  cp /windows/bin/avformat-*.dll /export && \
-  cp /windows/bin/avutil-*.dll /export && \
-  cp /windows/bin/libcrypto-*.dll /export && \
-  cp /windows/bin/libexif-*.dll /export && \
-  cp /windows/bin/libopus-*.dll /export && \
-  cp /windows/bin/libsodium-*.dll /export && \
-  cp /windows/bin/libsqlcipher-*.dll /export && \
-  cp /windows/bin/libssl-*.dll /export && \
-  cp /windows/bin/libtoxcore.dll /export && \
-  cp /windows/bin/swscale-*.dll /export && \
-  cp /windows/lib/libqrencode.dll /export && \
-  cp /windows/lib/libvpx.a /export && \
-  cp -r /windows/plugins/iconengines /export && \
-  cp -r /windows/plugins/imageformats /export && \
-  cp -r /windows/plugins/platforms /export && \
-  cp -r /windows/plugins/tls /export
+FROM base as debug-export
 
 RUN mkdir -p /debug_export
 
@@ -238,6 +171,73 @@ RUN mkdir -p /src/gdb && \
   /build/build_gdb_windows.sh --arch ${SCRIPT_ARCH} && \
   rm -fr /src/gdb && \
   cp /windows/bin/gdb.exe /debug_export/gdb.exe
+
+FROM base as qt
+
+COPY download/download_zstd.sh /build/download/download_zstd.sh
+COPY build_zstd.sh /build/build_zstd.sh
+
+RUN mkdir -p /src/zstd && \
+  cd /src/zstd && \
+  /build/build_zstd.sh --arch ${SCRIPT_ARCH} && \
+  rm -fr /src/zstd
+
+COPY download/download_qt.sh /build/download/download_qt.sh
+COPY build_qt_windows.sh /build/build_qt_windows.sh
+
+RUN mkdir -p /src/qt && \
+  cd /src/qt && \
+  /build/build_qt_windows.sh --arch ${SCRIPT_ARCH} && \
+  rm -fr /src/qt
+
+COPY download/download_nsisshellexecasuser.sh /build/download/download_nsisshellexecasuser.sh
+COPY build_nsisshellexecasuser_windows.sh /build/build_nsisshellexecasuser_windows.sh
+RUN mkdir -p /src/nsisshellexecasuser && \
+  cd /src/nsisshellexecasuser && \
+  /build/build_nsisshellexecasuser_windows.sh && \
+  rm -fr /src/nsisshellexecasuser
+
+COPY download/download_mingw_ldd.sh /build/download/download_mingw_ldd.sh
+COPY build_mingw_ldd_windows.sh /build/build_mingw_ldd_windows.sh
+RUN mkdir -p /src/mingw_ldd && \
+  cd /src/mingw_ldd && \
+  /build/build_mingw_ldd_windows.sh && \
+  rm -fr /src/mingw_ldd
+
+COPY --from=non-qt /windows/ /windows/
+
+RUN mkdir /export && \
+  cp /usr/${ARCH}-w64-mingw32/lib/libwinpthread-1.dll /export/ && \
+  cp /usr/lib/gcc/${ARCH}-w64-mingw32/13-posix/libgcc_s_*-1.dll /export && \
+  cp /usr/lib/gcc/${ARCH}-w64-mingw32/13-posix/libssp-0.dll /export && \
+  cp /usr/lib/gcc/${ARCH}-w64-mingw32/13-posix/libstdc++-6.dll /export && \
+  cp /windows/bin/OpenAL32.dll /export && \
+  cp /windows/bin/Qt6Core.dll /export && \
+  cp /windows/bin/Qt6Gui.dll /export && \
+  cp /windows/bin/Qt6Network.dll /export && \
+  cp /windows/bin/Qt6Svg.dll /export && \
+  cp /windows/bin/Qt6Xml.dll /export && \
+  cp /windows/bin/Qt6Widgets.dll /export && \
+  cp /windows/bin/avcodec-*.dll /export && \
+  cp /windows/bin/avdevice-*.dll /export && \
+  cp /windows/bin/avformat-*.dll /export && \
+  cp /windows/bin/avutil-*.dll /export && \
+  cp /windows/bin/swscale-*.dll /export && \
+  cp /windows/bin/libcrypto-*.dll /export && \
+  cp /windows/bin/libexif-*.dll /export && \
+  cp /windows/bin/libopus-*.dll /export && \
+  cp /windows/bin/libsodium-*.dll /export && \
+  cp /windows/bin/libsqlcipher-*.dll /export && \
+  cp /windows/bin/libssl-*.dll /export && \
+  cp /windows/bin/libtoxcore.dll /export && \
+  cp /windows/bin/libzstd.dll /export && \
+  cp /windows/lib/libqrencode.dll /export && \
+  cp -r /windows/plugins/iconengines /export && \
+  cp -r /windows/plugins/imageformats /export && \
+  cp -r /windows/plugins/platforms /export && \
+  cp -r /windows/plugins/tls /export
+
+COPY --from=debug-export /debug_export/ /debug_export/
 
 RUN chmod 0644 /build/windows-toolchain.cmake
 

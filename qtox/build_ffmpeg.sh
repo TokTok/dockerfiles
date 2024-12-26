@@ -38,7 +38,7 @@ fi
 "$SCRIPT_DIR/download/download_ffmpeg.sh"
 
 CFLAGS="$CROSS_CFLAG" \
-  CXXFLAGS="$CROSS_CXXFLAG" \
+  CPPFLAGS="$CROSS_CPPFLAG" \
   LDFLAGS="$CROSS_LDFLAG" \
   ./configure --arch="$FFMPEG_ARCH" \
   --enable-gpl \

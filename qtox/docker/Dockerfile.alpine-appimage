@@ -1,14 +1,18 @@
 # SPDX-License-Identifier: GPL-3.0-or-later.
 # Copyright © 2024 The TokTok team
 
-FROM alpine:3.20
+FROM alpine:3.21
 
 RUN ["apk", "add", \
+ "alsa-plugins", \
+ "alsa-plugins-pulse", \
  "bash", \
  "ccache", \
  "clang", \
  "cmake", \
  "compiler-rt", \
+ "coreutils", \
+ "curl", \
  "ffmpeg-dev", \
  "git", \
  "gzip", \
@@ -31,11 +35,8 @@ RUN ["apk", "add", \
 ENV CC=clang CXX=clang++
 
 WORKDIR /work/c-toxcore
-# We use toxcore v0.2.12 here to test qTox builds against an old toxcore version.
-# qTox normally uses the most recent toxcore version, but wants to remain
-# compatible with older versions present in Linux distributions.
 RUN git clone --recurse-submodules https://github.com/TokTok/c-toxcore /work/c-toxcore \
- && git checkout v0.2.12 \
+ && git checkout v0.2.20 \
  && cmake -B_build -H. -GNinja \
  && cmake --build _build --target install \
  && rm -rf /work/c-toxcore

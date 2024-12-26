@@ -132,6 +132,7 @@ jobs:
       matrix:
         image:
           - alpine
+          - alpine-appimage
           - alpine-static
           - debian
           - fedora

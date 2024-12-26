@@ -20,6 +20,7 @@ build_toxcore() {
     -DBOOTSTRAP_DAEMON=OFF \
     -DMIN_LOGGER_LEVEL=DEBUG \
     -DCMAKE_BUILD_TYPE=Release \
+    -GNinja \
     -B_build \
     .
 

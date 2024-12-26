@@ -31,6 +31,7 @@ assert_supported() {
 
 parse_arch() {
   LIB_TYPE=shared
+  EXTRA_ARGS=()
 
   while (($# > 0)); do
     case $1 in
@@ -53,6 +54,11 @@ parse_arch() {
       -h | --help)
         usage
         exit 1
+        ;;
+      --)
+        shift 1
+        EXTRA_ARGS=("$@")
+        break
         ;;
       *)
         echo "Unexpected argument $1"
@@ -87,6 +93,16 @@ parse_arch() {
     CROSS_CPPFLAG="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
     CROSS_CXXFLAG="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
     MAKE_JOBS="$(sysctl -n hw.ncpu)"
+    CMAKE_TOOLCHAIN_FILE=""
+  elif [ "$SCRIPT_ARCH" == "linux" ]; then
+    DEP_PREFIX="/work"
+    mkdir -p "$DEP_PREFIX"
+    HOST_OPTION=''
+    CROSS_LDFLAG=""
+    CROSS_CFLAG=""
+    CROSS_CPPFLAG=""
+    CROSS_CXXFLAG=""
+    MAKE_JOBS="$(nproc)"
     CMAKE_TOOLCHAIN_FILE=""
   else
     echo "Unexpected arch $SCRIPT_ARCH"

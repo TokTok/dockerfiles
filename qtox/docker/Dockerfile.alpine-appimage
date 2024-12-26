@@ -6,6 +6,7 @@ FROM alpine:3.21
 RUN ["apk", "add", \
  "alsa-plugins", \
  "alsa-plugins-pulse", \
+ "at-spi2-core-dev", \
  "bash", \
  "ccache", \
  "clang", \
@@ -13,33 +14,97 @@ RUN ["apk", "add", \
  "compiler-rt", \
  "coreutils", \
  "curl", \
+ "dbus-dev", \
  "ffmpeg-dev", \
+ "fontconfig-dev", \
  "git", \
  "gzip", \
+ "hunspell-dev", \
  "libexif-dev", \
- "libnotify-dev", \
+ "libinput-dev", \
  "libqrencode-dev", \
  "libsodium-dev", \
  "libvpx-dev", \
+ "libxkbcommon-dev", \
  "libxscrnsaver-dev", \
  "openal-soft-dev", \
+ "openssl-dev", \
  "opus-dev", \
- "qt6-qtbase-dev", \
- "qt6-qtsvg-dev", \
- "qt6-qttools", \
- "qt6-qttools-dev", \
  "samurai", \
- "sonnet-dev", \
- "sqlcipher-dev"]
+ "sqlcipher-dev", \
+ "xcb-util-cursor-dev", \
+ "xcb-util-keysyms-dev", \
+ "xcb-util-wm-dev", \
+ "wayland-dev", \
+ "zstd-dev"]
 
 ENV CC=clang CXX=clang++
 
-WORKDIR /work/c-toxcore
-RUN git clone --recurse-submodules https://github.com/TokTok/c-toxcore /work/c-toxcore \
- && git checkout v0.2.20 \
- && cmake -B_build -H. -GNinja \
- && cmake --build _build --target install \
- && rm -rf /work/c-toxcore
+ARG SCRIPT_ARCH=linux
+
+COPY download/common.sh /build/download/common.sh
+COPY build_utils.sh /build/build_utils.sh
+
+COPY download/download_qtbase.sh /build/download/download_qtbase.sh
+COPY build_qtbase_linux.sh /build/build_qtbase_linux.sh
+
+RUN mkdir -p /src/qt && \
+  cd /src/qt && \
+  /build/build_qtbase_linux.sh --arch ${SCRIPT_ARCH} --libtype shared && \
+  rm -fr /src/qt
+
+COPY download/download_qttools.sh /build/download/download_qttools.sh
+COPY build_qttools_linux.sh /build/build_qttools_linux.sh
+
+RUN mkdir -p /src/qt && \
+  cd /src/qt && \
+  /build/build_qttools_linux.sh --arch ${SCRIPT_ARCH} --libtype shared && \
+  rm -fr /src/qt
+
+COPY download/download_qtsvg.sh /build/download/download_qtsvg.sh
+COPY build_qtsvg_linux.sh /build/build_qtsvg_linux.sh
+
+RUN mkdir -p /src/qt && \
+  cd /src/qt && \
+  /build/build_qtsvg_linux.sh --arch ${SCRIPT_ARCH} --libtype shared && \
+  rm -fr /src/qt
+
+COPY download/download_qtimageformats.sh /build/download/download_qtimageformats.sh
+COPY build_qtimageformats_linux.sh /build/build_qtimageformats_linux.sh
+
+RUN mkdir -p /src/qt && \
+  cd /src/qt && \
+  /build/build_qtimageformats_linux.sh --arch ${SCRIPT_ARCH} --libtype shared && \
+  rm -fr /src/qt
+
+COPY download/download_qtwayland.sh /build/download/download_qtwayland.sh
+COPY build_qtwayland_linux.sh /build/build_qtwayland_linux.sh
+
+RUN mkdir -p /src/qt && \
+  cd /src/qt && \
+  /build/build_qtwayland_linux.sh --arch ${SCRIPT_ARCH} --libtype shared && \
+  rm -fr /src/qt
+
+COPY download/download_extra_cmake_modules.sh /build/download/download_extra_cmake_modules.sh
+COPY build_extra_cmake_modules.sh /build/build_extra_cmake_modules.sh
+RUN mkdir -p /src/tox && \
+    cd /src/tox && \
+    /build/build_extra_cmake_modules.sh --arch ${SCRIPT_ARCH} && \
+    rm -fr /src/tox
+
+COPY download/download_sonnet.sh /build/download/download_sonnet.sh
+COPY build_sonnet.sh /build/build_sonnet.sh
+RUN mkdir -p /src/tox && \
+    cd /src/tox && \
+    /build/build_sonnet.sh && \
+    rm -fr /src/tox
+
+COPY download/download_toxcore.sh /build/download/download_toxcore.sh
+COPY build_toxcore_linux.sh /build/build_toxcore_linux.sh
+RUN mkdir -p /src/tox && \
+    cd /src/tox && \
+    /build/build_toxcore_linux.sh && \
+    rm -fr /src/tox
 
 WORKDIR /qtox
 ENV HOME=/qtox

@@ -25,6 +25,7 @@ export PATH="$DEP_PREFIX/qt/bin:$PATH"
   -DCMAKE_BUILD_TYPE=Release \
   -DBUILD_SHARED_LIBS=OFF \
   -DSONNET_USE_QML=OFF \
+  -DHUNSPELL_LIBRARIES="$(echo "$DEP_PREFIX"/lib/libhunspell*.a)" \
   -DCMAKE_CXX_FLAGS="-DSONNET_STATIC -DQT_MESSAGELOGCONTEXT" \
   -B_build \
   -GNinja \

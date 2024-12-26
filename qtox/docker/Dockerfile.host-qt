@@ -35,7 +35,6 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
     -no-feature-dbus \
     -no-feature-eglfs \
     -no-feature-linuxfb \
-    -no-feature-qmake \
     -no-feature-sharedmemory \
     -no-feature-sql \
     -no-opengl \

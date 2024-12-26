@@ -7,7 +7,7 @@ ARG QT_VERSION=6.2.4
 # Build Qt for the host system.
 FROM toxchat/qtox:host-qt_$QT_VERSION AS host-qt
 # Build the rest (including another Qt) for Android.
-FROM ubuntu:22.04 AS base
+FROM ubuntu:24.04 AS base
 
 # No Qt from Ubuntu here.
 ENV DEBIAN_FRONTEND=noninteractive

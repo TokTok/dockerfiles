@@ -37,10 +37,11 @@ build_toxcore() {
     -DENABLE_SHARED="$ENABLE_SHARED" \
     "$CMAKE_TOOLCHAIN_FILE" \
     -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOS_MINIMUM_SUPPORTED_VERSION" \
+    -GNinja \
     -B_build \
     .
 
-  cmake --build _build -- "-j$MAKE_JOBS"
+  cmake --build _build
   cmake --install _build
 
   popd >/dev/null

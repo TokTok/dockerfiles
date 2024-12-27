@@ -24,6 +24,13 @@ def fix_args(args: list[str]) -> list[str]:
             fixed_args.append("-lz")
         elif libname(arg) == "input":
             fixed_args.append("-levdev")
+        elif libname(arg) == "openal":
+            fixed_args.append("/sysroot/usr/lib/libasound.a")
+            fixed_args.append("/sysroot/usr/lib/libportaudio.a")
+            fixed_args.append("/sysroot/usr/lib/libpulse.a")
+            fixed_args.append(
+                "/sysroot/usr/lib/pulseaudio/libpulsecommon-17.0.a")
+            fixed_args.append("/sysroot/usr/lib/libintl.a")
         elif libname(arg) == "xcb":
             fixed_args.append("-lXau")
         elif libname(arg) == "xcb-image":

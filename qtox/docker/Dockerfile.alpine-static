@@ -17,6 +17,9 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV CC=clang CXX=clang++ SYSROOT=/sysroot
 ENV PKG_CONFIG_PATH=$SYSROOT/usr/lib/pkgconfig:$SYSROOT/usr/lib64/pkgconfig:$SYSROOT/usr/share/pkgconfig
 
+ENV CFLAGS="-fPIC -O2"
+ENV CXXFLAGS="$CFLAGS"
+
 COPY toolchain/linux-static-toolchain.cmake $SYSROOT/static-toolchain.cmake
 
 FROM common AS base
@@ -104,21 +107,7 @@ RUN tar zxf <(wget -O- https://github.com/facebook/zstd/releases/download/v1.5.6
  && cmake --install _build \
  && rm -rf /work/build
 
-FROM base AS build-openal
-
-RUN tar jxf <(curl -L https://github.com/kcat/openal-soft/releases/download/1.23.1/openal-soft-1.23.1.tar.bz2) \
- && cd openal-soft-1.23.1 \
- && cmake -Wno-dev \
-  -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX="$SYSROOT/usr" \
-  -DLIBTYPE=STATIC \
-  -GNinja \
-  -B_build \
-  -H. \
- && cmake --build _build \
- && cmake --install _build \
- && rm -rf /work/build
+FROM base AS build-deps
 
 RUN tar jxf <(curl -L https://github.com/libexif/libexif/releases/download/v0.6.24/libexif-0.6.24.tar.bz2) \
  && cd libexif-0.6.24 \
@@ -130,7 +119,7 @@ RUN tar jxf <(curl -L https://github.com/libexif/libexif/releases/download/v0.6.
 RUN tar zxf <(curl -L https://github.com/fukuchi/libqrencode/archive/refs/tags/v4.1.1.tar.gz) \
  && cd libqrencode-4.1.1 \
  && autoreconf -fi \
- && ./configure --prefix="$SYSROOT/usr" --disable-shared --without-png CFLAGS=-fPIC \
+ && ./configure --prefix="$SYSROOT/usr" --disable-shared --without-png \
  && make -j"$(nproc)" \
  && make install \
  && rm -rf /work/build
@@ -200,7 +189,7 @@ RUN tar zxf <(curl -L https://github.com/openssl/openssl/releases/download/opens
 
 RUN tar zxf <(curl -L https://github.com/sqlcipher/sqlcipher/archive/refs/tags/v4.6.1.tar.gz) \
  && cd sqlcipher-4.6.1 \
- && ./configure --prefix="$SYSROOT/usr" --disable-shared CFLAGS=-fPIC LDFLAGS="-L$SYSROOT/usr/lib64" \
+ && ./configure --prefix="$SYSROOT/usr" --disable-shared LDFLAGS="-L$SYSROOT/usr/lib64" \
  && make -j"$(nproc)" \
  && make install \
  && rm -rf /work/build
@@ -236,7 +225,7 @@ RUN tar zxf <(curl -L https://ftp.gnu.org/pub/gnu/gettext/gettext-0.22.5.tar.gz)
 
 RUN tar Jxf <(curl -L https://download.gnome.org/sources/glib/2.83/glib-2.83.0.tar.xz) \
  && cd glib-2.83.0 \
- && meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" -Dtests=false -Dglib_debug=disabled \
+ && LDFLAGS="-static-pie" meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" -Dtests=false -Dglib_debug=disabled \
  && ninja -C build/ install \
  && rm -rf /work/build
 
@@ -327,26 +316,6 @@ RUN tar zxf <(curl -L https://github.com/libffi/libffi/releases/download/v3.4.6/
  && ./configure --prefix="$SYSROOT/usr" --disable-shared --enable-portable-binary --enable-pax_emutramp --disable-exec-static-tramp \
  && make -j"$(nproc)" \
  && make install \
- && rm -rf /work/build
-
-COPY --from=build-libxml $SYSROOT/usr $SYSROOT/usr
-
-RUN git clone --depth=1 https://gitlab.freedesktop.org/wayland/wayland.git \
- && cd wayland \
- && meson setup build/ -Ddefault_library=static -Ddocumentation=false -Dtests=false --prefix="$SYSROOT/usr" \
- && ninja -C build/ install \
- && rm -rf /work/build
-
-RUN git clone --depth=1 https://gitlab.freedesktop.org/wayland/wayland-protocols.git \
- && cd wayland-protocols \
- && meson setup build/ -Ddefault_library=static -Dtests=false --prefix="$SYSROOT/usr" \
- && ninja -C build/ install \
- && rm -rf /work/build
-
-RUN tar Jxf <(curl -L https://xkbcommon.org/download/libxkbcommon-1.7.0.tar.xz) \
- && cd libxkbcommon-1.7.0 \
- && LDFLAGS="-lXau -L$SYSROOT/usr/lib" meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" -Denable-tools=false \
- && ninja -C build/ install \
  && rm -rf /work/build
 
 RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/proto/randrproto-1.5.0.tar.gz) \
@@ -445,6 +414,33 @@ RUN tar zxf <(curl -L https://xorg.freedesktop.org/archive/individual/lib/libXxf
  && make install \
  && rm -rf /work/build
 
+RUN tar zxf <(curl -L https://xorg.freedesktop.org/archive/individual/lib/libXScrnSaver-1.2.4.tar.gz) \
+ && cd libXScrnSaver-* \
+ && ./configure --prefix="$SYSROOT/usr" --disable-shared \
+ && make -j"$(nproc)" \
+ && make install \
+ && rm -rf /work/build
+
+COPY --from=build-libxml $SYSROOT/usr $SYSROOT/usr
+
+RUN git clone --depth=1 https://gitlab.freedesktop.org/wayland/wayland.git \
+ && cd wayland \
+ && meson setup build/ -Ddefault_library=static -Ddocumentation=false -Dtests=false --prefix="$SYSROOT/usr" \
+ && ninja -C build/ install \
+ && rm -rf /work/build
+
+RUN git clone --depth=1 https://gitlab.freedesktop.org/wayland/wayland-protocols.git \
+ && cd wayland-protocols \
+ && meson setup build/ -Ddefault_library=static -Dtests=false --prefix="$SYSROOT/usr" \
+ && ninja -C build/ install \
+ && rm -rf /work/build
+
+RUN tar Jxf <(curl -L https://xkbcommon.org/download/libxkbcommon-1.7.0.tar.xz) \
+ && cd libxkbcommon-1.7.0 \
+ && LDFLAGS="-lXau -L$SYSROOT/usr/lib" meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" -Denable-tools=false \
+ && ninja -C build/ install \
+ && rm -rf /work/build
+
 FROM base AS build-qt
 
 COPY --from=build-x11 $SYSROOT/usr $SYSROOT/usr
@@ -493,8 +489,8 @@ RUN tar zxf <(curl https://xcb.freedesktop.org/dist/xcb-util-wm-0.4.2.tar.gz) \
 
 COPY --from=build-glib $SYSROOT/usr $SYSROOT/usr
 
-RUN tar Jxf <(curl -L https://dbus.freedesktop.org/releases/dbus/dbus-1.15.12.tar.xz) \
- && cd dbus-1.15.12 \
+RUN tar Jxf <(curl -L https://dbus.freedesktop.org/releases/dbus/dbus-1.16.0.tar.xz) \
+ && cd dbus-* \
  && CFLAGS="-I$SYSROOT/usr/include" LDFLAGS="-lxcb -L$SYSROOT/usr/lib" meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" -Dtools=false \
  && ninja -C build/ install \
  && rm -rf /work/build
@@ -535,7 +531,7 @@ ENV CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
 ENV OBJCXXFLAGS="$CXXFLAGS"
 
 RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
- && cd qtbase-everywhere-src-* && mkdir _build && cd _build \
+ && mv qtbase-everywhere-src-* qtbase && mkdir qtbase/_build && cd qtbase/_build \
  && ../configure \
     -prefix "$SYSROOT/opt/qt" \
     -appstore-compliant \
@@ -575,7 +571,7 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
  && rm -rf /work/build
 
 RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qttools-everywhere-src-$QT_VERSION.tar.xz") \
- && cd qttools-everywhere-src-* && mkdir _build && cd _build \
+ && mv qttools-everywhere-src-* qttools && mkdir qttools/_build && cd qttools/_build \
  && "$SYSROOT/opt/qt/bin/qt-configure-module" .. \
     -no-feature-assistant \
     -no-feature-designer \
@@ -597,7 +593,19 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
  && rm -rf /work/build
 
 RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtsvg-everywhere-src-$QT_VERSION.tar.xz") \
- && cd qtsvg-everywhere-src-* && mkdir _build && cd _build \
+ && mv qtsvg-everywhere-src-* qtsvg && mkdir qtsvg/_build && cd qtsvg/_build \
+ && "$SYSROOT/opt/qt/bin/qt-configure-module" .. \
+    -- \
+    -DCMAKE_FIND_ROOT_PATH="$SYSROOT/usr" \
+    -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+    -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+    -Wno-dev \
+ && cmake --build . \
+ && cmake --install . \
+ && rm -rf /work/build
+
+RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtimageformats-everywhere-src-$QT_VERSION.tar.xz") \
+ && mv qtimageformats-everywhere-src-* qtimageformats && mkdir qtimageformats/_build && cd qtimageformats/_build \
  && "$SYSROOT/opt/qt/bin/qt-configure-module" .. \
     -- \
     -DCMAKE_FIND_ROOT_PATH="$SYSROOT/usr" \
@@ -609,7 +617,7 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
  && rm -rf /work/build
 
 RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtwayland-everywhere-src-$QT_VERSION.tar.xz") \
- && cd qtwayland-everywhere-src-* && mkdir _build && cd _build \
+ && mv qtwayland-everywhere-src-* qtwayland && mkdir qtwayland/_build && cd qtwayland/_build \
  && "$SYSROOT/opt/qt/bin/qt-configure-module" .. \
     -- \
     -DCMAKE_FIND_ROOT_PATH="$SYSROOT/usr" \
@@ -618,15 +626,83 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
     -Wno-dev \
  && cmake --build . \
  && cmake --install . \
- && rm -rf /work/build \
- && ls "$SYSROOT/opt/qt/plugins/platforms/libqwayland-generic.a"
+ && rm -rf /work/build
+
+RUN tar zxf <(curl -L https://github.com/alsa-project/alsa-lib/archive/refs/tags/v1.2.13.tar.gz) \
+ && cd alsa-lib-* \
+ && autoreconf -fi \
+ && ./configure --prefix="$SYSROOT/usr" --disable-shared --disable-python --without-libdl CFLAGS="$CFLAGS -Dpage_size=alsa_page_size" \
+ && make -j"$(nproc)" \
+ && make install \
+ && rm -rf /work/build
+
+RUN tar Jxf <(curl -L https://github.com/libsndfile/libsndfile/releases/download/1.2.2/libsndfile-1.2.2.tar.xz) \
+ && cd libsndfile-* \
+ && cmake \
+  -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX="$SYSROOT/usr" \
+  -DENABLE_STATIC_RUNTIME=ON \
+  -DBUILD_TESTING=OFF \
+  -DBUILD_SHARED_LIBS=OFF \
+  -DBUILD_EXAMPLES=OFF \
+  -DBUILD_PROGRAMS=OFF \
+  -DCMAKE_C_FLAGS="$CFLAGS" \
+  -GNinja \
+  -B_build \
+  -H. \
+ && cmake --build _build \
+ && cmake --install _build \
+ && rm -rf /work/build
+
+# Needs gettext, so we build it at the end.
+RUN tar zxf <(curl -L https://freedesktop.org/software/pulseaudio/releases/pulseaudio-17.0.tar.gz) \
+ && cd pulseaudio-* \
+ && sed -i -e 's/= *shared_library(/= library(/g' $(find . -name "meson.build") \
+ && CFLAGS="$CFLAGS -I$SYSROOT/usr/include" LDFLAGS="-L$SYSROOT/usr/lib -lXau -lintl" meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" -Ddaemon=false -Ddoxygen=false -Dman=false -Dtests=false \
+ && ninja -C build/ install \
+ && rm -rf /work/build
+
+RUN tar zxf <(curl -L https://github.com/PortAudio/portaudio/archive/refs/tags/v19.7.0.tar.gz) \
+ && cd portaudio-* \
+ && ./configure --prefix="$SYSROOT/usr" --disable-shared --with-alsa \
+ && make -j"$(nproc)" \
+ && make install \
+ && rm -rf /work/build
+
+RUN tar zxf <(curl -L https://github.com/kcat/openal-soft/archive/refs/tags/1.24.1.tar.gz) \
+ && cd openal-soft-* \
+ && cmake -Wno-dev \
+  -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX="$SYSROOT/usr" \
+  -DLIBTYPE=STATIC \
+  -DALSOFT_EXAMPLES=OFF \
+  -DALSOFT_DLOPEN=OFF \
+  -DALSOFT_INSTALL_HRTF_DATA=OFF \
+  -DALSOFT_RTKIT=ON \
+  -DALSOFT_UTILS=OFF \
+  -DALSOFT_REQUIRE_ALSA=TRUE \
+  -DALSOFT_REQUIRE_PORTAUDIO=TRUE \
+  -DALSOFT_REQUIRE_PULSEAUDIO=TRUE \
+  -DALSOFT_REQUIRE_RTKIT=TRUE \
+  -DALSOFT_REQUIRE_SSE=TRUE \
+  -DALSOFT_REQUIRE_SSE2=TRUE \
+  -DALSOFT_REQUIRE_SSE3=TRUE \
+  -DALSOFT_REQUIRE_SSE4_1=TRUE \
+  -GNinja \
+  -B_build \
+  . \
+ && cmake --build _build \
+ && cmake --install _build \
+ && rm -rf /work/build
 
 # Final image
 FROM common
 
 COPY --from=build-qt $SYSROOT $SYSROOT
+COPY --from=build-deps $SYSROOT/usr $SYSROOT/usr
 COPY --from=build-ffmpeg $SYSROOT/usr $SYSROOT/usr
-COPY --from=build-openal $SYSROOT/usr $SYSROOT/usr
 COPY --from=build-toxcore $SYSROOT/usr $SYSROOT/usr
 
 RUN chmod 0644 "$SYSROOT/static-toolchain.cmake"

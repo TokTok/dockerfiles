@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later AND MIT
 # Copyright © 2021 by The qTox Project Contributors

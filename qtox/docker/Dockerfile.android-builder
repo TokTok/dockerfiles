@@ -2,7 +2,6 @@
 # Copyright © 2024 The TokTok team
 
 ARG QT_VERSION=6.2.4
-#ARG QT_VERSION=6.8.1
 
 # Build Qt for the host system.
 FROM toxchat/qtox:host-qt_$QT_VERSION AS host-qt
@@ -53,7 +52,6 @@ RUN yes | sdkmanager --licenses || true
 RUN ["sdkmanager", "platform-tools", "platforms;android-34", "build-tools;34.0.0"]
 
 ARG NDK_VERSION=21.3.6528147
-#ARG NDK_VERSION=26.1.10909125
 RUN sdkmanager "ndk;$NDK_VERSION"
 
 ENV ANDROID_NDK_ROOT=$ANDROID_SDK_HOME/ndk/$NDK_VERSION
@@ -63,16 +61,12 @@ ENV SYSROOT=$TOOLCHAIN/sysroot
 ENV PKG_CONFIG_PATH=$SYSROOT/usr/lib/pkgconfig
 
 ARG ANDROID_API=24
-#ARG ANDROID_API=26
 
-#ARG ANDROID_ABI=armeabi-v7a
 ARG ANDROID_ABI=arm64-v8a
 
 # OpenSSL
 #FROM base AS build-openssl
 
-#ARG ANDROID_OPENSSL_ABI=arm
-#ARG ANDROID_OPENSSL_ASM=-no-asm
 ARG ANDROID_OPENSSL_ABI=arm64
 ARG ANDROID_OPENSSL_ASM=
 RUN tar zxf <(wget -O- https://github.com/openssl/openssl/releases/download/openssl-3.4.0/openssl-3.4.0.tar.gz) \
@@ -108,11 +102,9 @@ RUN tar zxf <(wget -O- https://github.com/facebook/zstd/releases/download/v1.5.6
 #COPY --from=build-zstd $SYSROOT/usr $SYSROOT/usr
 COPY --from=host-qt /work/host /work/host
 
-#ARG QT_BUILD_TYPE=debug
 ARG QT_BUILD_TYPE=release
 
 ARG QT_VERSION=6.2.4
-#ARG QT_VERSION=6.8.1
 
 RUN tar Jxf <(wget -O- "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
  && sed -i -e 's!# *define QLOGGING_HAVE_BACKTRACE!//&!' qtbase-everywhere-src-*/src/corelib/global/qlogging.cpp \
@@ -156,7 +148,6 @@ RUN tar Jxf <(wget -O- "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" |
 # Base for the rest of the builds
 #FROM base AS build-base
 
-#ARG ANDROID_TRIPLE=armv7a-linux-androideabi
 ARG ANDROID_TRIPLE=aarch64-linux-android
 ENV ANDROID_TRIPLE_API=$ANDROID_TRIPLE$ANDROID_API
 ENV CC=$TOOLCHAIN/bin/$ANDROID_TRIPLE_API-clang \
@@ -165,7 +156,6 @@ ENV CC=$TOOLCHAIN/bin/$ANDROID_TRIPLE_API-clang \
 # ffmpeg
 #FROM build-base AS build-ffmpeg
 
-#ARG ANDROID_FFMPEG_ABI=armv7a
 ARG ANDROID_FFMPEG_ABI=arm64
 RUN tar Jxf <(wget -O- https://www.ffmpeg.org/releases/ffmpeg-7.1.tar.xz) \
  && cd ffmpeg-7.1 \
@@ -273,7 +263,6 @@ RUN tar zxf <(wget -O- https://github.com/xiph/opus/releases/download/v1.5.2/opu
 # libvpx
 #FROM build-base AS build-libvpx
 
-#ARG ANDROID_VPX_ABI=armv7-android-gcc
 ARG ANDROID_VPX_ABI=arm64-android-gcc
 RUN tar zxf <(wget -O- https://github.com/webmproject/libvpx/archive/refs/tags/v1.15.0.tar.gz) \
  && cd libvpx-1.15.0 \

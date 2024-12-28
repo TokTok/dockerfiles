@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later AND MIT
 # Copyright © 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "toxcore" --supported "win32 win64 macos macos-x86_64 macos-arm64" "$@"
+parse_arch --dep "toxcore" --supported "win32 win64 macos-x86_64 macos-arm64" "$@"
 
 if [ "$LIB_TYPE" = "shared" ]; then
   ENABLE_STATIC=OFF
@@ -32,7 +32,7 @@ build_toxcore() {
   cmake -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
     -DBOOTSTRAP_DAEMON=OFF \
     -DMIN_LOGGER_LEVEL=DEBUG \
-    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \
     -DENABLE_STATIC="$ENABLE_STATIC" \
     -DENABLE_SHARED="$ENABLE_SHARED" \
     "$CMAKE_TOOLCHAIN_FILE" \

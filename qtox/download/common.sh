@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later AND MIT
 #     Copyright (c) 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>

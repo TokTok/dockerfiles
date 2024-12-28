@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later AND MIT
 # Copyright © 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "vpx" --supported "win32 win64 macos macos-x86_64 macos-arm64" "$@"
+parse_arch --dep "vpx" --supported "win32 win64 macos-x86_64 macos-arm64" "$@"
 
 if [ "$SCRIPT_ARCH" == "win64" ]; then
   # There is a bug in gcc that breaks avx512 on 64-bit Windows https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54412
@@ -24,7 +24,7 @@ elif [ "$SCRIPT_ARCH" == "win32" ]; then
   ARCH_FLAGS=""
   CROSS_ARG="$MINGW_ARCH-w64-mingw32-"
   TARGET_ARG="x86-win32-gcc"
-elif [ "$SCRIPT_ARCH" == "macos" ] || [ "$SCRIPT_ARCH" == "macos-x86_64" ]; then
+elif [ "$SCRIPT_ARCH" == "macos-x86_64" ]; then
   ARCH_FLAGS=""
   CROSS_ARG=""
   TARGET_ARG="x86_64-darwin22-gcc" # macOS 13
@@ -63,7 +63,3 @@ CFLAGS="-O2 $ARCH_FLAGS $CROSS_CFLAG" \
 
 make -j "$MAKE_JOBS"
 make install
-
-if [ "$SCRIPT_ARCH" == "macos" ]; then
-  install_name_tool -id '@rpath/libvpx.dylib' "$DEP_PREFIX"/lib/libvpx.dylib
-fi

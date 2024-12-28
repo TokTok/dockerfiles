@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright © 2024 The TokTok team
@@ -22,7 +22,7 @@ fi
 "$SCRIPT_DIR/download/download_zstd.sh"
 
 cmake -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
-  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \
   -DZSTD_BUILD_STATIC="$ENABLE_STATIC" \
   -DZSTD_BUILD_SHARED="$ENABLE_SHARED" \
   -DBUILD_SHARED_LIBS="$ENABLE_SHARED" \

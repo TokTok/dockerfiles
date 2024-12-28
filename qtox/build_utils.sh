@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright © 2022 by The qTox Project Contributors
@@ -31,6 +31,8 @@ assert_supported() {
 
 parse_arch() {
   LIB_TYPE=shared
+  BUILD_TYPE=release
+  SANITIZE=
   EXTRA_ARGS=()
 
   while (($# > 0)); do
@@ -45,6 +47,14 @@ parse_arch() {
         ;;
       --libtype)
         LIB_TYPE=$2
+        shift 2
+        ;;
+      --buildtype)
+        BUILD_TYPE=$2
+        shift 2
+        ;;
+      --sanitize)
+        SANITIZE=$2
         shift 2
         ;;
       --supported)
@@ -84,7 +94,7 @@ parse_arch() {
     CROSS_CXXFLAG=""
     MAKE_JOBS="$(nproc)"
     CMAKE_TOOLCHAIN_FILE="-DCMAKE_TOOLCHAIN_FILE=/build/windows-toolchain.cmake"
-  elif [ "$SCRIPT_ARCH" == "macos" ] || [ "$SCRIPT_ARCH" == "macos-x86_64" ] || [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
+  elif [ "$SCRIPT_ARCH" == "macos-x86_64" ] || [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
     DEP_PREFIX="$(realpath "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/..)/local-deps"
     mkdir -p "$DEP_PREFIX"
     HOST_OPTION=''
@@ -109,5 +119,33 @@ parse_arch() {
     usage
     exit 1
   fi
+
+  if [ "$BUILD_TYPE" = "release" ]; then
+    CMAKE_BUILD_TYPE="Release"
+  elif [ "$BUILD_TYPE" = "debug" ]; then
+    CMAKE_BUILD_TYPE="RelWithDebInfo"
+  else
+    echo "Unexpected build type $BUILD_TYPE"
+    usage
+    exit 1
+  fi
+
+  if [ "$SANITIZE" = "asan" ]; then
+    CLANG_SANITIZER="address"
+  elif [ "$SANITIZE" = "tsan" ]; then
+    CLANG_SANITIZER="thread"
+  elif [ "$SANITIZE" = "ubsan" ]; then
+    CLANG_SANITIZER="undefined"
+  else
+    CLANG_SANITIZER=""
+  fi
+
+  if [ -n "$SANITIZE" ]; then
+    QT_PREFIX="$DEP_PREFIX/qt-$SANITIZE"
+  else
+    QT_PREFIX="$DEP_PREFIX/qt"
+  fi
+
+  export PATH="$QT_PREFIX/bin:$PATH"
   export PKG_CONFIG_PATH="$DEP_PREFIX/lib/pkgconfig:$DEP_PREFIX/lib64/pkgconfig"
 }

@@ -24,7 +24,6 @@ WORKDIR /work/build
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ARG QT_VERSION=6.2.4
-#ARG QT_VERSION=6.8.1
 
 RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
  && cd qtbase-everywhere-src-* && mkdir _build && cd _build \

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later AND MIT
 # Copyright © 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
@@ -28,10 +28,9 @@ else
   find . -name CMakeLists.txt -exec sed -i '' -e 's/target_link_libraries(KF6SonnetCore PUBLIC Qt6::Core)/target_link_libraries(KF6SonnetCore PUBLIC Qt6::Core sonnet_hunspell sonnet_nsspellchecker)/' '{}' ';'
 fi
 
-export PATH="$DEP_PREFIX/qt/bin:$PATH"
-"$DEP_PREFIX/qt/bin/qt-cmake" \
+"$QT_PREFIX/bin/qt-cmake" \
   -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
-  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \
   -DBUILD_SHARED_LIBS="$ENABLE_SHARED" \
   -DBUILD_DESIGNERPLUGIN=OFF \
   -DSONNET_USE_QML=OFF \

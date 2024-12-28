@@ -529,12 +529,13 @@ COPY --from=build-zstd $SYSROOT/usr $SYSROOT/usr
 
 FROM build-x11 AS build-qt
 
-ARG QT_VERSION=6.8.1
-
 ENV CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
 ENV OBJCXXFLAGS="$CXXFLAGS"
 
-RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
+COPY download/version_qt.sh /work/
+
+RUN . /work/version_qt.sh \
+ && tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
  && mv qtbase-everywhere-src-* qtbase && mkdir qtbase/_build && cd qtbase/_build \
  && ../configure \
     -prefix "$SYSROOT/opt/qt" \
@@ -574,7 +575,8 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
  && cmake --install . \
  && rm -rf /work/build
 
-RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qttools-everywhere-src-$QT_VERSION.tar.xz") \
+RUN . /work/version_qt.sh \
+ && tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qttools-everywhere-src-$QT_VERSION.tar.xz") \
  && mv qttools-everywhere-src-* qttools && mkdir qttools/_build && cd qttools/_build \
  && "$SYSROOT/opt/qt/bin/qt-configure-module" .. \
     -no-feature-assistant \
@@ -596,7 +598,8 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
  && cmake --install . \
  && rm -rf /work/build
 
-RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtsvg-everywhere-src-$QT_VERSION.tar.xz") \
+RUN . /work/version_qt.sh \
+ && tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtsvg-everywhere-src-$QT_VERSION.tar.xz") \
  && mv qtsvg-everywhere-src-* qtsvg && mkdir qtsvg/_build && cd qtsvg/_build \
  && "$SYSROOT/opt/qt/bin/qt-configure-module" .. \
     -- \
@@ -608,7 +611,8 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
  && cmake --install . \
  && rm -rf /work/build
 
-RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtimageformats-everywhere-src-$QT_VERSION.tar.xz") \
+RUN . /work/version_qt.sh \
+ && tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtimageformats-everywhere-src-$QT_VERSION.tar.xz") \
  && mv qtimageformats-everywhere-src-* qtimageformats && mkdir qtimageformats/_build && cd qtimageformats/_build \
  && "$SYSROOT/opt/qt/bin/qt-configure-module" .. \
     -- \
@@ -620,7 +624,8 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
  && cmake --install . \
  && rm -rf /work/build
 
-RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtwayland-everywhere-src-$QT_VERSION.tar.xz") \
+RUN . /work/version_qt.sh \
+ && tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtwayland-everywhere-src-$QT_VERSION.tar.xz") \
  && mv qtwayland-everywhere-src-* qtwayland && mkdir qtwayland/_build && cd qtwayland/_build \
  && "$SYSROOT/opt/qt/bin/qt-configure-module" .. \
     -- \

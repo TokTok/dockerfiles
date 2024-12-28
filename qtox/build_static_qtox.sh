@@ -5,7 +5,7 @@ set -euxo pipefail
 cmake \
   -DCMAKE_TOOLCHAIN_FILE=linux/static-toolchain.cmake \
   -DCMAKE_PREFIX_PATH=/sysroot/opt/qt/lib/cmake \
-  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \
   -DSPELL_CHECK=OFF \
   -DUPDATE_CHECK=ON \
   -DSTRICT_OPTIONS=ON \

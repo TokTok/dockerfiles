@@ -6,6 +6,7 @@
 
 set -euo pipefail
 
+# https://github.com/libexpat/libexpat/releases
 EXPAT_VERSION="2.6.4"
 EXPAT_HASH="a695629dae047055b37d50a0ff4776d1d45d0a4c842cf4ccee158441f55ff7ee"
 

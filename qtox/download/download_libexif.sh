@@ -6,6 +6,7 @@
 
 set -euo pipefail
 
+# https://github.com/libexif/libexif/releases
 LIBEXIF_VERSION=0.6.24
 LIBEXIF_HASH=d47564c433b733d83b6704c70477e0a4067811d184ec565258ac563d8223f6ae
 

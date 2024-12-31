@@ -5,6 +5,7 @@
 
 set -euo pipefail
 
+# https://github.com/hunspell/hunspell/releases
 HUNSPELL_VERSION=1.7.2
 HUNSPELL_HASH=11ddfa39afe28c28539fe65fc4f1592d410c1e9b6dd7d8a91ca25d85e9ec65b8
 

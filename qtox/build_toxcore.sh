@@ -22,12 +22,16 @@ else
 fi
 
 build_toxcore() {
-  TOXCORE_SRC="$(realpath .)/toxcore"
+  if [ -d "../../../c-toxcore" ]; then
+    pushd "../../../c-toxcore" >/dev/null || exit 1
+  else
+    TOXCORE_SRC="$(realpath .)/toxcore"
 
-  mkdir -p "$TOXCORE_SRC"
-  pushd "$TOXCORE_SRC" >/dev/null || exit 1
+    mkdir -p "$TOXCORE_SRC"
+    pushd "$TOXCORE_SRC" >/dev/null || exit 1
 
-  "$SCRIPT_DIR/download/download_toxcore.sh"
+    "$SCRIPT_DIR/download/download_toxcore.sh"
+  fi
 
   cmake -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
     -DBOOTSTRAP_DAEMON=OFF \

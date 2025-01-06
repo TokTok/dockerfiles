@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later.
-# Copyright © 2024 The TokTok team
+# Copyright © 2024-2025 The TokTok team
 
 FROM alpine:3.21
 
@@ -40,7 +40,7 @@ RUN ["apk", "add", \
 
 ENV CC=clang CXX=clang++
 
-ARG SCRIPT_ARCH=linux
+ARG SCRIPT_ARCH=linux-x86_64
 
 COPY download/common.sh /build/download/
 COPY build_utils.sh /build/
@@ -102,10 +102,10 @@ RUN mkdir -p /src/tox && \
     rm -fr /src/tox
 
 COPY download/download_toxcore.sh /build/download/
-COPY build_toxcore_linux.sh /build/
+COPY build_toxcore_system.sh /build/
 RUN mkdir -p /src/tox && \
     cd /src/tox && \
-    /build/build_toxcore_linux.sh && \
+    /build/build_toxcore_system.sh && \
     rm -fr /src/tox
 
 WORKDIR /qtox

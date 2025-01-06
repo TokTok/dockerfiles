@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright © 2024 The TokTok team
+# Copyright © 2024-2025 The TokTok team
 import subprocess
 import sys
 from typing import Optional

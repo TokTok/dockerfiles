@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later AND MIT
 # Copyright © 2017-2021 Maxim Biro <nurupo.contributions@gmail.com>
 # Copyright © 2021 by The qTox Project Contributors
-# Copyright © 2024 The TokTok team
+# Copyright © 2024-2025 The TokTok team
 
 set -euxo pipefail
 
@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "vpx" --supported "win32 win64 macos-x86_64 macos-arm64" "$@"
+parse_arch --dep "vpx" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64" "$@"
 
 if [ "$SCRIPT_ARCH" == "win64" ]; then
   # There is a bug in gcc that breaks avx512 on 64-bit Windows https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54412
@@ -32,7 +32,12 @@ elif [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
   ARCH_FLAGS=""
   CROSS_ARG=""
   TARGET_ARG="arm64-darwin23-gcc" # macOS 14
+elif [ "$SCRIPT_ARCH" == "linux-x86_64" ]; then
+  ARCH_FLAGS=""
+  CROSS_ARG=""
+  TARGET_ARG="x86_64-linux-gcc"
 else
+  echo "Unsupported arch: $SCRIPT_ARCH"
   exit 1
 fi
 

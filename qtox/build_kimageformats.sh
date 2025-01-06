@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # SPDX-License-Identifier: GPL-3.0-or-later AND MIT
-# Copyright © 2024 The TokTok team
+# Copyright © 2024-2025 The TokTok team
 
 set -euxo pipefail
 
@@ -9,7 +9,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "kimageformats" --supported "linux macos-x86_64 macos-arm64" "$@"
+parse_arch --dep "kimageformats" --supported "linux-x86_64 macos-x86_64 macos-arm64" "$@"
 
 "$SCRIPT_DIR/download/download_kimageformats.sh"
 

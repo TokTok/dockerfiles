@@ -8,16 +8,17 @@ set -euxo pipefail
 readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
+source "$SCRIPT_DIR/download/version_qt.sh"
 
-parse_arch --dep "qttools" --supported "linux-x86_64" "$@"
-
-"$SCRIPT_DIR/download/download_qttools.sh"
+parse_arch --dep "qttools" --supported "macos-arm64 macos-x86_64" "$@"
 
 export CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
 export OBJCXXFLAGS="$CXXFLAGS"
 
-mkdir qttools/_build && pushd qttools/_build
-"$DEP_PREFIX/qt/bin/qt-configure-module" .. \
+tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qttools-everywhere-src-$QT_VERSION.tar.xz")
+rm -rf qttools && mv "qttools-everywhere-src-$QT_VERSION" qttools && cd qttools
+rm -rf _build && mkdir _build && cd _build
+"$QT_PREFIX/bin/qt-configure-module" .. \
   -no-feature-assistant \
   -no-feature-designer \
   -no-feature-kmap2qmap \
@@ -29,7 +30,9 @@ mkdir qttools/_build && pushd qttools/_build
   -no-feature-qtdiag \
   -no-feature-qtplugininfo \
   -- \
+  -DCMAKE_FIND_ROOT_PATH="$DEP_PREFIX" \
   -Wno-dev
 cmake --build .
 cmake --install .
-popd
+cd ../..
+rm -rf qttools

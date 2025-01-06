@@ -2,7 +2,7 @@
 
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright © 2022 by The qTox Project Contributors
-# Copyright © 2024 The TokTok team
+# Copyright © 2024-2025 The TokTok team
 
 # shellcheck disable=SC2034
 
@@ -49,6 +49,10 @@ parse_arch() {
         LIB_TYPE=$2
         shift 2
         ;;
+      --prefix)
+        DEP_PREFIX=$2
+        shift 2
+        ;;
       --buildtype)
         BUILD_TYPE=$2
         shift 2
@@ -62,7 +66,7 @@ parse_arch() {
         shift 2
         ;;
       -h | --help)
-        usage
+        usage "$SUPPORTED"
         exit 1
         ;;
       --)
@@ -72,7 +76,7 @@ parse_arch() {
         ;;
       *)
         echo "Unexpected argument $1"
-        usage
+        usage "$SUPPORTED"
         exit 1
         ;;
     esac
@@ -86,7 +90,7 @@ parse_arch() {
     elif [ "$SCRIPT_ARCH" == "win64" ]; then
       MINGW_ARCH="x86_64"
     fi
-    DEP_PREFIX='/windows/'
+    DEP_PREFIX=${DEP_PREFIX:-/windows}
     HOST_OPTION="--host=$MINGW_ARCH-w64-mingw32"
     CROSS_LDFLAG=""
     CROSS_CFLAG=""
@@ -95,7 +99,7 @@ parse_arch() {
     MAKE_JOBS="$(nproc)"
     CMAKE_TOOLCHAIN_FILE="-DCMAKE_TOOLCHAIN_FILE=/build/windows-toolchain.cmake"
   elif [ "$SCRIPT_ARCH" == "macos-x86_64" ] || [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
-    DEP_PREFIX="$(realpath "$(dirname "$(realpath "${BASH_SOURCE[0]}")")"/..)/local-deps"
+    DEP_PREFIX="${DEP_PREFIX:-/work}"
     mkdir -p "$DEP_PREFIX"
     HOST_OPTION=''
     CROSS_LDFLAG="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
@@ -104,8 +108,8 @@ parse_arch() {
     CROSS_CXXFLAG="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
     MAKE_JOBS="$(sysctl -n hw.ncpu)"
     CMAKE_TOOLCHAIN_FILE=""
-  elif [ "$SCRIPT_ARCH" == "linux" ]; then
-    DEP_PREFIX="/work"
+  elif [[ "$SCRIPT_ARCH" == "linux"* ]]; then
+    DEP_PREFIX="${DEP_PREFIX:-/work}"
     mkdir -p "$DEP_PREFIX"
     HOST_OPTION=''
     CROSS_LDFLAG=""
@@ -116,7 +120,7 @@ parse_arch() {
     CMAKE_TOOLCHAIN_FILE=""
   else
     echo "Unexpected arch $SCRIPT_ARCH"
-    usage
+    usage "$SUPPORTED"
     exit 1
   fi
 
@@ -126,7 +130,7 @@ parse_arch() {
     CMAKE_BUILD_TYPE="RelWithDebInfo"
   else
     echo "Unexpected build type $BUILD_TYPE"
-    usage
+    usage "$SUPPORTED"
     exit 1
   fi
 

@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+# Compiles normally unless it's a file from the qtox source tree "src/".
+# For src/ files, it just creates an empty object file.
+import subprocess
+import sys
+
+
+def is_src_file(arg: str) -> bool:
+    return arg.startswith("/qtox/") and not arg.startswith("/qtox/_build")
+
+
+def has_src_file(args: list[str]) -> bool:
+    return any(is_src_file(arg) for arg in args)
+
+
+def output_file(args: list[str]) -> str:
+    for i, arg in enumerate(args):
+        if arg == "-o":
+            return args[i + 1]
+    raise ValueError("No output file specified")
+
+
+def real_compile(args: list[str]) -> None:
+    subprocess.run(["clang"] + args, check=True)
+
+
+def fake_compile(args: list[str]) -> None:
+    output = output_file(args)
+    with open(output, "wb") as f:
+        f.write(b"Nothing to see here, move along")
+
+
+def main() -> None:
+    if len(sys.argv) < 2:
+        print("Usage: fake-clang <option|file> [<option|file> ...]")
+        sys.exit(1)
+
+    if has_src_file(sys.argv[1:]) or "libqtox_static.a" in sys.argv[1:]:
+        fake_compile(sys.argv[1:])
+    else:
+        real_compile(sys.argv[1:])
+
+
+if __name__ == "__main__":
+    main()

@@ -4,38 +4,37 @@
 
 FROM fedora:latest
 
-RUN dnf --nodocs -y install dnf-plugins-core && \
-    dnf --nodocs -y install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm && \
-    dnf --nodocs -y install \
-        ccache \
-        clang \
-        clang-tools-extra \
-        cmake \
-        extra-cmake-modules \
-        ffmpeg-devel \
-        gcc \
-        gcc-c++ \
-        git \
-        kf6-sonnet-devel \
-        libasan \
-        libexif-devel \
-        libnotify-devel \
-        libsodium-devel \
-        libubsan \
-        libvpx-devel \
-        libXScrnSaver-devel \
-        make \
-        ninja-build \
-        openal-soft-devel \
-        opus-devel \
-        patch \
-        qrencode-devel \
-        qt6-linguist \
-        qt6-qtbase-devel \
-        qt6-qtsvg-devel \
-        sqlcipher-devel \
-        sqlite-devel && \
-    dnf clean all
+RUN dnf --nodocs -y install dnf-plugins-core \
+ && dnf --nodocs -y install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm \
+ && dnf --nodocs -y install \
+ ccache \
+ clang \
+ clang-tools-extra \
+ cmake \
+ ffmpeg-devel \
+ gcc \
+ gcc-c++ \
+ git \
+ kf6-sonnet-devel \
+ libasan \
+ libexif-devel \
+ libnotify-devel \
+ libsodium-devel \
+ libubsan \
+ libvpx-devel \
+ libXScrnSaver-devel \
+ make \
+ ninja-build \
+ openal-soft-devel \
+ opus-devel \
+ patch \
+ qrencode-devel \
+ qt6-qtbase-devel \
+ qt6-qtsvg-devel \
+ qt6-qttools-devel \
+ sqlcipher-devel \
+ sqlite-devel \
+ && dnf clean all
 
 ENV PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig
 
@@ -44,13 +43,15 @@ COPY build_utils.sh /build/build_utils.sh
 
 COPY download/download_toxcore.sh /build/download/download_toxcore.sh
 COPY build_toxcore_system.sh /build/build_toxcore_system.sh
-RUN mkdir -p /src/tox && \
-    cd /src/tox && \
-    /build/build_toxcore_system.sh && \
-    rm -fr /src/tox
+RUN mkdir -p /src/tox \
+ && cd /src/tox \
+ && /build/build_toxcore_system.sh \
+ && rm -fr /src/tox
 
-RUN echo '/usr/local/lib64/' >> /etc/ld.so.conf.d/locallib.conf && \
-    ldconfig
+RUN echo '/usr/local/lib64/' >> /etc/ld.so.conf.d/locallib.conf \
+ && ldconfig
+
+COPY --chmod=755 clang-fake /usr/local/bin/
 
 WORKDIR /qtox
 ENV HOME=/qtox

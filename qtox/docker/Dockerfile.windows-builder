@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: GPL-3.0-or-later.
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright © 2021 by The qTox Project Contributors
 # Copyright © 2024-2025 The TokTok team
 
@@ -44,11 +44,11 @@ RUN dpkg --add-architecture i386 \
 
 ARG ARCH
 ARG WINEARCH
-ENV WINEARCH=${WINEARCH}
-ARG SCRIPT_ARCH=${WINEARCH}
+ENV WINEARCH=$WINEARCH
+ARG SCRIPT_ARCH=$WINEARCH
 
-RUN update-alternatives --set ${ARCH}-w64-mingw32-gcc /usr/bin/${ARCH}-w64-mingw32-gcc-posix && \
-  update-alternatives --set ${ARCH}-w64-mingw32-g++ /usr/bin/${ARCH}-w64-mingw32-g++-posix
+RUN update-alternatives --set "${ARCH}-w64-mingw32-gcc" "/usr/bin/${ARCH}-w64-mingw32-gcc-posix" \
+ && update-alternatives --set "${ARCH}-w64-mingw32-g++" "/usr/bin/${ARCH}-w64-mingw32-g++-posix"
 
 COPY toolchain/windows-${ARCH}-toolchain.cmake /build/windows-toolchain.cmake
 
@@ -58,186 +58,225 @@ COPY build_utils.sh /build/
 COPY download/download_openssl.sh /build/download/
 COPY build_openssl.sh /build/
 
-RUN mkdir -p /src/openssl && \
-  cd /src/openssl && \
-  /build/build_openssl.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/openssl
+RUN mkdir -p /src/openssl \
+ && cd /src/openssl \
+ && /build/build_openssl.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/openssl
 
 FROM base AS non-qt
 
 COPY download/download_sqlcipher.sh /build/download/
 COPY build_sqlcipher.sh /build/
 
-RUN mkdir -p /src/sqlcipher && \
-  cd /src/sqlcipher && \
-  /build/build_sqlcipher.sh  --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/sqlcipher
+RUN mkdir -p /src/sqlcipher \
+ && cd /src/sqlcipher \
+ && /build/build_sqlcipher.sh  --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/sqlcipher
 
 COPY download/download_ffmpeg.sh /build/download/
 COPY build_ffmpeg.sh /build/
-RUN mkdir -p /src/ffmpeg && \
-  cd /src/ffmpeg && \
-  /build/build_ffmpeg.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/ffmpeg
+RUN mkdir -p /src/ffmpeg \
+ && cd /src/ffmpeg \
+ && /build/build_ffmpeg.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/ffmpeg
 
 COPY download/download_openal.sh /build/download/
 COPY build_openal.sh /build/
 COPY patches/openal-cmake-3-11.patch /build/patches/
 
-RUN mkdir -p /src/openal && \
-  cd /src/openal && \
-  /build/build_openal.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/openal
+RUN mkdir -p /src/openal \
+ && cd /src/openal \
+ && /build/build_openal.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/openal
 
 COPY download/download_qrencode.sh /build/download/
 COPY build_qrencode.sh /build/
-RUN mkdir -p /src/qrencode && \
-  cd /src/qrencode && \
-  /build/build_qrencode.sh  --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/qrencode
+RUN mkdir -p /src/qrencode \
+ && cd /src/qrencode \
+ && /build/build_qrencode.sh  --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/qrencode
 
 COPY download/download_libexif.sh /build/download/
 COPY build_libexif.sh /build/
-RUN mkdir -p /src/exif && \
-  cd /src/exif && \
-  /build/build_libexif.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/exif
+RUN mkdir -p /src/exif \
+ && cd /src/exif \
+ && /build/build_libexif.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/exif
 
 COPY download/download_opus.sh /build/download/
 COPY build_opus.sh /build/
-RUN mkdir -p /src/opus && \
-  cd /src/opus && \
-  /build/build_opus.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/opus
+RUN mkdir -p /src/opus \
+ && cd /src/opus \
+ && /build/build_opus.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/opus
 
 COPY download/download_sodium.sh /build/download/
 COPY build_sodium.sh /build/
-RUN mkdir -p /src/sodium && \
-  cd /src/sodium && \
-  /build/build_sodium.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/sodium
+RUN mkdir -p /src/sodium \
+ && cd /src/sodium \
+ && /build/build_sodium.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/sodium
 
 COPY download/download_vpx.sh /build/download/
 COPY build_vpx.sh /build/
-RUN mkdir -p /src/vpx && \
-  cd /src/vpx && \
-  /build/build_vpx.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/vpx
+RUN mkdir -p /src/vpx \
+ && cd /src/vpx \
+ && /build/build_vpx.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/vpx
+
+COPY download/download_extra_cmake_modules.sh /build/download/
+COPY build_extra_cmake_modules.sh /build/
+RUN mkdir -p /src/tox \
+ && cd /src/tox \
+ && /build/build_extra_cmake_modules.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/tox
 
 COPY download/download_toxcore.sh /build/download/
 COPY build_toxcore.sh /build/
-RUN mkdir -p /src/tox && \
-  cd /src/tox && \
-  /build/build_toxcore.sh && \
-  rm -fr /src/tox
+RUN mkdir -p /src/tox \
+ && cd /src/tox \
+ && /build/build_toxcore.sh \
+ && rm -fr /src/tox
 
 FROM base as debug-export
 
 RUN mkdir -p /debug_export
 
 COPY download/download_mingw_debug_scripts.sh /build/download/
-RUN mkdir -p /src/mingw-debug-scripts && \
-  cd /src/mingw-debug-scripts && \
-  /build/download/download_mingw_debug_scripts.sh  && \
-  sed -i "s|your-app-name.exe|qtox.exe|g" debug-*.bat && \
-  cp -a debug-*.bat /debug_export && \
-  rm -fr /src/mingw-debug-scripts
+RUN mkdir -p /src/mingw-debug-scripts \
+ && cd /src/mingw-debug-scripts \
+ && /build/download/download_mingw_debug_scripts.sh  \
+ && sed -i "s|your-app-name.exe|qtox.exe|g" debug-*.bat \
+ && cp -a debug-*.bat /debug_export \
+ && rm -fr /src/mingw-debug-scripts
 
 COPY download/download_gmp.sh /build/download/
 COPY build_gmp_windows.sh /build/
-RUN  mkdir -p /src/gmp && \
-  cd /src/gmp && \
-  /build/build_gmp_windows.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/gmp
+RUN  mkdir -p /src/gmp \
+ && cd /src/gmp \
+ && /build/build_gmp_windows.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/gmp
 
 COPY download/download_libexpat.sh /build/download/
 COPY build_libexpat_windows.sh /build/
-RUN mkdir -p /src/libexpat && \
-  cd /src/libexpat && \
-  /build/build_libexpat_windows.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/libexpat
+RUN mkdir -p /src/libexpat \
+ && cd /src/libexpat \
+ && /build/build_libexpat_windows.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/libexpat
 
 COPY download/download_mpfr.sh /build/download/
 COPY build_mpfr_windows.sh /build/
-RUN  mkdir -p /src/mpfr && \
-  cd /src/mpfr && \
-  /build/build_mpfr_windows.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/mpfr
+RUN  mkdir -p /src/mpfr \
+ && cd /src/mpfr \
+ && /build/build_mpfr_windows.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/mpfr
 
 COPY download/download_gdb.sh /build/download/
 COPY build_gdb_windows.sh /build/
-RUN mkdir -p /src/gdb && \
-  cd /src/gdb && \
-  /build/build_gdb_windows.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/gdb && \
-  cp /windows/bin/gdb.exe /debug_export/gdb.exe
+RUN mkdir -p /src/gdb \
+ && cd /src/gdb \
+ && /build/build_gdb_windows.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/gdb \
+ && cp /windows/bin/gdb.exe /debug_export/gdb.exe
 
 FROM base as qt
 
 COPY download/download_zstd.sh /build/download/
 COPY build_zstd.sh /build/
 
-RUN mkdir -p /src/zstd && \
-  cd /src/zstd && \
-  /build/build_zstd.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/zstd
+RUN mkdir -p /src/zstd \
+ && cd /src/zstd \
+ && /build/build_zstd.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/zstd
 
 COPY download/version_qt.sh /build/download/
 
 COPY download/download_qt.sh /build/download/
 COPY build_qt_windows.sh /build/
 
-RUN mkdir -p /src/qt && \
-  cd /src/qt && \
-  /build/build_qt_windows.sh --arch ${SCRIPT_ARCH} && \
-  rm -fr /src/qt
+RUN mkdir -p /src/qt \
+ && cd /src/qt \
+ && /build/build_qt_windows.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/qt
+
+COPY download/download_extra_cmake_modules.sh /build/download/
+COPY build_extra_cmake_modules.sh /build/
+RUN mkdir -p /src/tox \
+ && cd /src/tox \
+ && /build/build_extra_cmake_modules.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/tox
+
+COPY download/download_hunspell.sh /build/download/
+COPY build_hunspell.sh /build/
+RUN mkdir -p /src/tox \
+ && cd /src/tox \
+ && /build/build_hunspell.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/tox
+
+COPY download/download_sonnet.sh /build/download/
+COPY build_sonnet.sh /build/
+RUN mkdir -p /src/tox \
+ && cd /src/tox \
+ && /build/build_sonnet.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/tox
+
+COPY download/download_kimageformats.sh /build/download/
+COPY build_kimageformats.sh /build/
+RUN mkdir -p /src/tox \
+ && cd /src/tox \
+ && /build/build_kimageformats.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/tox
 
 COPY download/download_nsisshellexecasuser.sh /build/download/
 COPY build_nsisshellexecasuser_windows.sh /build/
-RUN mkdir -p /src/nsisshellexecasuser && \
-  cd /src/nsisshellexecasuser && \
-  /build/build_nsisshellexecasuser_windows.sh && \
-  rm -fr /src/nsisshellexecasuser
+RUN mkdir -p /src/nsisshellexecasuser \
+ && cd /src/nsisshellexecasuser \
+ && /build/build_nsisshellexecasuser_windows.sh \
+ && rm -fr /src/nsisshellexecasuser
 
 COPY download/download_mingw_ldd.sh /build/download/
 COPY build_mingw_ldd_windows.sh /build/
-RUN mkdir -p /src/mingw_ldd && \
-  cd /src/mingw_ldd && \
-  /build/build_mingw_ldd_windows.sh && \
-  rm -fr /src/mingw_ldd
+RUN mkdir -p /src/mingw_ldd \
+ && cd /src/mingw_ldd \
+ && /build/build_mingw_ldd_windows.sh \
+ && rm -fr /src/mingw_ldd
 
 COPY --from=non-qt /windows/ /windows/
 
-RUN mkdir /export && \
-  cp /usr/${ARCH}-w64-mingw32/lib/libwinpthread-1.dll /export/ && \
-  cp /usr/lib/gcc/${ARCH}-w64-mingw32/13-posix/libgcc_s_*-1.dll /export && \
-  cp /usr/lib/gcc/${ARCH}-w64-mingw32/13-posix/libssp-0.dll /export && \
-  cp /usr/lib/gcc/${ARCH}-w64-mingw32/13-posix/libstdc++-6.dll /export && \
-  cp /windows/bin/OpenAL32.dll /export && \
-  cp /windows/bin/Qt6Core.dll /export && \
-  cp /windows/bin/Qt6Gui.dll /export && \
-  cp /windows/bin/Qt6Network.dll /export && \
-  cp /windows/bin/Qt6Svg.dll /export && \
-  cp /windows/bin/Qt6Xml.dll /export && \
-  cp /windows/bin/Qt6Widgets.dll /export && \
-  cp /windows/bin/avcodec-*.dll /export && \
-  cp /windows/bin/avdevice-*.dll /export && \
-  cp /windows/bin/avformat-*.dll /export && \
-  cp /windows/bin/avutil-*.dll /export && \
-  cp /windows/bin/swscale-*.dll /export && \
-  cp /windows/bin/libcrypto-*.dll /export && \
-  cp /windows/bin/libexif-*.dll /export && \
-  cp /windows/bin/libopus-*.dll /export && \
-  cp /windows/bin/libsodium-*.dll /export && \
-  cp /windows/bin/libsqlcipher-*.dll /export && \
-  cp /windows/bin/libssl-*.dll /export && \
-  cp /windows/bin/libtoxcore.dll /export && \
-  cp /windows/bin/libzstd.dll /export && \
-  cp /windows/lib/libqrencode.dll /export && \
-  cp -r /windows/plugins/iconengines /export && \
-  cp -r /windows/plugins/imageformats /export && \
-  cp -r /windows/plugins/platforms /export && \
-  cp -r /windows/plugins/tls /export
+RUN mkdir /export \
+ && cp /usr/${ARCH}-w64-mingw32/lib/libwinpthread-1.dll /export/ \
+ && cp /usr/lib/gcc/${ARCH}-w64-mingw32/13-posix/libgcc_s_*-1.dll /export \
+ && cp /usr/lib/gcc/${ARCH}-w64-mingw32/13-posix/libssp-0.dll /export \
+ && cp /usr/lib/gcc/${ARCH}-w64-mingw32/13-posix/libstdc++-6.dll /export \
+ && cp /windows/bin/OpenAL32.dll /export \
+ && cp /windows/bin/Qt6Core.dll /export \
+ && cp /windows/bin/Qt6Gui.dll /export \
+ && cp /windows/bin/Qt6Network.dll /export \
+ && cp /windows/bin/Qt6Svg.dll /export \
+ && cp /windows/bin/Qt6Xml.dll /export \
+ && cp /windows/bin/Qt6Widgets.dll /export \
+ && cp /windows/bin/avcodec-*.dll /export \
+ && cp /windows/bin/avdevice-*.dll /export \
+ && cp /windows/bin/avformat-*.dll /export \
+ && cp /windows/bin/avutil-*.dll /export \
+ && cp /windows/bin/swscale-*.dll /export \
+ && cp /windows/bin/libKF6SonnetCore.dll /export \
+ && cp /windows/bin/libKF6SonnetUi.dll /export \
+ && cp /windows/bin/libcrypto-*.dll /export \
+ && cp /windows/bin/libexif-*.dll /export \
+ && cp /windows/bin/libhunspell-*.dll /export \
+ && cp /windows/bin/libopus-*.dll /export \
+ && cp /windows/bin/libsodium-*.dll /export \
+ && cp /windows/bin/libsqlcipher-*.dll /export \
+ && cp /windows/bin/libssl-*.dll /export \
+ && cp /windows/bin/libtoxcore.dll /export \
+ && cp /windows/bin/libzstd.dll /export \
+ && cp /windows/lib/libqrencode.dll /export \
+ && cp -r /windows/lib/plugins/kf6 /export \
+ && cp -r /windows/plugins/iconengines /export \
+ && cp -r /windows/plugins/imageformats /export \
+ && cp -r /windows/plugins/platforms /export \
+ && cp -r /windows/plugins/tls /export
 
 COPY --from=debug-export /debug_export/ /debug_export/
 

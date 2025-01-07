@@ -144,7 +144,9 @@ parse_arch() {
     CLANG_SANITIZER=""
   fi
 
-  if [ -n "$SANITIZE" ]; then
+  if [ "$SCRIPT_ARCH" == "win32" ] || [ "$SCRIPT_ARCH" == "win64" ]; then
+    QT_PREFIX=$DEP_PREFIX
+  elif [ -n "$SANITIZE" ]; then
     QT_PREFIX="$DEP_PREFIX/qt-$SANITIZE"
   else
     QT_PREFIX="$DEP_PREFIX/qt"

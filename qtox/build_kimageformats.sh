@@ -9,7 +9,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "kimageformats" --supported "linux-x86_64 macos-x86_64 macos-arm64" "$@"
+parse_arch --dep "kimageformats" --supported "linux-x86_64 macos-x86_64 macos-arm64 win32 win64" "$@"
 
 "$SCRIPT_DIR/download/download_kimageformats.sh"
 

@@ -50,63 +50,70 @@ COPY download/version_qt.sh /build/download/
 COPY download/download_qtbase.sh /build/download/
 COPY build_qtbase_linux.sh /build/
 
-RUN mkdir -p /src/qt && \
-  cd /src/qt && \
-  /build/build_qtbase_linux.sh --arch ${SCRIPT_ARCH} --libtype shared && \
-  rm -fr /src/qt
+RUN mkdir -p /src/qt \
+ && cd /src/qt \
+ && /build/build_qtbase_linux.sh --arch "$SCRIPT_ARCH" --libtype shared \
+ && rm -fr /src/qt
 
 COPY download/download_qttools.sh /build/download/
 COPY build_qttools_linux.sh /build/
 
-RUN mkdir -p /src/qt && \
-  cd /src/qt && \
-  /build/build_qttools_linux.sh --arch ${SCRIPT_ARCH} --libtype shared && \
-  rm -fr /src/qt
+RUN mkdir -p /src/qt \
+ && cd /src/qt \
+ && /build/build_qttools_linux.sh --arch "$SCRIPT_ARCH" --libtype shared \
+ && rm -fr /src/qt
 
 COPY download/download_qtsvg.sh /build/download/
 COPY build_qtsvg_linux.sh /build/
 
-RUN mkdir -p /src/qt && \
-  cd /src/qt && \
-  /build/build_qtsvg_linux.sh --arch ${SCRIPT_ARCH} --libtype shared && \
-  rm -fr /src/qt
+RUN mkdir -p /src/qt \
+ && cd /src/qt \
+ && /build/build_qtsvg_linux.sh --arch "$SCRIPT_ARCH" --libtype shared \
+ && rm -fr /src/qt
 
 COPY download/download_qtimageformats.sh /build/download/
 COPY build_qtimageformats_linux.sh /build/
 
-RUN mkdir -p /src/qt && \
-  cd /src/qt && \
-  /build/build_qtimageformats_linux.sh --arch ${SCRIPT_ARCH} --libtype shared && \
-  rm -fr /src/qt
+RUN mkdir -p /src/qt \
+ && cd /src/qt \
+ && /build/build_qtimageformats_linux.sh --arch "$SCRIPT_ARCH" --libtype shared \
+ && rm -fr /src/qt
 
 COPY download/download_qtwayland.sh /build/download/
 COPY build_qtwayland_linux.sh /build/
 
-RUN mkdir -p /src/qt && \
-  cd /src/qt && \
-  /build/build_qtwayland_linux.sh --arch ${SCRIPT_ARCH} --libtype shared && \
-  rm -fr /src/qt
+RUN mkdir -p /src/qt \
+ && cd /src/qt \
+ && /build/build_qtwayland_linux.sh --arch "$SCRIPT_ARCH" --libtype shared \
+ && rm -fr /src/qt
 
 COPY download/download_extra_cmake_modules.sh /build/download/
 COPY build_extra_cmake_modules.sh /build/
-RUN mkdir -p /src/tox && \
-    cd /src/tox && \
-    /build/build_extra_cmake_modules.sh --arch ${SCRIPT_ARCH} && \
-    rm -fr /src/tox
+RUN mkdir -p /src/tox \
+ && cd /src/tox \
+ && /build/build_extra_cmake_modules.sh --arch "$SCRIPT_ARCH" --libtype shared \
+ && rm -fr /src/tox
 
 COPY download/download_sonnet.sh /build/download/
 COPY build_sonnet.sh /build/
-RUN mkdir -p /src/tox && \
-    cd /src/tox && \
-    /build/build_sonnet.sh && \
-    rm -fr /src/tox
+RUN mkdir -p /src/tox \
+ && cd /src/tox \
+ && /build/build_sonnet.sh --arch "$SCRIPT_ARCH" --libtype shared \
+ && rm -fr /src/tox
+
+COPY download/download_kimageformats.sh /build/download/
+COPY build_kimageformats.sh /build/
+RUN mkdir -p /src/tox \
+ && cd /src/tox \
+ && /build/build_kimageformats.sh --arch "$SCRIPT_ARCH" --libtype shared \
+ && rm -fr /src/tox
 
 COPY download/download_toxcore.sh /build/download/
-COPY build_toxcore_system.sh /build/
-RUN mkdir -p /src/tox && \
-    cd /src/tox && \
-    /build/build_toxcore_system.sh && \
-    rm -fr /src/tox
+COPY build_toxcore.sh /build/
+RUN mkdir -p /src/tox \
+ && cd /src/tox \
+ && /build/build_toxcore.sh --arch "$SCRIPT_ARCH" --libtype shared \
+ && rm -fr /src/tox
 
 WORKDIR /qtox
 ENV HOME=/qtox

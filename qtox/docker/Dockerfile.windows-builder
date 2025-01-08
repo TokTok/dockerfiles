@@ -50,7 +50,7 @@ ARG SCRIPT_ARCH=$WINEARCH
 RUN update-alternatives --set "${ARCH}-w64-mingw32-gcc" "/usr/bin/${ARCH}-w64-mingw32-gcc-posix" \
  && update-alternatives --set "${ARCH}-w64-mingw32-g++" "/usr/bin/${ARCH}-w64-mingw32-g++-posix"
 
-COPY toolchain/windows-${ARCH}-toolchain.cmake /build/windows-toolchain.cmake
+COPY --chmod=644 toolchain/windows-${ARCH}-toolchain.cmake /build/windows-toolchain.cmake
 
 COPY download/common.sh /build/download/
 COPY build_utils.sh /build/
@@ -191,12 +191,36 @@ RUN mkdir -p /src/zstd \
 
 COPY download/version_qt.sh /build/download/
 
-COPY download/download_qt.sh /build/download/
-COPY build_qt_windows.sh /build/
+COPY download/download_qtbase.sh /build/download/
+COPY build_qtbase_windows.sh /build/
 
 RUN mkdir -p /src/qt \
  && cd /src/qt \
- && /build/build_qt_windows.sh --arch "$SCRIPT_ARCH" \
+ && /build/build_qtbase_windows.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/qt
+
+COPY download/download_qttools.sh /build/download/
+COPY build_qttools_windows.sh /build/
+
+RUN mkdir -p /src/qt \
+ && cd /src/qt \
+ && /build/build_qttools_windows.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/qt
+
+COPY download/download_qtsvg.sh /build/download/
+COPY build_qtsvg_windows.sh /build/
+
+RUN mkdir -p /src/qt \
+ && cd /src/qt \
+ && /build/build_qtsvg_windows.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/qt
+
+COPY download/download_qtimageformats.sh /build/download/
+COPY build_qtimageformats_windows.sh /build/
+
+RUN mkdir -p /src/qt \
+ && cd /src/qt \
+ && /build/build_qtimageformats_windows.sh --arch "$SCRIPT_ARCH" \
  && rm -fr /src/qt
 
 COPY download/download_extra_cmake_modules.sh /build/download/
@@ -273,14 +297,19 @@ RUN mkdir /export \
  && cp /windows/bin/libzstd.dll /export \
  && cp /windows/lib/libqrencode.dll /export \
  && cp -r /windows/lib/plugins/kf6 /export \
- && cp -r /windows/plugins/iconengines /export \
- && cp -r /windows/plugins/imageformats /export \
  && cp -r /windows/plugins/platforms /export \
  && cp -r /windows/plugins/tls /export
 
-COPY --from=debug-export /debug_export/ /debug_export/
+# We're selective about Qt image format plugins for security reasons. We only
+# include the ones we've tested (e.g. with fuzzing).
+RUN mkdir /export/iconengines \
+ && cp /windows/plugins/iconengines/qsvgicon.dll /export/iconengines/ \
+ && mkdir /export/imageformats \
+ && for fmt in kimg_qoi qgif qjpeg qsvg qwebp; do \
+      cp "/windows/plugins/imageformats/$fmt.dll" /export/imageformats/; \
+    done
 
-RUN chmod 0644 /build/windows-toolchain.cmake
+COPY --from=debug-export /debug_export/ /debug_export/
 
 WORKDIR /qtox
 ENV HOME=/qtox

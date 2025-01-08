@@ -13,7 +13,7 @@ source "$SCRIPT_DIR/build_utils.sh"
 
 parse_arch --dep "qt" --supported "win32 win64" "$@"
 
-"$SCRIPT_DIR/download/download_qt.sh"
+"$SCRIPT_DIR/download/download_qtbase.sh"
 
 CROSS_COMPILE="$MINGW_ARCH-w64-mingw32-"
 "${CROSS_COMPILE}gcc" --version
@@ -53,43 +53,6 @@ mkdir qtbase/_build && pushd qtbase/_build
   -DCMAKE_CXX_FLAGS="-DQT_MESSAGELOGCONTEXT" \
   -Wno-dev
 cat config.summary
-cmake --build .
-cmake --install .
-popd
-
-mkdir qttools/_build && pushd qttools/_build
-"$DEP_PREFIX/bin/qt-configure-module" .. \
-  -no-feature-assistant \
-  -no-feature-designer \
-  -no-feature-kmap2qmap \
-  -no-feature-pixeltool \
-  -no-feature-qdbus \
-  -no-feature-qdoc \
-  -no-feature-qev \
-  -no-feature-qtattributionsscanner \
-  -no-feature-qtdiag \
-  -no-feature-qtplugininfo \
-  -- \
-  -DCMAKE_CXX_FLAGS="-DQT_MESSAGELOGCONTEXT" \
-  -Wno-dev
-cmake --build .
-cmake --install .
-popd
-
-mkdir qtsvg/_build && pushd qtsvg/_build
-"$DEP_PREFIX/bin/qt-configure-module" .. \
-  -- \
-  -DCMAKE_CXX_FLAGS="-DQT_MESSAGELOGCONTEXT" \
-  -Wno-dev
-cmake --build .
-cmake --install .
-popd
-
-mkdir qtimageformats/_build && pushd qtimageformats/_build
-"$DEP_PREFIX/bin/qt-configure-module" .. \
-  -- \
-  -DCMAKE_CXX_FLAGS="-DQT_MESSAGELOGCONTEXT" \
-  -Wno-dev
 cmake --build .
 cmake --install .
 popd

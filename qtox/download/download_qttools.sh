@@ -13,9 +13,6 @@ source "$(dirname "$(realpath "$0")")/version_qt.sh"
 
 MIRROR=http://master.qt-project.org
 
-(
-  mkdir qttools && cd qttools
-  download_verify_extract_tarball \
-    "$MIRROR/archive/qt/$QT_MAJOR.$QT_MINOR/$QT_MAJOR.$QT_MINOR.$QT_PATCH/submodules/qttools-everywhere-src-$QT_MAJOR.$QT_MINOR.$QT_PATCH.tar.xz" \
-    "$QTTOOLS_HASH"
-)
+download_verify_extract_tarball \
+  "$MIRROR/archive/qt/$QT_MAJOR.$QT_MINOR/$QT_MAJOR.$QT_MINOR.$QT_PATCH/submodules/qttools-everywhere-src-$QT_MAJOR.$QT_MINOR.$QT_PATCH.tar.xz" \
+  "$QTTOOLS_HASH"

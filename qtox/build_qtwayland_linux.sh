@@ -16,8 +16,8 @@ parse_arch --dep "qtwayland" --supported "linux-x86_64" "$@"
 export CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
 export OBJCXXFLAGS="$CXXFLAGS"
 
-mkdir qtwayland/_build && pushd qtwayland/_build
-"$DEP_PREFIX/qt/bin/qt-configure-module" .. \
+mkdir _build && pushd _build
+"$QT_PREFIX/bin/qt-configure-module" .. \
   -- \
   -Wno-dev
 cmake --build .

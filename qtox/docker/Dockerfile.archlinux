@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: GPL-3.0-or-later.
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright © 2021 by The qTox Project Contributors
 # Copyright © 2024-2025 The TokTok team
 
@@ -27,12 +27,14 @@ ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
 COPY download/common.sh /build/download/common.sh
 COPY build_utils.sh /build/build_utils.sh
+
 COPY download/download_toxcore.sh /build/download/download_toxcore.sh
 COPY build_toxcore_system.sh /build/build_toxcore_system.sh
-RUN mkdir -p /src/tox && \
-    cd /src/tox && \
-    /build/build_toxcore_system.sh && \
-    rm -fr /src/tox
+
+RUN mkdir -p /src/toxcore \
+ && cd /src/toxcore \
+ && /build/build_toxcore_system.sh \
+ && rm -fr /src/toxcore
 
 WORKDIR /qtox
 ENV HOME=/qtox

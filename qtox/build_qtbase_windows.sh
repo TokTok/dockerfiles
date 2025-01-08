@@ -18,8 +18,9 @@ parse_arch --dep "qt" --supported "win32 win64" "$@"
 CROSS_COMPILE="$MINGW_ARCH-w64-mingw32-"
 "${CROSS_COMPILE}gcc" --version
 
-mkdir qtbase/_build && pushd qtbase/_build
-../configure -prefix "$DEP_PREFIX" \
+mkdir _build && pushd _build
+../configure \
+  -prefix "$QT_PREFIX" \
   -appstore-compliant \
   -release \
   -shared \

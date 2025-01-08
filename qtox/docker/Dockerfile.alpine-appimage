@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: GPL-3.0-or-later.
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright © 2024-2025 The TokTok team
 
 FROM alpine:3.21
@@ -50,70 +50,70 @@ COPY download/version_qt.sh /build/download/
 COPY download/download_qtbase.sh /build/download/
 COPY build_qtbase_linux.sh /build/
 
-RUN mkdir -p /src/qt \
- && cd /src/qt \
+RUN mkdir -p /src/qtbase \
+ && cd /src/qtbase \
  && /build/build_qtbase_linux.sh --arch "$SCRIPT_ARCH" --libtype shared \
- && rm -fr /src/qt
+ && rm -fr /src/qtbase
 
 COPY download/download_qttools.sh /build/download/
-COPY build_qttools_linux.sh /build/
+COPY build_qttools.sh /build/
 
-RUN mkdir -p /src/qt \
- && cd /src/qt \
- && /build/build_qttools_linux.sh --arch "$SCRIPT_ARCH" --libtype shared \
- && rm -fr /src/qt
+RUN mkdir -p /src/qttools \
+ && cd /src/qttools \
+ && /build/build_qttools.sh --arch "$SCRIPT_ARCH" --libtype shared \
+ && rm -fr /src/qttools
 
 COPY download/download_qtsvg.sh /build/download/
-COPY build_qtsvg_linux.sh /build/
+COPY build_qtsvg.sh /build/
 
-RUN mkdir -p /src/qt \
- && cd /src/qt \
- && /build/build_qtsvg_linux.sh --arch "$SCRIPT_ARCH" --libtype shared \
- && rm -fr /src/qt
+RUN mkdir -p /src/qtsvg \
+ && cd /src/qtsvg \
+ && /build/build_qtsvg.sh --arch "$SCRIPT_ARCH" --libtype shared \
+ && rm -fr /src/qtsvg
 
 COPY download/download_qtimageformats.sh /build/download/
-COPY build_qtimageformats_linux.sh /build/
+COPY build_qtimageformats.sh /build/
 
-RUN mkdir -p /src/qt \
- && cd /src/qt \
- && /build/build_qtimageformats_linux.sh --arch "$SCRIPT_ARCH" --libtype shared \
- && rm -fr /src/qt
+RUN mkdir -p /src/qtimageformats \
+ && cd /src/qtimageformats \
+ && /build/build_qtimageformats.sh --arch "$SCRIPT_ARCH" --libtype shared \
+ && rm -fr /src/qtimageformats
 
 COPY download/download_qtwayland.sh /build/download/
 COPY build_qtwayland_linux.sh /build/
 
-RUN mkdir -p /src/qt \
- && cd /src/qt \
+RUN mkdir -p /src/qtwayland \
+ && cd /src/qtwayland \
  && /build/build_qtwayland_linux.sh --arch "$SCRIPT_ARCH" --libtype shared \
- && rm -fr /src/qt
+ && rm -fr /src/qtwayland
 
 COPY download/download_extra_cmake_modules.sh /build/download/
 COPY build_extra_cmake_modules.sh /build/
-RUN mkdir -p /src/tox \
- && cd /src/tox \
+RUN mkdir -p /src/ecm \
+ && cd /src/ecm \
  && /build/build_extra_cmake_modules.sh --arch "$SCRIPT_ARCH" --libtype shared \
- && rm -fr /src/tox
+ && rm -fr /src/ecm
 
 COPY download/download_sonnet.sh /build/download/
 COPY build_sonnet.sh /build/
-RUN mkdir -p /src/tox \
- && cd /src/tox \
+RUN mkdir -p /src/sonnet \
+ && cd /src/sonnet \
  && /build/build_sonnet.sh --arch "$SCRIPT_ARCH" --libtype shared \
- && rm -fr /src/tox
+ && rm -fr /src/sonnet
 
 COPY download/download_kimageformats.sh /build/download/
 COPY build_kimageformats.sh /build/
-RUN mkdir -p /src/tox \
- && cd /src/tox \
+RUN mkdir -p /src/kimageformats \
+ && cd /src/kimageformats \
  && /build/build_kimageformats.sh --arch "$SCRIPT_ARCH" --libtype shared \
- && rm -fr /src/tox
+ && rm -fr /src/kimageformats
 
 COPY download/download_toxcore.sh /build/download/
 COPY build_toxcore.sh /build/
-RUN mkdir -p /src/tox \
- && cd /src/tox \
+RUN mkdir -p /src/toxcore \
+ && cd /src/toxcore \
  && /build/build_toxcore.sh --arch "$SCRIPT_ARCH" --libtype shared \
- && rm -fr /src/tox
+ && rm -fr /src/toxcore
 
 # We're selective about KDE image format plugins for security reasons. We only
 # include the ones we've tested (e.g. with fuzzing).

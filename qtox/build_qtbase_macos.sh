@@ -12,6 +12,8 @@ source "$SCRIPT_DIR/download/version_qt.sh"
 
 parse_arch --dep "qtbase" --supported "macos-arm64 macos-x86_64" "$@"
 
+"$SCRIPT_DIR/download/download_qtbase.sh"
+
 export CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
 export OBJCXXFLAGS="$CXXFLAGS"
 
@@ -28,9 +30,7 @@ else
   QT_FORCE_DEBUG_INFO="-no-force-debug-info"
 fi
 
-tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz")
-rm -rf qtbase && mv "qtbase-everywhere-src-$QT_VERSION" qtbase && cd qtbase
-rm -rf _build && mkdir _build && cd _build
+mkdir _build && pushd _build
 ../configure \
   --prefix="$QT_PREFIX" \
   -appstore-compliant \
@@ -61,5 +61,4 @@ rm -rf _build && mkdir _build && cd _build
 cat config.summary
 cmake --build .
 cmake --install .
-cd ../..
-rm -rf qtbase
+popd

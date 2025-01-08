@@ -11,12 +11,12 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "qt" --supported "win32 win64" "$@"
+parse_arch --dep "qttools" --supported "linux-x86_64 macos-arm64 macos-x86_64 win32 win64" "$@"
 
 "$SCRIPT_DIR/download/download_qttools.sh"
 
-mkdir qttools/_build && pushd qttools/_build
-"$DEP_PREFIX/bin/qt-configure-module" .. \
+mkdir _build && pushd _build
+"$QT_PREFIX/bin/qt-configure-module" .. \
   -no-feature-assistant \
   -no-feature-designer \
   -no-feature-kmap2qmap \

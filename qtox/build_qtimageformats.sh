@@ -11,12 +11,12 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "qt" --supported "win32 win64" "$@"
+parse_arch --dep "qtimageformats" --supported "linux-x86_64 macos-arm64 macos-x86_64 win32 win64" "$@"
 
 "$SCRIPT_DIR/download/download_qtimageformats.sh"
 
-mkdir qtimageformats/_build && pushd qtimageformats/_build
-"$DEP_PREFIX/bin/qt-configure-module" .. \
+mkdir _build && pushd _build
+"$QT_PREFIX/bin/qt-configure-module" .. \
   -- \
   -DCMAKE_CXX_FLAGS="-DQT_MESSAGELOGCONTEXT" \
   -Wno-dev

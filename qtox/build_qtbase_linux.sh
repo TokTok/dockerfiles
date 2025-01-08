@@ -16,9 +16,10 @@ parse_arch --dep "qtbase" --supported "linux-x86_64" "$@"
 export CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
 export OBJCXXFLAGS="$CXXFLAGS"
 
-mkdir -p qtbase/_build
-pushd qtbase/_build
-../configure -prefix "$DEP_PREFIX/qt" \
+mkdir -p _build
+pushd _build
+../configure \
+  -prefix "$QT_PREFIX" \
   -appstore-compliant \
   -release \
   "-$LIB_TYPE" \

@@ -18,6 +18,9 @@ export OBJCXXFLAGS="$CXXFLAGS"
 
 mkdir qtimageformats/_build && pushd qtimageformats/_build
 "$DEP_PREFIX/qt/bin/qt-configure-module" .. \
+  -no-feature-jasper \
+  -no-feature-mng \
+  -no-feature-tiff \
   -- \
   -Wno-dev
 cmake --build .

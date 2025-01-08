@@ -115,14 +115,15 @@ RUN mkdir -p /src/tox \
  && /build/build_toxcore.sh --arch "$SCRIPT_ARCH" --libtype shared \
  && rm -fr /src/tox
 
-# We're selective about Qt image format plugins for security reasons. We only
+# We're selective about KDE image format plugins for security reasons. We only
 # include the ones we've tested (e.g. with fuzzing).
 RUN mkdir /work/tmp \
- && for fmt in kimg_qoi libqgif libqjpeg libqsvg libqwebp; do \
-      cp "/work/qt/plugins/imageformats/$fmt.so" /work/tmp; \
+ && for fmt in qoi; do \
+      cp "/work/qt/plugins/imageformats/kimg_$fmt.so" /work/tmp; \
     done \
- && rm -rf /work/qt/plugins/imageformats \
- && mv /work/tmp /work/qt/plugins/imageformats
+ && rm -f /work/qt/plugins/imageformats/kimg_* \
+ && mv /work/tmp/* /work/qt/plugins/imageformats/ \
+ && rmdir /work/tmp
 
 WORKDIR /qtox
 ENV HOME=/qtox

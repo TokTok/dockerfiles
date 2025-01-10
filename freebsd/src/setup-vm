@@ -62,18 +62,19 @@ RUN chsh -s /usr/local/bin/bash root
 
 # Install required toxcore dependencies
 RUN PAGER=cat ASSUME_ALWAYS_YES=YES pkg install \
-  git \
-  opus \
-  libconfig \
-  libvpx \
-  libsodium \
-  gmake \
+  autotools \
   cmake \
+  git \
+  gmake \
+  libconfig \
+  libsndfile \
+  libsodium \
+  libvpx \
+  ninja \
+  opus \
   pkgconf \
   portaudio \
-  libsndfile \
-  texinfo \
-  autotools
+  texinfo
 
 # === Compress the VM image ===
 

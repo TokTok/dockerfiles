@@ -8,7 +8,7 @@
 
 set -euxo pipefail
 
-MACOS_MINIMUM_SUPPORTED_VERSION=12.0
+MACOS_MINIMUM_SUPPORTED_VERSION=10.14
 
 usage() {
   # note: this is the usage from the build script's context, so the usage

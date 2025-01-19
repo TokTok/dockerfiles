@@ -57,6 +57,7 @@ mkdir _build && pushd _build
   -no-openssl \
   -- \
   -DCMAKE_FIND_ROOT_PATH="$DEP_PREFIX" \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOS_MINIMUM_SUPPORTED_VERSION" \
   -Wno-dev
 cat config.summary
 cmake --build .

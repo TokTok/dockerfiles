@@ -6,8 +6,6 @@
 
 set -euo pipefail
 
-QTREMOTEOBJECTS_HASH=7ef2870f05614b71d1cfdd7ac12acef5294abc43da244a6e9e411f21208f59f8
-
 source "$(dirname "$(realpath "$0")")/common.sh"
 source "$(dirname "$(realpath "$0")")/version_qt.sh"
 

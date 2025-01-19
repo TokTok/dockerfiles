@@ -6,8 +6,6 @@
 
 set -euo pipefail
 
-QTSVG_HASH=3d0de73596e36b2daa7c48d77c4426bb091752856912fba720215f756c560dd0
-
 source "$(dirname "$(realpath "$0")")/common.sh"
 source "$(dirname "$(realpath "$0")")/version_qt.sh"
 

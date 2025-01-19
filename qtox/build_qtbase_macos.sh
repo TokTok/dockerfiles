@@ -8,7 +8,6 @@ set -euxo pipefail
 readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
-source "$SCRIPT_DIR/download/version_qt.sh"
 
 parse_arch --dep "qtbase" --supported "macos-arm64 macos-x86_64" "$@"
 
@@ -18,17 +17,24 @@ export CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
 export OBJCXXFLAGS="$CXXFLAGS"
 
 if [ -n "$SANITIZE" ]; then
-  QT_SANITIZE=(-sanitize "$CLANG_SANITIZER")
+  QT_CONFIGURE_FLAGS=(-sanitize "$CLANG_SANITIZER")
   BUILD_TYPE=debug
 else
-  QT_SANITIZE=()
+  QT_CONFIGURE_FLAGS=()
 fi
 
 if [ "$BUILD_TYPE" = "debug" ]; then
-  QT_FORCE_DEBUG_INFO="-force-debug-info"
+  QT_CONFIGURE_FLAGS+=("-force-debug-info")
 else
-  QT_FORCE_DEBUG_INFO="-no-force-debug-info"
+  QT_CONFIGURE_FLAGS+=("-no-force-debug-info")
 fi
+
+if [ "$MACOS_MINIMUM_SUPPORTED_VERSION" != "10.15" ]; then
+  QT_CONFIGURE_FLAGS+=("-no-feature-printsupport")
+fi
+
+# We want -Werror to catch warnings related to macOS version compatibility.
+sed -i '' -e 's/-Wextra/-Wextra -Werror "-Wno-#warnings" -Wno-deprecated-declarations/' cmake/QtCompilerFlags.cmake
 
 mkdir _build && pushd _build
 ../configure \
@@ -37,8 +43,7 @@ mkdir _build && pushd _build
   -static \
   -release \
   -force-asserts \
-  "$QT_FORCE_DEBUG_INFO" \
-  "${QT_SANITIZE[@]}" \
+  "${QT_CONFIGURE_FLAGS[@]}" \
   -qt-doubleconversion \
   -qt-freetype \
   -qt-harfbuzz \
@@ -49,7 +54,6 @@ mkdir _build && pushd _build
   -no-feature-androiddeployqt \
   -no-feature-brotli \
   -no-feature-macdeployqt \
-  -no-feature-printsupport \
   -no-feature-qmake \
   -no-feature-sql \
   -no-feature-dbus \

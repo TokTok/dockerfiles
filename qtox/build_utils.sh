@@ -8,8 +8,6 @@
 
 set -euxo pipefail
 
-MACOS_MINIMUM_SUPPORTED_VERSION=10.15
-
 usage() {
   # note: this is the usage from the build script's context, so the usage
   # doesn't include --dep argument, since that comes from the build script
@@ -34,6 +32,7 @@ parse_arch() {
   BUILD_TYPE=release
   SANITIZE=
   EXTRA_ARGS=()
+  MACOS_MINIMUM_SUPPORTED_VERSION=12.0
 
   while (($# > 0)); do
     case $1 in
@@ -55,6 +54,10 @@ parse_arch() {
         ;;
       --buildtype)
         BUILD_TYPE=$2
+        shift 2
+        ;;
+      --macos)
+        MACOS_MINIMUM_SUPPORTED_VERSION=$2
         shift 2
         ;;
       --sanitize)
@@ -83,6 +86,7 @@ parse_arch() {
   done
 
   assert_supported "$SCRIPT_ARCH" "$SUPPORTED"
+  export MACOS_MINIMUM_SUPPORTED_VERSION
 
   if [ "$SCRIPT_ARCH" == "win32" ] || [ "$SCRIPT_ARCH" == "win64" ]; then
     if [ "$SCRIPT_ARCH" == "win32" ]; then

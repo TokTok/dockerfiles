@@ -6,8 +6,6 @@
 
 set -euo pipefail
 
-QTBASE_HASH=40b14562ef3bd779bc0e0418ea2ae08fa28235f8ea6e8c0cb3bce1d6ad58dcaf
-
 source "$(dirname "$(realpath "$0")")/common.sh"
 source "$(dirname "$(realpath "$0")")/version_qt.sh"
 

@@ -1,4 +1,4 @@
-FROM alpine:3.19.0
+FROM alpine:3.21.0
 
 RUN ["apk", "add", "--no-cache", \
  "bash", \
@@ -8,9 +8,10 @@ RUN ["apk", "add", "--no-cache", \
  "git", \
  "linux-headers", \
  "musl-dev", \
- "nawk"]
+ "nawk", \
+ "patch"]
 
-RUN ["git", "clone", "--branch=pkgsrc-2023Q4", "--depth=1", "https://github.com/NetBSD/pkgsrc", "/work/pkgsrc"]
+RUN ["git", "clone", "--branch=pkgsrc-2024Q4", "--depth=1", "https://github.com/NetBSD/pkgsrc", "/work/pkgsrc"]
 WORKDIR /work/pkgsrc/bootstrap
 ENV TOOLS_PLATFORM.awk=/usr/bin/nawk
 RUN ["./bootstrap"]

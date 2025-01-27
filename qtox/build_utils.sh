@@ -33,6 +33,7 @@ parse_arch() {
   SANITIZE=
   EXTRA_ARGS=()
   MACOS_MINIMUM_SUPPORTED_VERSION=12.0
+  IOS_MINIMUM_SUPPORTED_VERSION=10.0
 
   while (($# > 0)); do
     case $1 in
@@ -87,6 +88,7 @@ parse_arch() {
 
   assert_supported "$SCRIPT_ARCH" "$SUPPORTED"
   export MACOS_MINIMUM_SUPPORTED_VERSION
+  export IOS_MINIMUM_SUPPORTED_VERSION
 
   if [ "$SCRIPT_ARCH" == "win32" ] || [ "$SCRIPT_ARCH" == "win64" ]; then
     if [ "$SCRIPT_ARCH" == "win32" ]; then
@@ -106,10 +108,22 @@ parse_arch() {
     DEP_PREFIX="${DEP_PREFIX:-/work}"
     mkdir -p "$DEP_PREFIX"
     HOST_OPTION=''
-    CROSS_LDFLAG="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
-    CROSS_CFLAG="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
-    CROSS_CPPFLAG="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
-    CROSS_CXXFLAG="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
+    MACOS_FLAGS="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
+    CROSS_LDFLAG="$MACOS_FLAGS"
+    CROSS_CFLAG="$MACOS_FLAGS"
+    CROSS_CPPFLAG="$MACOS_FLAGS"
+    CROSS_CXXFLAG="$MACOS_FLAGS"
+    MAKE_JOBS="$(sysctl -n hw.ncpu)"
+    CMAKE_TOOLCHAIN_FILE=""
+  elif [ "$SCRIPT_ARCH" == "ios-arm64" ]; then
+    DEP_PREFIX="${DEP_PREFIX:-/work}"
+    mkdir -p "$DEP_PREFIX"
+    HOST_OPTION="--host=arm64-apple-darwin"
+    IOS_FLAGS="-miphoneos-version-min=$IOS_MINIMUM_SUPPORTED_VERSION -arch arm64 -isysroot $(xcrun --sdk iphoneos --show-sdk-path)"
+    CROSS_LDFLAG="$IOS_FLAGS"
+    CROSS_CFLAG="$IOS_FLAGS"
+    CROSS_CPPFLAG="$IOS_FLAGS"
+    CROSS_CXXFLAG="$IOS_FLAGS"
     MAKE_JOBS="$(sysctl -n hw.ncpu)"
     CMAKE_TOOLCHAIN_FILE=""
   elif [[ "$SCRIPT_ARCH" == "linux"* ]]; then

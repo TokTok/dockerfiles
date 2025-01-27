@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "sodium" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64" "$@"
+parse_arch --dep "sodium" --supported "linux-aarch64 linux-x86_64 win32 win64 macos-x86_64 macos-arm64 ios-arm64" "$@"
 
 if [ "$LIB_TYPE" = "shared" ]; then
   ENABLE_STATIC=--disable-static
@@ -28,12 +28,13 @@ for sym in blake2b blake2b_final blake2b_init blake2b_init_key blake2b_init_para
   RENAME_CFLAGS="$RENAME_CFLAGS -D$sym=sodium_$sym"
 done
 
-CFLAGS="-O3 $CROSS_CFLAG $RENAME_CFLAGS" \
-  LDFLAGS="$CROSS_LDFLAG -fstack-protector" \
-  ./configure "$HOST_OPTION" \
+./configure "$HOST_OPTION" \
   --prefix="$DEP_PREFIX" \
+  --disable-pie \
   "$ENABLE_STATIC" \
-  "$ENABLE_SHARED"
+  "$ENABLE_SHARED" \
+  CFLAGS="-O3 -fPIC $CROSS_CFLAG $RENAME_CFLAGS" \
+  LDFLAGS="$CROSS_LDFLAG -fstack-protector"
 
 make -j "$MAKE_JOBS"
 make install

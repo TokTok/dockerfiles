@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "sodium" --supported "linux-aarch64 linux-x86_64 win32 win64 macos-x86_64 macos-arm64 ios-arm64" "$@"
+parse_arch --dep "sodium" --supported "linux-aarch64 linux-x86_64 win32 win64 macos-x86_64 macos-arm64 ios-arm64 ios-armv7 ios-armv7s ios-i386 ios-x86_64" "$@"
 
 if [ "$LIB_TYPE" = "shared" ]; then
   ENABLE_STATIC=--disable-static
@@ -34,7 +34,8 @@ done
   "$ENABLE_STATIC" \
   "$ENABLE_SHARED" \
   CFLAGS="-O3 -fPIC $CROSS_CFLAG $RENAME_CFLAGS" \
-  LDFLAGS="$CROSS_LDFLAG -fstack-protector"
+  LDFLAGS="$CROSS_LDFLAG -fstack-protector" ||
+  (cat config.log && exit 1)
 
 make -j "$MAKE_JOBS"
 make install

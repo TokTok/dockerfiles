@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "vpx" --supported "linux-aarch64 linux-x86_64 win32 win64 macos-x86_64 macos-arm64 ios-arm64" "$@"
+parse_arch --dep "vpx" --supported "linux-aarch64 linux-x86_64 win32 win64 macos-x86_64 macos-arm64 ios-arm64 ios-armv7 ios-armv7s ios-i386 ios-x86_64" "$@"
 
 if [ "$SCRIPT_ARCH" == "win64" ]; then
   # There is a bug in gcc that breaks avx512 on 64-bit Windows https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54412
@@ -27,15 +27,31 @@ elif [ "$SCRIPT_ARCH" == "win32" ]; then
 elif [ "$SCRIPT_ARCH" == "macos-x86_64" ]; then
   ARCH_FLAGS=""
   CROSS_ARG=""
-  TARGET_ARG="x86_64-darwin22-gcc" # macOS 13
+  TARGET_ARG="x86_64-darwin19-gcc" # macOS 10.15
 elif [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
   ARCH_FLAGS=""
   CROSS_ARG=""
-  TARGET_ARG="arm64-darwin23-gcc" # macOS 14
+  TARGET_ARG="arm64-darwin19-gcc" # macOS 10.15
 elif [ "$SCRIPT_ARCH" == "ios-arm64" ]; then
   ARCH_FLAGS=""
   CROSS_ARG=""
   TARGET_ARG="arm64-darwin-gcc"
+elif [ "$SCRIPT_ARCH" == "ios-armv7" ]; then
+  ARCH_FLAGS=""
+  CROSS_ARG=""
+  TARGET_ARG="armv7-darwin-gcc"
+elif [ "$SCRIPT_ARCH" == "ios-armv7s" ]; then
+  ARCH_FLAGS=""
+  CROSS_ARG=""
+  TARGET_ARG="armv7s-darwin-gcc"
+elif [ "$SCRIPT_ARCH" == "ios-i386" ]; then
+  ARCH_FLAGS=""
+  CROSS_ARG=""
+  TARGET_ARG="x86-iphonesimulator-gcc"
+elif [ "$SCRIPT_ARCH" == "ios-x86_64" ]; then
+  ARCH_FLAGS=""
+  CROSS_ARG=""
+  TARGET_ARG="x86_64-iphonesimulator-gcc"
 elif [ "$SCRIPT_ARCH" == "linux-x86_64" ]; then
   ARCH_FLAGS=""
   CROSS_ARG=""

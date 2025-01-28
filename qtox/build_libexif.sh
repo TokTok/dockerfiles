@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "libexif" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64" "$@"
+parse_arch --dep "libexif" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm" "$@"
 
 if [ "$LIB_TYPE" = "shared" ]; then
   ENABLE_STATIC=--disable-static
@@ -25,12 +25,12 @@ fi
 
 CFLAGS="-O2 -g0 $CROSS_CFLAG" \
   LDFLAGS="$CROSS_LDFLAG" \
-  ./configure "$HOST_OPTION" \
+  "${EMCONFIGURE[@]}" ./configure "${HOST_OPTION[@]}" \
   --prefix="$DEP_PREFIX" \
   "$ENABLE_STATIC" \
   "$ENABLE_SHARED" \
   --disable-docs \
   --disable-nls
 
-make -j "$MAKE_JOBS"
-make install
+"${EMMAKE[@]}" make -j "$MAKE_JOBS"
+"${EMMAKE[@]}" make install

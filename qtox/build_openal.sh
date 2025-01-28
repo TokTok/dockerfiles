@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "openal" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64" "$@"
+parse_arch --dep "openal" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm" "$@"
 
 if [ "$SCRIPT_ARCH" = "win32" ] || [ "$SCRIPT_ARCH" = "win64" ]; then
   "$SCRIPT_DIR/download/download_openal.sh" patched
@@ -34,7 +34,7 @@ fi
 
 export CFLAGS="-fPIC"
 export CXXFLAGS="-fPIC -std=c++20"
-cmake \
+"${EMCMAKE[@]}" cmake \
   "$CMAKE_TOOLCHAIN_FILE" \
   -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
   -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \

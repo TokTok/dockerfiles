@@ -1,0 +1,11 @@
+diff --color -ru libsodium-1.0.20/src/libsodium/randombytes/randombytes.c libsodium-1.0.20-patched/src/libsodium/randombytes/randombytes.c
+--- libsodium-1.0.20/src/libsodium/randombytes/randombytes.c	2024-05-25 13:15:18.000000000 +0100
++++ libsodium-1.0.20-patched/src/libsodium/randombytes/randombytes.c	2025-01-28 19:28:03.603929189 +0000
+@@ -69,6 +69,7 @@
+     randombytes_init_if_needed();
+     return implementation->random();
+ #else
++    randombytes_stir(); // to make sure getRandomValue exists in all threads
+     return EM_ASM_INT_V({
+         return Module.getRandomValue();
+     });

@@ -16,7 +16,7 @@ parse_arch --dep "mpfr" --supported "win32 win64" "$@"
 "$SCRIPT_DIR/download/download_mpfr.sh"
 
 CC_FOR_BUILD=gcc CFLAGS="-O2 -g0 -I/windows/include" LDFLAGS="-L/windows/lib" \
-  ./configure "$HOST_OPTION" \
+  ./configure "${HOST_OPTION[@]}" \
   --prefix="$DEP_PREFIX" \
   --enable-static \
   --disable-shared

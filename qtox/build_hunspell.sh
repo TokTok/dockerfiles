@@ -21,7 +21,7 @@ fi
 
 "$SCRIPT_DIR/download/download_hunspell.sh"
 
-./configure "$HOST_OPTION" \
+"${EMCONFIGURE[@]}" ./configure "${HOST_OPTION[@]}" \
   --prefix="$DEP_PREFIX" \
   "$ENABLE_STATIC" \
   "$ENABLE_SHARED" \
@@ -29,5 +29,5 @@ fi
   CXXFLAGS="-O2 -g0 $CROSS_CFLAG" \
   CFLAGS="-O2 -g0 $CROSS_CFLAG"
 
-make -j "$MAKE_JOBS"
-make install
+"${EMMAKE[@]}" make -j "$MAKE_JOBS"
+"${EMMAKE[@]}" make install

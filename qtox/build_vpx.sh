@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "vpx" --supported "linux-aarch64 linux-x86_64 win32 win64 macos-x86_64 macos-arm64 ios-arm64 ios-armv7 ios-armv7s iphonesimulator-arm64 iphonesimulator-x86_64" "$@"
+parse_arch --dep "vpx" --supported "linux-aarch64 linux-x86_64 win32 win64 macos-x86_64 macos-arm64 ios-arm64 ios-armv7 ios-armv7s iphonesimulator-arm64 iphonesimulator-x86_64 wasm" "$@"
 
 if [ "$SCRIPT_ARCH" == "win64" ]; then
   # There is a bug in gcc that breaks avx512 on 64-bit Windows https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54412
@@ -60,6 +60,10 @@ elif [ "$SCRIPT_ARCH" == "linux-aarch64" ]; then
   ARCH_FLAGS=""
   CROSS_ARG=""
   TARGET_ARG="arm64-linux-gcc"
+elif [ "$SCRIPT_ARCH" == "wasm" ]; then
+  ARCH_FLAGS=""
+  CROSS_ARG=""
+  TARGET_ARG="generic-gnu"
 else
   echo "Unsupported arch: $SCRIPT_ARCH"
   exit 1
@@ -80,7 +84,7 @@ CFLAGS="-O2 $ARCH_FLAGS $CROSS_CFLAG" \
   CXXFLAGS="-O2 $CROSS_CXXFLAG" \
   LDFLAGS="$CROSS_LDFLAG" \
   CROSS="$CROSS_ARG" \
-  ./configure \
+  "${EMCONFIGURE[@]}" ./configure \
   --target="$TARGET_ARG" \
   --prefix="$DEP_PREFIX" \
   "$ENABLE_STATIC" \
@@ -92,5 +96,5 @@ CFLAGS="-O2 $ARCH_FLAGS $CROSS_CFLAG" \
   --disable-unit-tests \
   --enable-pic
 
-make -j "$MAKE_JOBS"
-make install
+"${EMMAKE[@]}" make -j "$MAKE_JOBS"
+"${EMMAKE[@]}" make install

@@ -138,6 +138,7 @@ jobs:
           - fedora
           - flatpak-builder
           - ubuntu-lts
+          - wasm-builder
           - windows-builder.i686
           - windows-builder.x86_64
         include:

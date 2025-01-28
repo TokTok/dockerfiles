@@ -11,7 +11,14 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "ffmpeg" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64" "$@"
+parse_arch --dep "ffmpeg" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm" "$@"
+
+CONFIGURE_FLAGS=()
+if [ "$LIB_TYPE" = "shared" ]; then
+  CONFIGURE_FLAGS+=(--disable-static --enable-shared)
+else
+  CONFIGURE_FLAGS+=(--enable-static --disable-shared)
+fi
 
 if [ "$SCRIPT_ARCH" == "win64" ]; then
   FFMPEG_ARCH="x86_64"
@@ -21,18 +28,26 @@ elif [ "$SCRIPT_ARCH" == "win32" ]; then
   FFMPEG_ARCH="x86"
   TARGET_OS="mingw32"
   CROSS_PREFIX="$MINGW_ARCH-w64-mingw32-"
+elif [ "$SCRIPT_ARCH" == "wasm" ]; then
+  FFMPEG_ARCH="x86_32"
+  TARGET_OS="none"
+  CROSS_PREFIX=""
+  CONFIGURE_FLAGS+=(
+    --enable-cross-compile
+    --disable-inline-asm
+    --disable-x86asm
+    --cc="emcc"
+    --cxx="em++"
+    --nm="$EMSDK/upstream/bin/llvm-nm -g"
+    --ar="$EMSDK/upstream/bin/llvm-ar"
+    --as="$EMSDK/upstream/bin/llvm-as"
+    --ranlib="$EMSDK/upstream/bin/llvm-ranlib"
+    --dep-cc="emcc"
+  )
 else
   FFMPEG_ARCH=""
   TARGET_OS=""
   CROSS_PREFIX=""
-fi
-
-if [ "$LIB_TYPE" = "shared" ]; then
-  ENABLE_STATIC=--disable-static
-  ENABLE_SHARED=--enable-shared
-else
-  ENABLE_STATIC=--enable-static
-  ENABLE_SHARED=--disable-shared
 fi
 
 "$SCRIPT_DIR/download/download_ffmpeg.sh"
@@ -40,10 +55,9 @@ fi
 CFLAGS="$CROSS_CFLAG" \
   CPPFLAGS="$CROSS_CPPFLAG" \
   LDFLAGS="$CROSS_LDFLAG" \
-  ./configure --arch="$FFMPEG_ARCH" \
+  "${EMCONFIGURE[@]}" ./configure --arch="$FFMPEG_ARCH" \
   --enable-gpl \
-  "$ENABLE_STATIC" \
-  "$ENABLE_SHARED" \
+  "${CONFIGURE_FLAGS[@]}" \
   --prefix="$DEP_PREFIX" \
   --target-os="$TARGET_OS" \
   --cross-prefix="$CROSS_PREFIX" \

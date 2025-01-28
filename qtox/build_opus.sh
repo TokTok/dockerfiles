@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "opus" --supported "linux-aarch64 linux-x86_64 win32 win64 macos-x86_64 macos-arm64 ios-arm64 ios-armv7 ios-armv7s iphonesimulator-arm64 iphonesimulator-x86_64" "$@"
+parse_arch --dep "opus" --supported "linux-aarch64 linux-x86_64 win32 win64 macos-x86_64 macos-arm64 ios-arm64 ios-armv7 ios-armv7s iphonesimulator-arm64 iphonesimulator-x86_64 wasm" "$@"
 
 if [ "$LIB_TYPE" = "shared" ]; then
   ENABLE_STATIC=--disable-static
@@ -25,12 +25,12 @@ fi
 
 LDFLAGS="-fstack-protector $CROSS_LDFLAG" \
   CFLAGS="-O2 -fPIC -g0 $CROSS_CFLAG" \
-  ./configure "$HOST_OPTION" \
+  "${EMCONFIGURE[@]}" ./configure "${HOST_OPTION[@]}" \
   "--prefix=$DEP_PREFIX" \
   "$ENABLE_STATIC" \
   "$ENABLE_SHARED" \
   --disable-extra-programs \
   --disable-doc
 
-make -j "$MAKE_JOBS"
-make install
+"${EMMAKE[@]}" make -j "$MAKE_JOBS"
+"${EMMAKE[@]}" make install

@@ -112,6 +112,7 @@ RUN mkdir -p /src/opus \
 
 COPY download/download_sodium.sh /build/download/
 COPY build_sodium.sh /build/
+COPY patches/sodium.patch /build/patches/
 RUN mkdir -p /src/sodium \
  && cd /src/sodium \
  && /build/build_sodium.sh --arch "$SCRIPT_ARCH" \

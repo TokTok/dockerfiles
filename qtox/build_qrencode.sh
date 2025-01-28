@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "qrencode" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64" "$@"
+parse_arch --dep "qrencode" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm" "$@"
 
 if [ "$LIB_TYPE" = "shared" ]; then
   BUILD_SHARED_LIBS=ON
@@ -21,7 +21,7 @@ fi
 
 "$SCRIPT_DIR/download/download_qrencode.sh"
 
-cmake . \
+"${EMCMAKE[@]}" cmake . \
   -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \
   -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
   -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOS_MINIMUM_SUPPORTED_VERSION" \

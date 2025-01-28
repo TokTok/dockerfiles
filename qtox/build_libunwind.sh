@@ -23,7 +23,7 @@ fi
 
 CFLAGS="-O3 -DNO_FRAME_POINTER $CROSS_CFLAG" \
   LDFLAGS="$CROSS_LDFLAG" \
-  ./configure "$HOST_OPTION" \
+  ./configure "${HOST_OPTION[@]}" \
   --prefix="$DEP_PREFIX" \
   "$ENABLE_STATIC" \
   "$ENABLE_SHARED"

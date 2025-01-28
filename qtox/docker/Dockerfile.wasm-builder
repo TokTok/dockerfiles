@@ -1,0 +1,172 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright © 2021 by The qTox Project Contributors
+# Copyright © 2024-2025 The TokTok team
+
+FROM toxchat/qtox:host-qt_6.8.1 AS base
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+ autoconf \
+ automake \
+ ca-certificates \
+ ccache \
+ curl \
+ git \
+ libtool \
+ pkg-config \
+ python3 \
+ tclsh \
+ unzip \
+ yasm \
+ zip \
+ xz-utils \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /work/emsdk
+RUN git clone --depth=1 https://github.com/emscripten-core/emsdk /work/emsdk \
+ && ./emsdk install 4.0.1 \
+ && ./emsdk activate 4.0.1
+
+ARG SCRIPT_ARCH=wasm
+ENV SCRIPT_ARCH=$SCRIPT_ARCH
+
+# COPY --chmod=644 toolchain/windows-${ARCH}-toolchain.cmake /build/windows-toolchain.cmake
+
+COPY download/common.sh /build/download/
+COPY build_utils.sh /build/
+
+FROM base AS non-qt
+
+COPY download/download_ffmpeg.sh /build/download/
+COPY build_ffmpeg.sh /build/
+RUN mkdir -p /src/ffmpeg \
+ && cd /src/ffmpeg \
+ && /build/build_ffmpeg.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/ffmpeg
+
+COPY download/download_tomcrypt.sh /build/download/
+COPY build_tomcrypt.sh /build/
+
+RUN mkdir -p /src/tomcrypt \
+ && cd /src/tomcrypt \
+ && /build/build_tomcrypt.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/tomcrypt
+
+COPY download/download_sqlcipher.sh /build/download/
+COPY build_sqlcipher.sh /build/
+
+RUN mkdir -p /src/sqlcipher \
+ && cd /src/sqlcipher \
+ && /build/build_sqlcipher.sh  --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/sqlcipher
+
+COPY download/download_openal.sh /build/download/
+COPY build_openal.sh /build/
+COPY patches/openal-cmake-3-11.patch /build/patches/
+
+RUN mkdir -p /src/openal \
+ && cd /src/openal \
+ && /build/build_openal.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/openal
+
+COPY download/download_qrencode.sh /build/download/
+COPY build_qrencode.sh /build/
+RUN mkdir -p /src/qrencode \
+ && cd /src/qrencode \
+ && /build/build_qrencode.sh  --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/qrencode
+
+COPY download/download_libexif.sh /build/download/
+COPY build_libexif.sh /build/
+RUN mkdir -p /src/exif \
+ && cd /src/exif \
+ && /build/build_libexif.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/exif
+
+COPY download/download_opus.sh /build/download/
+COPY build_opus.sh /build/
+RUN mkdir -p /src/opus \
+ && cd /src/opus \
+ && /build/build_opus.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/opus
+
+COPY download/download_sodium.sh /build/download/
+COPY build_sodium.sh /build/
+COPY patches/sodium.patch /build/patches/
+RUN mkdir -p /src/sodium \
+ && cd /src/sodium \
+ && /build/build_sodium.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/sodium
+
+COPY download/download_vpx.sh /build/download/
+COPY build_vpx.sh /build/
+COPY patches/vpx.patch /build/patches/
+RUN mkdir -p /src/vpx \
+ && cd /src/vpx \
+ && /build/build_vpx.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/vpx
+
+COPY download/download_toxcore.sh /build/download/
+COPY build_toxcore.sh /build/
+RUN mkdir -p /src/toxcore \
+ && cd /src/toxcore \
+ && /build/build_toxcore.sh \
+ && rm -fr /src/toxcore
+
+FROM base as qt
+
+COPY download/download_zstd.sh /build/download/
+COPY build_zstd.sh /build/
+
+RUN mkdir -p /src/zstd \
+ && cd /src/zstd \
+ && /build/build_zstd.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/zstd
+
+COPY download/version_qt.sh /build/download/
+
+COPY download/download_qtbase.sh /build/download/
+COPY build_qtbase_wasm.sh /build/
+
+RUN mkdir -p /src/qtbase \
+ && cd /src/qtbase \
+ && /build/build_qtbase_wasm.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/qtbase
+
+COPY download/download_qttools.sh /build/download/
+COPY build_qttools.sh /build/
+
+RUN mkdir -p /src/qttools \
+ && cd /src/qttools \
+ && /build/build_qttools.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/qttools
+
+COPY download/download_qtsvg.sh /build/download/
+COPY build_qtsvg.sh /build/
+
+RUN mkdir -p /src/qtsvg \
+ && cd /src/qtsvg \
+ && /build/build_qtsvg.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/qtsvg
+
+COPY download/download_qtimageformats.sh /build/download/
+COPY build_qtimageformats.sh /build/
+
+RUN mkdir -p /src/qtimageformats \
+ && cd /src/qtimageformats \
+ && /build/build_qtimageformats.sh --arch "$SCRIPT_ARCH" \
+ && rm -fr /src/qtimageformats
+
+COPY --from=non-qt /work/include/ /work/include/
+COPY --from=non-qt /work/lib/ /work/lib/
+COPY --from=non-qt /work/share/ /work/share/
+
+RUN sed -i -e 's/_qt_test_emscripten_version()//' /work/qt/lib/cmake/Qt6Core/Qt6WasmMacros.cmake
+
+WORKDIR /qtox
+ENV HOME=/qtox

@@ -16,6 +16,7 @@ parse_arch --dep "qtremoteobjects" --supported "linux-x86_64 macos-arm64 macos-x
 mkdir _build && pushd _build
 "$QT_PREFIX/bin/qt-configure-module" .. \
   -- \
+  -DCMAKE_FIND_ROOT_PATH="$DEP_PREFIX" \
   -DCMAKE_CXX_FLAGS="-DQT_MESSAGELOGCONTEXT" \
   -Wno-dev
 cmake --build .

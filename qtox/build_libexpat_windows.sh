@@ -15,7 +15,7 @@ parse_arch --dep "libexpat" --supported "win32 win64" "$@"
 
 "$SCRIPT_DIR/download/download_libexpat.sh"
 
-CFLAGS="-O2 -g0" ./configure "$HOST_OPTION" \
+CFLAGS="-O2 -g0" ./configure "${HOST_OPTION[@]}" \
   --prefix="$DEP_PREFIX" \
   --enable-static \
   --disable-shared

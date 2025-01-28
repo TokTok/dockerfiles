@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "openssl" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64" "$@"
+parse_arch --dep "openssl" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm" "$@"
 
 if [ "$SCRIPT_ARCH" == "win64" ]; then
   OPENSSL_ARCH="mingw64"
@@ -28,6 +28,11 @@ elif [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
 elif [ "$SCRIPT_ARCH" == "linux-x86_64" ]; then
   OPENSSL_ARCH="linux-x86_64"
   CROSS_COMPILE_ARCH=""
+elif [ "$SCRIPT_ARCH" == "wasm" ]; then
+  OPENSSL_ARCH="no-asm"
+  CROSS_COMPILE_ARCH=""
+  export CC=emcc
+  export CXX=em++
 else
   echo "Unsupported arch: $SCRIPT_ARCH"
   exit 1
@@ -47,9 +52,11 @@ CFLAGS="-O2 $CROSS_CFLAG" \
   --prefix="$DEP_PREFIX" \
   --openssldir="$DEP_PREFIX/ssl" \
   "$ENABLE_SHARED" \
-  -no-tests -fPIC \
+  -no-tests \
+  -no-afalgeng \
+  -fPIC \
   "$CROSS_COMPILE_ARCH" \
   "$OPENSSL_ARCH"
 
-make -j "$MAKE_JOBS"
-make install_sw
+"${EMMAKE[@]}" make -j "$MAKE_JOBS"
+"${EMMAKE[@]}" make install_sw

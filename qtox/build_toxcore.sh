@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "toxcore" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64" "$@"
+parse_arch --dep "toxcore" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm" "$@"
 
 if [ "$LIB_TYPE" = "shared" ]; then
   ENABLE_STATIC=OFF
@@ -19,6 +19,12 @@ if [ "$LIB_TYPE" = "shared" ]; then
 else
   ENABLE_STATIC=ON
   ENABLE_SHARED=OFF
+fi
+
+if [ "$SCRIPT_ARCH" = "wasm" ]; then
+  MIN_LOGGER_LEVEL=TRACE
+else
+  MIN_LOGGER_LEVEL=DEBUG
 fi
 
 if [ -d "../../../c-toxcore" ]; then
@@ -32,9 +38,9 @@ else
   "$SCRIPT_DIR/download/download_toxcore.sh"
 fi
 
-cmake -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
+"${EMCMAKE[@]}" cmake -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
   -DBOOTSTRAP_DAEMON=OFF \
-  -DMIN_LOGGER_LEVEL=DEBUG \
+  -DMIN_LOGGER_LEVEL="$MIN_LOGGER_LEVEL" \
   -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \
   -DENABLE_STATIC="$ENABLE_STATIC" \
   -DENABLE_SHARED="$ENABLE_SHARED" \

@@ -13,20 +13,26 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "sqlcipher" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64" "$@"
-
-if [ "$LIB_TYPE" = "shared" ]; then
-  ENABLE_STATIC=--disable-static
-  ENABLE_SHARED=--enable-shared
-else
-  ENABLE_STATIC=--enable-static
-  ENABLE_SHARED=--disable-shared
-fi
+parse_arch --dep "sqlcipher" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm" "$@"
 
 "$SCRIPT_DIR/download/download_sqlcipher.sh"
 
+CONFIGURE_FLAGS=()
+if [ "$LIB_TYPE" = "shared" ]; then
+  CONFIGURE_FLAGS+=(--disable-static --enable-shared)
+else
+  CONFIGURE_FLAGS+=(--enable-static --disable-shared)
+fi
+
 CFLAGS="-O2 -g0 -DSQLITE_HAS_CODEC -I$DEP_PREFIX/include/ $CROSS_CFLAG"
-LDFLAGS="-lcrypto -L$DEP_PREFIX/lib/ -L$DEP_PREFIX/lib64/ $CROSS_LDFLAG"
+
+if [ "$SCRIPT_ARCH" = "wasm" ]; then
+  CONFIGURE_FLAGS+=(--with-crypto-lib=libtomcrypt)
+  CONFIGURE_FLAGS+=(BUILD_CC="cc" CC=/work/emsdk/upstream/emscripten/emcc)
+  LDFLAGS="-L$DEP_PREFIX/lib/ -L$DEP_PREFIX/lib64/ -L$DEP_PREFIX/libx32/"
+else
+  LDFLAGS="-lcrypto -L$DEP_PREFIX/lib/ -L$DEP_PREFIX/lib64/ -L$DEP_PREFIX/libx32/"
+fi
 
 if [ "$SCRIPT_ARCH" = "win32" ] || [ "$SCRIPT_ARCH" = "win64" ]; then
   sed -i s/'if test "$TARGET_EXEEXT" = ".exe"'/'if test ".exe" = ".exe"'/g configure
@@ -37,15 +43,15 @@ else
   LIBS=''
 fi
 
-./configure "$HOST_OPTION" \
+./configure "${HOST_OPTION[@]}" \
   --prefix="$DEP_PREFIX" \
-  "$ENABLE_STATIC" \
-  "$ENABLE_SHARED" \
+  "${CONFIGURE_FLAGS[@]}" \
   --disable-tcl \
   --enable-tempstore=yes \
   CFLAGS="$CFLAGS $CROSS_CFLAG" \
   LDFLAGS="$LDFLAGS $CROSS_LDFLAG" \
-  LIBS="$LIBS"
+  LIBS="$LIBS" ||
+  (cat config.log && exit 1)
 
 if [ "$SCRIPT_ARCH" = "win32" ] || [ "$SCRIPT_ARCH" = "win64" ]; then
   sed -i s/"TEXE = $"/"TEXE = .exe"/ Makefile

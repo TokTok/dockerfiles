@@ -90,6 +90,10 @@ parse_arch() {
   export MACOS_MINIMUM_SUPPORTED_VERSION
   export IOS_MINIMUM_SUPPORTED_VERSION
 
+  EMCONFIGURE=()
+  EMMAKE=()
+  EMCMAKE=()
+
   if [ "$SCRIPT_ARCH" == "win32" ] || [ "$SCRIPT_ARCH" == "win64" ]; then
     if [ "$SCRIPT_ARCH" == "win32" ]; then
       MINGW_ARCH="i686"
@@ -97,7 +101,7 @@ parse_arch() {
       MINGW_ARCH="x86_64"
     fi
     DEP_PREFIX=${DEP_PREFIX:-/windows}
-    HOST_OPTION="--host=$MINGW_ARCH-w64-mingw32"
+    HOST_OPTION=("--host=$MINGW_ARCH-w64-mingw32")
     CROSS_LDFLAG=""
     CROSS_CFLAG=""
     CROSS_CPPFLAG=""
@@ -107,7 +111,7 @@ parse_arch() {
   elif [ "$SCRIPT_ARCH" == "macos-x86_64" ] || [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
     DEP_PREFIX="${DEP_PREFIX:-/work}"
     mkdir -p "$DEP_PREFIX"
-    HOST_OPTION=''
+    HOST_OPTION=()
     MACOS_FLAGS="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
     CROSS_LDFLAG="$MACOS_FLAGS"
     CROSS_CFLAG="$MACOS_FLAGS"
@@ -119,7 +123,7 @@ parse_arch() {
     ARCH="${SCRIPT_ARCH#ios-}"
     DEP_PREFIX="${DEP_PREFIX:-/work}"
     mkdir -p "$DEP_PREFIX"
-    HOST_OPTION="--host=arm64-apple-darwin"
+    HOST_OPTION=("--host=arm64-apple-darwin")
     IOS_FLAGS="-miphoneos-version-min=$IOS_MINIMUM_SUPPORTED_VERSION -arch $ARCH -isysroot $(xcrun --sdk iphoneos --show-sdk-path)"
     CROSS_LDFLAG="$IOS_FLAGS"
     CROSS_CFLAG="$IOS_FLAGS"
@@ -131,7 +135,7 @@ parse_arch() {
     ARCH="${SCRIPT_ARCH#iphonesimulator-}"
     DEP_PREFIX="${DEP_PREFIX:-/work}"
     mkdir -p "$DEP_PREFIX"
-    HOST_OPTION="--host=arm64-apple-darwin"
+    HOST_OPTION=("--host=arm64-apple-darwin")
     IOS_FLAGS="-arch $ARCH -isysroot $(xcrun --sdk iphonesimulator --show-sdk-path)"
     CROSS_LDFLAG="$IOS_FLAGS"
     CROSS_CFLAG="$IOS_FLAGS"
@@ -142,13 +146,28 @@ parse_arch() {
   elif [[ "$SCRIPT_ARCH" == "linux"* ]]; then
     DEP_PREFIX="${DEP_PREFIX:-/work}"
     mkdir -p "$DEP_PREFIX"
-    HOST_OPTION=''
+    HOST_OPTION=()
     CROSS_LDFLAG=""
     CROSS_CFLAG=""
     CROSS_CPPFLAG=""
     CROSS_CXXFLAG=""
     MAKE_JOBS="$(nproc)"
     CMAKE_TOOLCHAIN_FILE=""
+  elif [ "$SCRIPT_ARCH" == "wasm" ]; then
+    DEP_PREFIX="${DEP_PREFIX:-/work}"
+    mkdir -p "$DEP_PREFIX"
+    HOST_OPTION=("--host=wasm32-unknown-emscripten" "--build=x86_64-pc-linux-gnu")
+    CROSS_LDFLAG=""
+    CROSS_CFLAG="-s USE_PTHREADS=1"
+    CROSS_CPPFLAG=""
+    CROSS_CXXFLAG="-s USE_PTHREADS=1"
+    MAKE_JOBS="$(nproc)"
+    CMAKE_TOOLCHAIN_FILE=""
+    LIB_TYPE=static
+    source "/work/emsdk/emsdk_env.sh"
+    EMCONFIGURE=(emconfigure)
+    EMMAKE=(emmake)
+    EMCMAKE=(emcmake)
   else
     echo "Unexpected arch $SCRIPT_ARCH"
     usage "$SUPPORTED"

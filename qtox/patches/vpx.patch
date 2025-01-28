@@ -1,0 +1,23 @@
+diff --color -ur libvpx-1.15.0/build/make/configure.sh libvpx-1.15.0-patched/build/make/configure.sh
+--- libvpx-1.15.0/build/make/configure.sh	2024-10-23 18:24:57.000000000 +0000
++++ libvpx-1.15.0-patched/build/make/configure.sh	2025-01-28 14:40:49.730194745 +0000
+@@ -996,8 +996,6 @@
+       add_ldflags "-arch ${toolchain%%-*}"
+       ;;
+     *-iphonesimulator-*)
+-      add_cflags  "-miphoneos-version-min=${IOS_VERSION_MIN}"
+-      add_ldflags "-miphoneos-version-min=${IOS_VERSION_MIN}"
+       iossim_sdk_dir="$(show_darwin_sdk_path iphonesimulator)"
+       if [ -d "${iossim_sdk_dir}" ]; then
+         add_cflags  "-isysroot ${iossim_sdk_dir}"
+diff --color -ur libvpx-1.15.0/configure libvpx-1.15.0-patched/configure
+--- libvpx-1.15.0/configure	2024-10-23 18:24:57.000000000 +0000
++++ libvpx-1.15.0-patched/configure	2025-01-28 14:41:08.792305046 +0000
+@@ -103,6 +103,7 @@
+ all_platforms="${all_platforms} arm64-darwin21-gcc"
+ all_platforms="${all_platforms} arm64-darwin22-gcc"
+ all_platforms="${all_platforms} arm64-darwin23-gcc"
++all_platforms="${all_platforms} arm64-iphonesimulator-gcc"
+ all_platforms="${all_platforms} arm64-linux-gcc"
+ all_platforms="${all_platforms} arm64-win64-gcc"
+ all_platforms="${all_platforms} arm64-win64-vs15"

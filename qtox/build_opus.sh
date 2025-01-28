@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "opus" --supported "linux-aarch64 linux-x86_64 win32 win64 macos-x86_64 macos-arm64 ios-arm64 ios-armv7 ios-armv7s ios-i386 ios-x86_64" "$@"
+parse_arch --dep "opus" --supported "linux-aarch64 linux-x86_64 win32 win64 macos-x86_64 macos-arm64 ios-arm64 ios-armv7 ios-armv7s iphonesimulator-arm64 iphonesimulator-x86_64" "$@"
 
 if [ "$LIB_TYPE" = "shared" ]; then
   ENABLE_STATIC=--disable-static

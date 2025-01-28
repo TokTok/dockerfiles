@@ -120,12 +120,19 @@ parse_arch() {
     DEP_PREFIX="${DEP_PREFIX:-/work}"
     mkdir -p "$DEP_PREFIX"
     HOST_OPTION="--host=arm64-apple-darwin"
-    if [ "$ARCH" = "i386" ] || [ "$ARCH" = "x86_64" ]; then
-      XC_SDK="iphonesimulator"
-    else
-      XC_SDK="iphoneos"
-    fi
-    IOS_FLAGS="-miphoneos-version-min=$IOS_MINIMUM_SUPPORTED_VERSION -arch $ARCH -isysroot $(xcrun --sdk "$XC_SDK" --show-sdk-path)"
+    IOS_FLAGS="-miphoneos-version-min=$IOS_MINIMUM_SUPPORTED_VERSION -arch $ARCH -isysroot $(xcrun --sdk iphoneos --show-sdk-path)"
+    CROSS_LDFLAG="$IOS_FLAGS"
+    CROSS_CFLAG="$IOS_FLAGS"
+    CROSS_CPPFLAG="$IOS_FLAGS"
+    CROSS_CXXFLAG="$IOS_FLAGS"
+    MAKE_JOBS="$(sysctl -n hw.ncpu)"
+    CMAKE_TOOLCHAIN_FILE=""
+  elif [[ "$SCRIPT_ARCH" == "iphonesimulator-"* ]]; then
+    ARCH="${SCRIPT_ARCH#iphonesimulator-}"
+    DEP_PREFIX="${DEP_PREFIX:-/work}"
+    mkdir -p "$DEP_PREFIX"
+    HOST_OPTION="--host=arm64-apple-darwin"
+    IOS_FLAGS="-arch $ARCH -isysroot $(xcrun --sdk iphonesimulator --show-sdk-path)"
     CROSS_LDFLAG="$IOS_FLAGS"
     CROSS_CFLAG="$IOS_FLAGS"
     CROSS_CPPFLAG="$IOS_FLAGS"

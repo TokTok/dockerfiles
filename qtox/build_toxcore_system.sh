@@ -18,6 +18,7 @@ build_toxcore() {
 
   cmake . \
     -DBOOTSTRAP_DAEMON=OFF \
+    -DEXPERIMENTAL_API=ON \
     -DMIN_LOGGER_LEVEL=DEBUG \
     -DCMAKE_BUILD_TYPE=Release \
     -GNinja \

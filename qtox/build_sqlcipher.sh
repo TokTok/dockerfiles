@@ -28,7 +28,7 @@ CFLAGS="-O2 -g0 -DSQLITE_HAS_CODEC -I$DEP_PREFIX/include/ $CROSS_CFLAG"
 
 if [ "$SCRIPT_ARCH" = "wasm" ]; then
   CONFIGURE_FLAGS+=(--with-crypto-lib=libtomcrypt)
-  CONFIGURE_FLAGS+=(BUILD_CC="cc" CC=/work/emsdk/upstream/emscripten/emcc)
+  CONFIGURE_FLAGS+=(BUILD_CC="cc" CC=/opt/buildhome/emsdk/upstream/emscripten/emcc)
   LDFLAGS="-L$DEP_PREFIX/lib/ -L$DEP_PREFIX/lib64/ -L$DEP_PREFIX/libx32/"
 else
   LDFLAGS="-lcrypto -L$DEP_PREFIX/lib/ -L$DEP_PREFIX/lib64/ -L$DEP_PREFIX/libx32/"

@@ -109,7 +109,7 @@ parse_arch() {
     MAKE_JOBS="$(nproc)"
     CMAKE_TOOLCHAIN_FILE="-DCMAKE_TOOLCHAIN_FILE=/build/windows-toolchain.cmake"
   elif [ "$SCRIPT_ARCH" == "macos-x86_64" ] || [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
-    DEP_PREFIX="${DEP_PREFIX:-/work}"
+    DEP_PREFIX="${DEP_PREFIX:-/opt/buildhome}"
     mkdir -p "$DEP_PREFIX"
     HOST_OPTION=()
     MACOS_FLAGS="-mmacosx-version-min=$MACOS_MINIMUM_SUPPORTED_VERSION"
@@ -121,7 +121,7 @@ parse_arch() {
     CMAKE_TOOLCHAIN_FILE=""
   elif [[ "$SCRIPT_ARCH" == "ios-"* ]]; then
     ARCH="${SCRIPT_ARCH#ios-}"
-    DEP_PREFIX="${DEP_PREFIX:-/work}"
+    DEP_PREFIX="${DEP_PREFIX:-/opt/buildhome}"
     mkdir -p "$DEP_PREFIX"
     HOST_OPTION=("--host=arm64-apple-darwin")
     IOS_FLAGS="-miphoneos-version-min=$IOS_MINIMUM_SUPPORTED_VERSION -arch $ARCH -isysroot $(xcrun --sdk iphoneos --show-sdk-path)"
@@ -133,7 +133,7 @@ parse_arch() {
     CMAKE_TOOLCHAIN_FILE=""
   elif [[ "$SCRIPT_ARCH" == "iphonesimulator-"* ]]; then
     ARCH="${SCRIPT_ARCH#iphonesimulator-}"
-    DEP_PREFIX="${DEP_PREFIX:-/work}"
+    DEP_PREFIX="${DEP_PREFIX:-/opt/buildhome}"
     mkdir -p "$DEP_PREFIX"
     HOST_OPTION=("--host=arm64-apple-darwin")
     IOS_FLAGS="-arch $ARCH -isysroot $(xcrun --sdk iphonesimulator --show-sdk-path)"
@@ -144,7 +144,7 @@ parse_arch() {
     MAKE_JOBS="$(sysctl -n hw.ncpu)"
     CMAKE_TOOLCHAIN_FILE=""
   elif [[ "$SCRIPT_ARCH" == "linux"* ]]; then
-    DEP_PREFIX="${DEP_PREFIX:-/work}"
+    DEP_PREFIX="${DEP_PREFIX:-/opt/buildhome}"
     mkdir -p "$DEP_PREFIX"
     HOST_OPTION=()
     CROSS_LDFLAG=""
@@ -154,7 +154,7 @@ parse_arch() {
     MAKE_JOBS="$(nproc)"
     CMAKE_TOOLCHAIN_FILE=""
   elif [ "$SCRIPT_ARCH" == "wasm" ]; then
-    DEP_PREFIX="${DEP_PREFIX:-/work}"
+    DEP_PREFIX="${DEP_PREFIX:-/opt/buildhome}"
     mkdir -p "$DEP_PREFIX"
     HOST_OPTION=("--host=wasm32-unknown-emscripten" "--build=x86_64-pc-linux-gnu")
     CROSS_LDFLAG=""
@@ -164,7 +164,7 @@ parse_arch() {
     MAKE_JOBS="$(nproc)"
     CMAKE_TOOLCHAIN_FILE=""
     LIB_TYPE=static
-    source "/work/emsdk/emsdk_env.sh"
+    source "/opt/buildhome/emsdk/emsdk_env.sh"
     EMCONFIGURE=(emconfigure)
     EMMAKE=(emmake)
     EMCMAKE=(emcmake)

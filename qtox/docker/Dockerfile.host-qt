@@ -20,14 +20,14 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /work/build
+WORKDIR /opt/buildhome/build
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ARG QT_VERSION=6.2.4
 
 RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
  && cd qtbase-everywhere-src-* && mkdir _build && cd _build \
- && ../configure -prefix "/work/host/qt" \
+ && ../configure -prefix "/opt/buildhome/host/qt" \
     -release \
     -feature-zstd \
     -no-feature-brotli \
@@ -39,15 +39,15 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
     -no-opengl \
  && cmake --build . \
  && cmake --install . \
- && rm -rf /work/build
+ && rm -rf /opt/buildhome/build
 
 RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qttools-everywhere-src-$QT_VERSION.tar.xz") \
  && cd qttools-everywhere-src-* && mkdir _build && cd _build \
- && /work/host/qt/bin/qt-configure-module .. \
+ && /opt/buildhome/host/qt/bin/qt-configure-module .. \
     -no-feature-pixeltool \
     -no-feature-qdbus \
     -no-feature-qtdiag \
     -no-feature-qtplugininfo \
  && cmake --build . \
  && cmake --install . \
- && rm -rf /work/build
+ && rm -rf /opt/buildhome/build

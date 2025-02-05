@@ -42,7 +42,7 @@ pushd _build
   -no-glib \
   -no-openssl \
   -device-option "QT_EMSCRIPTEN_ASYNCIFY=1" \
-  -qt-host-path /work/host/qt \
+  -qt-host-path /opt/buildhome/host/qt \
   -platform wasm-emscripten \
   -feature-thread \
   -feature-wasm-simd128 \

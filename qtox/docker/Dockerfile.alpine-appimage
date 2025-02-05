@@ -113,17 +113,17 @@ COPY build_toxcore.sh /build/
 RUN mkdir -p /src/toxcore \
  && cd /src/toxcore \
  && /build/build_toxcore.sh --arch "$SCRIPT_ARCH" --libtype shared \
- && rm -fr /src/toxcore
+ && rm -fr /opt/buildhome/work/toxcore
 
 # We're selective about KDE image format plugins for security reasons. We only
 # include the ones we've tested (e.g. with fuzzing).
-RUN mkdir /work/tmp \
+RUN mkdir /opt/buildhome/tmp \
  && for fmt in qoi; do \
-      cp "/work/qt/plugins/imageformats/kimg_$fmt.so" /work/tmp; \
+      cp "/opt/buildhome/qt/plugins/imageformats/kimg_$fmt.so" /opt/buildhome/tmp; \
     done \
- && rm -f /work/qt/plugins/imageformats/kimg_* \
- && mv /work/tmp/* /work/qt/plugins/imageformats/ \
- && rmdir /work/tmp
+ && rm -f /opt/buildhome/qt/plugins/imageformats/kimg_* \
+ && mv /opt/buildhome/tmp/* /opt/buildhome/qt/plugins/imageformats/ \
+ && rmdir /opt/buildhome/tmp
 
 WORKDIR /qtox
 ENV HOME=/qtox

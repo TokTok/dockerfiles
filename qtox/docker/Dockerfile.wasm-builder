@@ -27,8 +27,8 @@ RUN apt-get update \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /work/emsdk
-RUN git clone --depth=1 https://github.com/emscripten-core/emsdk /work/emsdk \
+WORKDIR /opt/buildhome/emsdk
+RUN git clone --depth=1 https://github.com/emscripten-core/emsdk /opt/buildhome/emsdk \
  && ./emsdk install 4.0.1 \
  && ./emsdk activate 4.0.1
 
@@ -162,11 +162,11 @@ RUN mkdir -p /src/qtimageformats \
  && /build/build_qtimageformats.sh --arch "$SCRIPT_ARCH" \
  && rm -fr /src/qtimageformats
 
-COPY --from=non-qt /work/include/ /work/include/
-COPY --from=non-qt /work/lib/ /work/lib/
-COPY --from=non-qt /work/share/ /work/share/
+COPY --from=non-qt /opt/buildhome/include/ /opt/buildhome/include/
+COPY --from=non-qt /opt/buildhome/lib/ /opt/buildhome/lib/
+COPY --from=non-qt /opt/buildhome/share/ /opt/buildhome/share/
 
-RUN sed -i -e 's/_qt_test_emscripten_version()//' /work/qt/lib/cmake/Qt6Core/Qt6WasmMacros.cmake
+RUN sed -i -e 's/_qt_test_emscripten_version()//' /opt/buildhome/qt/lib/cmake/Qt6Core/Qt6WasmMacros.cmake
 
 WORKDIR /qtox
 ENV HOME=/qtox

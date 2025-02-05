@@ -30,15 +30,15 @@ RUN ["apk", "add", \
 
 ENV CC=clang CXX=clang++
 
-WORKDIR /work/c-toxcore
+WORKDIR /opt/buildhome/c-toxcore
 # We use toxcore v0.2.14 here to test qTox builds against an old toxcore version.
 # qTox normally uses the most recent toxcore version, but wants to remain
 # compatible with older versions present in Linux distributions.
-RUN git clone --recurse-submodules https://github.com/TokTok/c-toxcore /work/c-toxcore \
+RUN git clone --recurse-submodules https://github.com/TokTok/c-toxcore /opt/buildhome/c-toxcore \
  && git checkout v0.2.14 \
  && cmake -B_build -H. -GNinja \
  && cmake --build _build --target install \
- && rm -rf /work/c-toxcore
+ && rm -rf /opt/buildhome/c-toxcore
 
 WORKDIR /qtox
 ENV HOME=/qtox

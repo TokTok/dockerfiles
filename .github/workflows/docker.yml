@@ -233,3 +233,41 @@ jobs:
           cache-from: type=registry,ref=toxchat/qtox:android-builder.${{ matrix.arch }}.${{ matrix.build_type }}_${{ matrix.version }}
           cache-to: type=inline
           push: ${{ github.event_name == 'push' }}
+
+  update-nightly-tag:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Move nightly tag to head for nightly release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: git tag -f nightly && git push origin nightly -f
+
+  deploy-qtox-wasm-buildhome:
+    # Extracts /opt/buildhome from the qtox:wasm-builder image and puts it into
+    # a nightly release artifact.
+    needs: [update-nightly-tag, qtox]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch wasm-builder image
+        run: docker pull toxchat/qtox:wasm-builder
+      - name: Extract /opt/buildhome from wasm-builder
+        run: docker run --rm --entrypoint tar toxchat/qtox:wasm-builder -c -C /opt buildhome > qtox-wasm-buildhome.tar
+      - name: Compress nightly release artifact
+        run: |
+          ls -lh qtox-wasm-buildhome.tar
+          gzip qtox-wasm-buildhome.tar
+          ls -lh qtox-wasm-buildhome.tar.gz
+      - name: Upload nightly release artifact
+        if: github.event_name == 'push'
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          tag: nightly
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          prerelease: true
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: qtox-wasm-buildhome.tar.gz

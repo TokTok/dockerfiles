@@ -133,7 +133,7 @@ RUN mkdir -p /src/toxcore \
  && /build/build_toxcore.sh \
  && rm -fr /src/toxcore
 
-FROM base as debug-export
+FROM base AS debug-export
 
 RUN mkdir -p /debug_export
 
@@ -174,7 +174,7 @@ RUN mkdir -p /src/gdb \
  && rm -fr /src/gdb \
  && cp /windows/bin/gdb.exe /debug_export/gdb.exe
 
-FROM base as qt
+FROM base AS qt
 
 COPY download/download_zstd.sh /build/download/
 COPY build_zstd.sh /build/

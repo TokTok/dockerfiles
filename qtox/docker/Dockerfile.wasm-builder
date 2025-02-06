@@ -118,7 +118,7 @@ RUN mkdir -p /src/toxcore \
  && /build/build_toxcore.sh \
  && rm -fr /src/toxcore
 
-FROM base as qt
+FROM base AS qt
 
 COPY download/download_zstd.sh /build/download/
 COPY build_zstd.sh /build/

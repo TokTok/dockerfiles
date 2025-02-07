@@ -5,6 +5,7 @@ ENV DEBIAN_FRONTEND="noninteractive"
 # Install flutter dependencies
 RUN apt-get update && apt-get install --no-install-recommends -y \
  ca-certificates \
+ clang \
  curl \
  fonts-droid-fallback \
  gdb \

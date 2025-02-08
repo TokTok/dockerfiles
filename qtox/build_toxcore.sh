@@ -38,7 +38,14 @@ else
   "$SCRIPT_DIR/download/download_toxcore.sh"
 fi
 
-"${EMCMAKE[@]}" cmake -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
+if [ -n "$SANITIZE" ]; then
+  export CFLAGS="-fsanitize=$CLANG_SANITIZER"
+  export CXXFLAGS="-fsanitize=$CLANG_SANITIZER"
+  CMAKE_BUILD_TYPE=Debug
+fi
+
+"${EMCMAKE[@]}" cmake \
+  -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
   -DBOOTSTRAP_DAEMON=OFF \
   -DEXPERIMENTAL_API=ON \
   -DMIN_LOGGER_LEVEL="$MIN_LOGGER_LEVEL" \

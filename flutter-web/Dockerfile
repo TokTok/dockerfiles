@@ -27,14 +27,12 @@ USER builder
 WORKDIR /home/builder
 
 # Clone the flutter repo
-RUN ["git", "clone", "--depth=1000", "https://github.com/flutter/flutter.git", "/home/builder/flutter"]
+RUN ["git", "clone", "--depth=1", "--branch=3.27.2", "https://github.com/flutter/flutter.git", "/home/builder/flutter"]
 
 # Set flutter path
-# RUN /home/builder/flutter/bin/flutter doctor -v
-ENV PATH="/home/builder/flutter/bin:/home/builder/flutter/bin/cache/dart-sdk/bin:${PATH}"
+ENV PATH="/home/builder/flutter/bin:/home/builder/flutter/bin/cache/dart-sdk/bin:$PATH"
 
 # Run flutter doctor
 RUN ["flutter", "doctor", "-v"]
 # Enable flutter web
-RUN ["flutter", "channel", "master"]
 RUN ["flutter", "config", "--enable-web"]

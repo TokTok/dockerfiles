@@ -27,7 +27,7 @@ USER builder
 WORKDIR /home/builder
 
 # Clone the flutter repo
-RUN ["git", "clone", "--depth=1", "--branch=3.27.2", "https://github.com/flutter/flutter.git", "/home/builder/flutter"]
+RUN ["git", "clone", "--depth=1", "--branch=3.29.0-0.3.pre", "https://github.com/flutter/flutter.git", "/home/builder/flutter"]
 
 # Set flutter path
 ENV PATH="/home/builder/flutter/bin:/home/builder/flutter/bin/cache/dart-sdk/bin:$PATH"

@@ -1,0 +1,79 @@
+x-shared-params: &shared_params
+  # Fixes various issues when building/running in the docker containers
+  # Known fixes:
+  #    * Appimage mounting
+  #    * Attaching to processes in GDB
+  #    * Fix tcl build due to pivot_root
+  cap_add:
+    - ALL
+  # Allows us to run app images from within the context of a docker image
+  devices:
+    - /dev/fuse:/dev/fuse
+  # X11 stuff
+  environment:
+    DISPLAY: ${DISPLAY:-:0}
+    XAUTHORITY: ${XAUTHORITY:-/root/.Xauthority}
+  volumes:
+    - .:/qtox
+    - /tmp/.X11-unix:/tmp/.X11-unix
+    - ~/.Xauthority:/root/.Xauthority
+  user: ${USER_ID:-0}:${GROUP_ID:-0}
+  network_mode: host
+
+services:
+  alpine:
+    image: toxchat/qtox:alpine
+    <<: *shared_params
+  alpine-appimage:
+    image: toxchat/qtox:alpine-appimage
+    <<: *shared_params
+  alpine-static:
+    image: toxchat/qtox:alpine-static
+    <<: *shared_params
+  android_builder.armeabi-v7a.debug_6.2.4:
+    image: toxchat/qtox:android-builder.armeabi-v7a.debug_6.2.4
+    <<: *shared_params
+  android_builder.armeabi-v7a.release_6.2.4:
+    image: toxchat/qtox:android-builder.armeabi-v7a.release_6.2.4
+    <<: *shared_params
+  android_builder.arm64-v8a.debug_6.2.4:
+    image: toxchat/qtox:android-builder.arm64-v8a.debug_6.2.4
+    <<: *shared_params
+  android_builder.arm64-v8a.release_6.2.4:
+    image: toxchat/qtox:android-builder.arm64-v8a.release_6.2.4
+    <<: *shared_params
+  android_builder.armeabi-v7a.debug_6.8.1:
+    image: toxchat/qtox:android-builder.armeabi-v7a.debug_6.8.1
+    <<: *shared_params
+  android_builder.armeabi-v7a.release_6.8.1:
+    image: toxchat/qtox:android-builder.armeabi-v7a.release_6.8.1
+    <<: *shared_params
+  android_builder.arm64-v8a.debug_6.8.1:
+    image: toxchat/qtox:android-builder.arm64-v8a.debug_6.8.1
+    <<: *shared_params
+  android_builder.arm64-v8a.release_6.8.1:
+    image: toxchat/qtox:android-builder.arm64-v8a.release_6.8.1
+    <<: *shared_params
+  debian:
+    image: toxchat/qtox:debian
+    <<: *shared_params
+  fedora:
+    image: toxchat/qtox:fedora
+    <<: *shared_params
+  flatpak:
+    image: toxchat/qtox:flatpak-builder
+    # Flatpak build uses pivot_root() in tcl build
+    privileged: true
+    <<: *shared_params
+  ubuntu_lts:
+    image: toxchat/qtox:ubuntu-lts
+    <<: *shared_params
+  windows_builder.i686:
+    image: toxchat/qtox:windows-builder.i686
+    <<: *shared_params
+  windows_builder.x86_64:
+    image: toxchat/qtox:windows-builder.x86_64
+    <<: *shared_params
+  wasm_builder:
+    image: toxchat/qtox:wasm-builder
+    <<: *shared_params

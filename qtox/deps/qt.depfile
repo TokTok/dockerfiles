@@ -1,0 +1,6 @@
+# Qt dependencies.
+qtbase
+qttools
+qtsvg
+qtimageformats
+qtwayland

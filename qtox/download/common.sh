@@ -6,12 +6,12 @@
 
 check_sha256() {
   if uname | grep -q Darwin; then
-    HASH_BIN="gsha256sum"
+    HASH_BIN=("shasum" "-a" "256")
   else
-    HASH_BIN="sha256sum"
+    HASH_BIN=("sha256sum")
   fi
 
-  if ! (echo "$1  $2" | "$HASH_BIN" -c --quiet --status -); then
+  if ! (echo "$1  $2" | "${HASH_BIN[@]}" -c --quiet --status -); then
     echo "Error: sha256 of $2 doesn't match the known one."
     echo "Expected: $1  $2"
     echo -n "Got: "

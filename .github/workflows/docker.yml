@@ -244,7 +244,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: git tag -f nightly && git push origin nightly -f
 
-  deploy-qtox-wasm-buildhome:
+  qtox-wasm-buildhome:
     # Extracts /opt/buildhome from the qtox:wasm-builder image and puts it into
     # a nightly release artifact.
     needs: [update-nightly-tag, qtox]
@@ -269,5 +269,45 @@ jobs:
           omitNameDuringUpdate: true
           prerelease: true
           replacesArtifacts: true
-          token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: qtox-wasm-buildhome.tar.gz
+
+  qt-static-macos:
+    needs: [update-nightly-tag]
+    strategy:
+      matrix:
+        arch: [arm64, x86_64]
+        macos: ["10.15", "12.0"]
+    runs-on: ${{ matrix.arch == 'arm64' && 'macos-14' || 'macos-13' }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache Qt
+        id: cache-qt
+        uses: actions/cache@v4
+        with:
+          path: |
+            /Users/runner/work/deps/qt
+          key: ${{ github.job }}-${{ matrix.arch }}-${{ matrix.macos }}-qt
+      - name: Homebrew dependencies to build dependencies
+        run: brew bundle --file qtox/deps/Brewfile-static
+      - name: Build Qt
+        if: steps.cache-qt.outputs.cache-hit != 'true'
+        run: qtox/deps/local_install_deps.sh
+          --arch ${{ matrix.arch }}
+          --macos-version ${{ matrix.macos }}
+          --dep-file qtox/deps/qt.depfile
+          --dep-prefix /Users/runner/work/deps
+      - name: Build tarball
+        run: tar -zcf qt-static-macos-${{ matrix.arch }}-${{ matrix.macos }}.tar.gz -C /Users/runner/work/deps qt
+      - name: Upload tarball to nightly release
+        if: github.event_name == 'push'
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          tag: nightly
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          prerelease: true
+          replacesArtifacts: true
+          artifacts: qt-static-macos-${{ matrix.arch }}-${{ matrix.macos }}.tar.gz

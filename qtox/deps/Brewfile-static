@@ -1,0 +1,5 @@
+# Dependencies for building Qt from source.
+brew "bash"  # macOS bash is too old
+brew "cmake"
+brew "git"
+brew "ninja"

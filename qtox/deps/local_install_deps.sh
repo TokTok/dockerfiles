@@ -11,6 +11,8 @@ BUILD_TYPE="release"
 SANITIZE=""
 MACOS_VERSION="12.0"
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+
 GIT_ROOT="$(git rev-parse --show-toplevel)"
 DEP_PREFIX="$GIT_ROOT/third_party/deps"
 
@@ -82,14 +84,14 @@ case "$(uname -s)" in
 esac
 
 install_deps() {
-  DOCKERFILES="$PWD"
+  QTOX_DIR="$(realpath "$SCRIPT_DIR/..")"
   for dep in "$@"; do
     mkdir -p "external/$dep"
     pushd "external/$dep"
-    if [ -f "$DOCKERFILES/qtox/build_${dep}_$SYSTEM.sh" ]; then
-      SCRIPT="$DOCKERFILES/qtox/build_${dep}_$SYSTEM.sh"
+    if [ -f "$QTOX_DIR/build_${dep}_$SYSTEM.sh" ]; then
+      SCRIPT="$QTOX_DIR/build_${dep}_$SYSTEM.sh"
     else
-      SCRIPT="$DOCKERFILES/qtox/build_$dep.sh"
+      SCRIPT="$QTOX_DIR/build_$dep.sh"
     fi
     "$SCRIPT" \
       --arch "$SYSTEM-$ARCH" \

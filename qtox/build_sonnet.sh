@@ -15,6 +15,14 @@ parse_arch --dep "sonnet" --supported "linux-x86_64 macos-x86_64 macos-arm64 win
 
 "$SCRIPT_DIR/download/download_sonnet.sh"
 
+sed_i() {
+  if [ "$(uname)" = "Darwin" ]; then
+    sed -i '' "$@"
+  else
+    sed -i "$@"
+  fi
+}
+
 if [ "$LIB_TYPE" = "shared" ]; then
   CMAKE_CXX_FLAGS=
   ENABLE_SHARED=ON
@@ -23,12 +31,16 @@ else
   CMAKE_CXX_FLAGS="-DSONNET_STATIC"
   ENABLE_SHARED=OFF
   HUNSPELL_LIBRARIES=("$(echo "$DEP_PREFIX"/lib/libhunspell*.a)")
-  find . -name CMakeLists.txt -exec sed -i '{}' -e 's/ MODULE$/ STATIC/g' ';'
-  find . -name CMakeLists.txt -exec sed -i '{}' -e 's/install(TARGETS sonnet_\([^ ]*\) /&EXPORT KF6SonnetTargets/g' ';'
+  CMAKE_LISTS=()
+  while IFS= read -r -d '' txt; do
+    CMAKE_LISTS+=("$txt")
+  done < <(find . -name CMakeLists.txt -print0)
+  sed_i -e 's/ MODULE$/ STATIC/g' "${CMAKE_LISTS[@]}"
+  sed_i -e 's/install(TARGETS sonnet_\([^ ]*\) /&EXPORT KF6SonnetTargets/g' "${CMAKE_LISTS[@]}"
   if [ "$SCRIPT_ARCH" = "macos-x86_64" ] || [ "$SCRIPT_ARCH" = "macos-arm64" ]; then
-    find . -name CMakeLists.txt -exec sed -i '{}' -e 's/target_link_libraries(KF6SonnetCore PUBLIC Qt6::Core)/target_link_libraries(KF6SonnetCore PUBLIC Qt6::Core sonnet_hunspell sonnet_nsspellchecker)/' ';'
+    sed_i -e 's/target_link_libraries(KF6SonnetCore PUBLIC Qt6::Core)/target_link_libraries(KF6SonnetCore PUBLIC Qt6::Core sonnet_hunspell sonnet_nsspellchecker)/' "${CMAKE_LISTS[@]}"
   else
-    find . -name CMakeLists.txt -exec sed -i '{}' -e 's/target_link_libraries(KF6SonnetCore PUBLIC Qt6::Core)/target_link_libraries(KF6SonnetCore PUBLIC Qt6::Core sonnet_hunspell)/' ';'
+    sed_i -e 's/target_link_libraries(KF6SonnetCore PUBLIC Qt6::Core)/target_link_libraries(KF6SonnetCore PUBLIC Qt6::Core sonnet_hunspell)/' "${CMAKE_LISTS[@]}"
   fi
 fi
 

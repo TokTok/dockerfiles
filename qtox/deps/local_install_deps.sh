@@ -114,4 +114,8 @@ while IFS= read -r line; do
   fi
 done <"$DEP_FILE"
 
-install_deps "${DEPS[@]}"
+if [ "${#DEPS[@]}" -eq 0 ]; then
+  echo "No dependencies found in $DEP_FILE"
+else
+  install_deps "${DEPS[@]}"
+fi

@@ -26,8 +26,9 @@ RUN groupadd -r -g 1000 builder \
 USER builder
 WORKDIR /home/builder
 
-# Clone the flutter repo
-RUN ["git", "clone", "--depth=1", "--branch=3.27.2", "https://github.com/flutter/flutter.git", "/home/builder/flutter"]
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+RUN tar -C /home/builder -Jxf <(curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.29.0-stable.tar.xz)
 
 # Set flutter path
 ENV PATH="/home/builder/flutter/bin:/home/builder/flutter/bin/cache/dart-sdk/bin:$PATH"

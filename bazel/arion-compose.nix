@@ -32,6 +32,7 @@ in
 
           environment.systemPackages = [
             pkgs.bazel_7
+            pkgs.bazel-remote
             pkgs.coreutils
             pkgs.git
             # Needed because coursier (for Kotlin) requires that java is in $PATH.

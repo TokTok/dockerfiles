@@ -50,21 +50,11 @@ jobs:
         if: ${{ matrix.has_base }}
         run: |
           cd ${{ matrix.image }} && ./build.sh
-      - name: Build and push (with base image)
-        if: ${{ matrix.has_base }}
-        uses: docker/build-push-action@v6
-        with:
-          context: "${{ matrix.image }}"
-          build-contexts: "base=oci-layout://${{ matrix.image }}/layers:base"
-          tags: toxchat/${{ matrix.image }}:latest
-          cache-from: type=registry,ref=toxchat/${{ matrix.image }}:latest
-          cache-to: type=inline
-          push: ${{ github.event_name == 'push' }}
       - name: Build and push
-        if: ${{ !matrix.has_base }}
         uses: docker/build-push-action@v6
         with:
           context: "${{ matrix.image }}"
+          build-contexts: ${{ matrix.has_base && format('base=oci-layout://{0}/layers:base', matrix.image) || '' }}
           tags: toxchat/${{ matrix.image }}:latest
           cache-from: type=registry,ref=toxchat/${{ matrix.image }}:latest
           cache-to: type=inline

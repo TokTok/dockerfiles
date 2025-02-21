@@ -1,7 +1,7 @@
 ---
 name: docker
 
-# Run on push and once a week to keep the images from bitrotting and to
+# Run on push and once a week to keep the images from bit-rotting and to
 # identify issues while no commits are being pushed.
 on:
   push:
@@ -13,7 +13,7 @@ on:
 
 # Cancel old PR builds when pushing new commits.
 concurrency:
-  group: build-${{ github.event.pull_request.number || github.ref }}
+  group: docker-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 env:
@@ -42,12 +42,13 @@ jobs:
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Login to DockerHub
+      - name: Login to GitHub Container Registry
         if: ${{ github.event_name == 'push' }}
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Build base image
@@ -59,8 +60,8 @@ jobs:
         with:
           context: "${{ matrix.image }}"
           build-contexts: ${{ matrix.has_base && format('base=oci-layout://{0}/layers:base', matrix.image) || '' }}
-          tags: toxchat/${{ matrix.image }}:latest
-          cache-from: type=registry,ref=toxchat/${{ matrix.image }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ matrix.image }}:latest
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ matrix.image }}:latest
           cache-to: type=inline
           push: ${{ github.event_name == 'push' }}
 
@@ -98,12 +99,13 @@ jobs:
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Login to DockerHub
+      - name: Login to GitHub Container Registry
         if: ${{ github.event_name == 'push' }}
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Build and push
@@ -113,8 +115,8 @@ jobs:
           file: "docker/Dockerfile.host-qt"
           build-args: |
             QT_VERSION=${{ matrix.version }}
-          tags: toxchat/qtox:host-qt_${{ matrix.version }}
-          cache-from: type=registry,ref=toxchat/qtox:host-qt_${{ matrix.version }}
+          tags: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/qtox:host-qt_${{ matrix.version }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.NAMESPACE }}/qtox:host-qt_${{ matrix.version }}
           cache-to: type=inline
           push: ${{ github.event_name == 'push' }}
 
@@ -151,12 +153,13 @@ jobs:
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Login to DockerHub
+      - name: Login to GitHub Container Registry
         if: ${{ github.event_name == 'push' }}
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Build and push
@@ -165,8 +168,8 @@ jobs:
           context: "{{defaultContext}}:qtox"
           file: "docker/Dockerfile.${{ matrix.file || matrix.image }}"
           build-args: ${{ matrix.args }}
-          tags: toxchat/qtox:${{ matrix.image }}
-          cache-from: type=registry,ref=toxchat/qtox:${{ matrix.image }}
+          tags: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/qtox:${{ matrix.image }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.NAMESPACE }}/qtox:${{ matrix.image }}
           cache-to: type=inline
           push: ${{ github.event_name == 'push' }}
 
@@ -205,12 +208,13 @@ jobs:
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Login to DockerHub
+      - name: Login to GitHub Container Registry
         if: ${{ github.event_name == 'push' }}
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Build and push
@@ -224,8 +228,8 @@ jobs:
             NDK_VERSION=${{ matrix.ndk_version }}
             QT_BUILD_TYPE=${{ matrix.build_type }}
             QT_VERSION=${{ matrix.version }}
-          tags: toxchat/qtox:android-builder.${{ matrix.arch }}.${{ matrix.build_type }}_${{ matrix.version }}
-          cache-from: type=registry,ref=toxchat/qtox:android-builder.${{ matrix.arch }}.${{ matrix.build_type }}_${{ matrix.version }}
+          tags: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/qtox:android-builder.${{ matrix.arch }}.${{ matrix.build_type }}_${{ matrix.version }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.NAMESPACE }}/qtox:android-builder.${{ matrix.arch }}.${{ matrix.build_type }}_${{ matrix.version }}
           cache-to: type=inline
           push: ${{ github.event_name == 'push' }}
 
@@ -238,33 +242,6 @@ jobs:
       - name: Move nightly tag to head for nightly release
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: git tag -f nightly && git push origin nightly -f
-
-  qtox-wasm-buildhome:
-    # Extracts /opt/buildhome from the qtox:wasm-builder image and puts it into
-    # a nightly release artifact.
-    needs: [update-nightly-tag, qtox]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Fetch wasm-builder image
-        run: docker pull toxchat/qtox:wasm-builder
-      - name: Extract /opt/buildhome from wasm-builder
-        run: docker run --rm --entrypoint tar toxchat/qtox:wasm-builder -c -C /opt buildhome > qtox-wasm-buildhome.tar
-      - name: Compress nightly release artifact
-        run: |
-          ls -lh qtox-wasm-buildhome.tar
-          gzip qtox-wasm-buildhome.tar
-          ls -lh qtox-wasm-buildhome.tar.gz
-      - name: Upload nightly release artifact
-        if: github.event_name == 'push'
-        uses: ncipollo/release-action@v1
-        with:
-          allowUpdates: true
-          tag: nightly
-          omitBodyDuringUpdate: true
-          omitNameDuringUpdate: true
-          prerelease: true
-          replacesArtifacts: true
-          artifacts: qtox-wasm-buildhome.tar.gz
 
   qt-static-macos:
     needs: [update-nightly-tag]

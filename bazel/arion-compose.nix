@@ -7,7 +7,7 @@ in
   services.bazel =
     { pkgs, lib, ... }:
     {
-      image.name = "toxchat/bazel";
+      image.name = "ghcr.io/toktok/bazel";
 
       nixos = {
         useSystemd = true;

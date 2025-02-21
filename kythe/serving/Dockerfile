@@ -1,7 +1,7 @@
 # Extract index.
-FROM toxchat/kythe-release:latest as release
-FROM toxchat/kythe-tables:latest as tables
-FROM toxchat/kythe-webui:latest as webui
+FROM ghcr.io/toktok/kythe-release:latest as release
+FROM ghcr.io/toktok/kythe-tables:latest as tables
+FROM ghcr.io/toktok/kythe-webui:latest as webui
 FROM ubuntu:22.04
 
 COPY --from=release /opt/kythe /opt/kythe

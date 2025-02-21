@@ -9,7 +9,7 @@ my $SERVER = 'integration_test_server';
 my $WORKER = 'integration_test_worker';
 
 sub start {
-   open my $server, '-|', @RUN, $SERVER, '-p', '8980:8980', 'toxchat/buildfarm-server'
+   open my $server, '-|', @RUN, $SERVER, '-p', '8980:8980', 'ghcr.io/toktok/buildfarm-server'
       or die "could not start server: $!";
 
    while (my $line = <$server>) {
@@ -17,7 +17,7 @@ sub start {
       last if $line =~ 'INFO: buildfarm-server.* initialized';
    }
 
-   open my $worker, '-|', @RUN, $WORKER, 'toxchat/buildfarm-worker', $ENV{HOSTNAME}
+   open my $worker, '-|', @RUN, $WORKER, 'ghcr.io/toktok/buildfarm-worker', $ENV{HOSTNAME}
       or die "could not start worker $!";
 
    while (my $line = <$worker>) {

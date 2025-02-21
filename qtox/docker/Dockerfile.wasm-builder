@@ -2,7 +2,7 @@
 # Copyright © 2021 by The qTox Project Contributors
 # Copyright © 2024-2025 The TokTok team
 
-FROM toxchat/qtox:host-qt_6.8.1 AS base
+FROM ghcr.io/toktok/qtox:host-qt_6.8.1 AS base
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 

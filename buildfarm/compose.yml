@@ -3,14 +3,14 @@ services:
     image: "redis:alpine"
     ports: ["6379:6379"]
   server:
-    image: "toxchat/buildfarm-server"
+    image: "ghcr.io/toktok/buildfarm-server"
     build:
       context: "."
       dockerfile: "server.Dockerfile"
     depends_on: ["redis"]
     ports: ["8980:8980"]
   worker:
-    image: "toxchat/buildfarm-worker"
+    image: "ghcr.io/toktok/buildfarm-worker"
     build:
       context: "."
       dockerfile: "worker.Dockerfile"

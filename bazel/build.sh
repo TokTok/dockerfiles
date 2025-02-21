@@ -14,9 +14,9 @@ fi
 
 # Build a docker image.
 nix-shell -p arion --run 'arion build'
-IMAGE="$(nix-shell -p arion --run 'arion config' | grep -o 'toxchat/bazel:.*')"
+IMAGE="$(nix-shell -p arion --run 'arion config' | grep -o 'ghcr.io/toktok/bazel:.*')"
 
-docker tag "$IMAGE" "toxchat/bazel:base"
+docker tag "$IMAGE" "ghcr.io/toktok/bazel:base"
 
 mkdir layers
-docker save "toxchat/bazel:base" | tar -x -C layers
+docker save "ghcr.io/toktok/bazel:base" | tar -x -C layers

@@ -1,5 +1,5 @@
 # Extract index.
-FROM toxchat/kythe-buildenv:latest AS tables
+FROM ghcr.io/toktok/kythe-buildenv:latest AS tables
 
 # From: https://kythe.io/examples/#extracting-other-bazel-based-repositories
 RUN ["git", "clone", "--depth=50", "--recursive", "-j8",\

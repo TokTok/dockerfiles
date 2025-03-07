@@ -17,7 +17,7 @@ GIT_ROOT="$(git rev-parse --show-toplevel)"
 DEP_PREFIX="$GIT_ROOT/third_party/deps"
 
 usage() {
-  echo "Usage: $0 --project-name <project-name> [options]"
+  echo "Usage: $0 --dep-file <file> [options]"
   echo "Options:"
   echo "  --arch <arch>                   Architecture (arm64 or x86_64)"
   echo "  --build-type <build-type>       Build type (debug or release)"

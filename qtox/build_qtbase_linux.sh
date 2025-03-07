@@ -16,14 +16,28 @@ parse_arch --dep "qtbase" --supported "linux-x86_64" "$@"
 export CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
 export OBJCXXFLAGS="$CXXFLAGS"
 
+if [ -n "$SANITIZE" ]; then
+  QT_CONFIGURE_FLAGS=(-sanitize "$CLANG_SANITIZER")
+  BUILD_TYPE=debug
+else
+  QT_CONFIGURE_FLAGS=()
+fi
+
+if [ "$BUILD_TYPE" = "debug" ]; then
+  QT_CONFIGURE_FLAGS+=("-force-debug-info")
+else
+  QT_CONFIGURE_FLAGS+=("-no-force-debug-info")
+fi
+
 mkdir -p _build
 pushd _build
 ../configure \
   -prefix "$QT_PREFIX" \
   -appstore-compliant \
   -release \
-  "-$LIB_TYPE" \
   -force-asserts \
+  "${QT_CONFIGURE_FLAGS[@]}" \
+  "-$LIB_TYPE" \
   -qt-doubleconversion \
   -qt-harfbuzz \
   -qt-libjpeg \

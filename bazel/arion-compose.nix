@@ -19,7 +19,7 @@ in
           services.openssh.enable = true;
           services.nscd.enable = false;
 
-          system.stateVersion = "24.11";
+          system.stateVersion = "25.11";
           system.nssModules = lib.mkForce [ ];
 
           systemd.sockets.nix-daemon.enable = true;
@@ -31,12 +31,13 @@ in
           };
 
           environment.systemPackages = [
-            pkgs.bazel_7
+            pkgs.bazel_8
             pkgs.bazel-remote
             pkgs.coreutils
             pkgs.git
             # Needed because coursier (for Kotlin) requires that java is in $PATH.
             pkgs.jdk21_headless
+            pkgs.python311
           ];
 
           security.sudo.wheelNeedsPassword = false;

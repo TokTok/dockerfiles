@@ -7,7 +7,7 @@
 set -euo pipefail
 
 MPFR_VERSION=4.2.1
-MPFR_HASH=116715552bd966c85b417c424db1bbdf639f53836eb361549d1f8d6ded5cb4c6
+MPFR_HASH=ed8a128e1446e7cca92add1681a6431ba8c1a3250048c6c72648c1bafbe3e8d3
 
 source "$(dirname "$(realpath "$0")")/common.sh"
 

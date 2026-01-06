@@ -25,7 +25,7 @@ check_sha256() {
 download_file() {
   # Curl command wrapper to download a file to the CWD
   local URL="$1"
-  curl -L --connect-timeout 10 -O "$URL"
+  curl -L -k --connect-timeout 10 -O "$URL"
 }
 
 download_verify_extract_tarball() {

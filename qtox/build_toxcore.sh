@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "toxcore" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm" "$@"
+parse_arch --dep "toxcore" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm ios-arm64 iphonesimulator-arm64 iphonesimulator-x86_64" "$@"
 
 if [ "$LIB_TYPE" = "shared" ]; then
   ENABLE_STATIC=OFF
@@ -44,6 +44,12 @@ if [ -n "$SANITIZE" ]; then
   CMAKE_BUILD_TYPE=Debug
 fi
 
+if [[ "$SCRIPT_ARCH" == "ios-"* ]] || [[ "$SCRIPT_ARCH" == "iphonesimulator-"* ]]; then
+  DEPLOYMENT_TARGET="$IOS_MINIMUM_SUPPORTED_VERSION"
+else
+  DEPLOYMENT_TARGET="$MACOS_MINIMUM_SUPPORTED_VERSION"
+fi
+
 "${EMCMAKE[@]}" cmake \
   -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
   -DBOOTSTRAP_DAEMON=OFF \
@@ -52,8 +58,8 @@ fi
   -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \
   -DENABLE_STATIC="$ENABLE_STATIC" \
   -DENABLE_SHARED="$ENABLE_SHARED" \
-  "$CMAKE_TOOLCHAIN_FILE" \
-  -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOS_MINIMUM_SUPPORTED_VERSION" \
+  "${CMAKE_TOOLCHAIN_FILE[@]}" \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET="$DEPLOYMENT_TARGET" \
   -GNinja \
   -B_build \
   .

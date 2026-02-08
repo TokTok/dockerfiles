@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "openal" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm" "$@"
+parse_arch --dep "openal" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm ios-arm64 iphonesimulator-arm64 iphonesimulator-x86_64" "$@"
 
 if [ "$SCRIPT_ARCH" = "win32" ] || [ "$SCRIPT_ARCH" = "win64" ]; then
   "$SCRIPT_DIR/download/download_openal.sh" patched
@@ -32,13 +32,19 @@ else
   LIBTYPE=STATIC
 fi
 
+if [[ "$SCRIPT_ARCH" == "ios-"* ]] || [[ "$SCRIPT_ARCH" == "iphonesimulator-"* ]]; then
+  DEPLOYMENT_TARGET="$IOS_MINIMUM_SUPPORTED_VERSION"
+else
+  DEPLOYMENT_TARGET="$MACOS_MINIMUM_SUPPORTED_VERSION"
+fi
+
 export CFLAGS="-fPIC"
 export CXXFLAGS="-fPIC -std=c++20"
 "${EMCMAKE[@]}" cmake \
-  "$CMAKE_TOOLCHAIN_FILE" \
+  "${CMAKE_TOOLCHAIN_FILE[@]}" \
   -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
   -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \
-  -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOS_MINIMUM_SUPPORTED_VERSION" \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET="$DEPLOYMENT_TARGET" \
   -DCMAKE_MACOSX_RPATH="$MACOSX_RPATH" \
   -DALSOFT_UTILS=OFF \
   -DALSOFT_EXAMPLES=OFF \

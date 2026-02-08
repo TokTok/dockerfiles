@@ -9,7 +9,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "qtbase" --supported "macos-arm64 macos-x86_64" "$@"
+parse_arch --dep "qtbase" --supported "macos-arm64 macos-x86_64 ios-arm64 iphonesimulator-arm64 iphonesimulator-x86_64" "$@"
 
 "$SCRIPT_DIR/download/download_qtbase.sh"
 
@@ -29,15 +29,27 @@ else
   QT_CONFIGURE_FLAGS+=("-no-force-debug-info")
 fi
 
-if [ "$MACOS_MINIMUM_SUPPORTED_VERSION" != "10.15" ]; then
-  QT_CONFIGURE_FLAGS+=("-no-feature-printsupport")
+if [[ "$SCRIPT_ARCH" == "ios-"* ]]; then
+  QT_CONFIGURE_FLAGS+=("-sdk" "iphoneos" "-no-feature-printsupport" "-no-feature-icu" "-no-feature-filesystemwatcher")
+elif [[ "$SCRIPT_ARCH" == "iphonesimulator-"* ]]; then
+  QT_CONFIGURE_FLAGS+=("-sdk" "iphonesimulator" "-no-feature-printsupport" "-no-feature-icu" "-no-feature-filesystemwatcher")
+else
+  if [ "$MACOS_MINIMUM_SUPPORTED_VERSION" != "10.15" ]; then
+    QT_CONFIGURE_FLAGS+=("-no-feature-printsupport")
+  fi
+fi
+
+if [ -n "$QT_HOST_PATH" ]; then
+  QT_CONFIGURE_FLAGS+=("-qt-host-path" "$QT_HOST_PATH")
 fi
 
 # We want -Werror to catch warnings related to macOS version compatibility.
-sed -i '' -e 's/-Wextra/-Wextra -Werror "-Wno-#warnings" -Wno-cast-function-type-mismatch -Wno-deprecated-declarations -Wno-unused-but-set-variable -Wno-vla-cxx-extension/' cmake/QtCompilerFlags.cmake
+# We silence unused-variable because disabling features (like filesystemwatcher) can leave variables unused in Qt's source.
+sed -i '' -e 's/-Wextra/-Wextra -Werror "-Wno-#warnings" -Wno-cast-function-type-mismatch -Wno-deprecated-declarations -Wno-unused-but-set-variable -Wno-unused-variable -Wno-vla-cxx-extension/' cmake/QtCompilerFlags.cmake
 
 mkdir _build && pushd _build
 ../configure \
+  -platform macx-clang \
   --prefix="$QT_PREFIX" \
   -appstore-compliant \
   -static \
@@ -61,7 +73,7 @@ mkdir _build && pushd _build
   -no-openssl \
   -- \
   -DCMAKE_FIND_ROOT_PATH="$DEP_PREFIX" \
-  -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOS_MINIMUM_SUPPORTED_VERSION" \
+  "${CMAKE_TOOLCHAIN_FILE[@]}" \
   -Wno-dev
 cat config.summary
 cmake --build .

@@ -10,6 +10,7 @@ ARCH="$(uname -m)"
 BUILD_TYPE="release"
 SANITIZE=""
 MACOS_VERSION="12.0"
+QT_HOST_PATH=""
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
@@ -25,6 +26,7 @@ usage() {
   echo "  --dep-prefix <dep-prefix>       Dependency prefix (default: third_party/deps)"
   echo "  --sanitize <sanitize>           Sanitizer (address, thread, undefined)"
   echo "  --macos-version <macos-version> macOS version (default: 12.0)"
+  echo "  --host-path <host-path>         Host Qt path"
   echo "  --help, -h                      Show this help message"
 }
 
@@ -52,6 +54,10 @@ while (($# > 0)); do
       ;;
     --macos-version)
       MACOS_VERSION=$2
+      shift 2
+      ;;
+    --host-path)
+      QT_HOST_PATH=$2
       shift 2
       ;;
     --help | -h)
@@ -93,13 +99,19 @@ install_deps() {
     else
       SCRIPT="$QTOX_DIR/build_$dep.sh"
     fi
+    if [[ "$ARCH" == "ios-"* ]] || [[ "$ARCH" == "iphonesimulator-"* ]]; then
+      SCRIPT_ARCH="$ARCH"
+    else
+      SCRIPT_ARCH="$SYSTEM-$ARCH"
+    fi
     "$SCRIPT" \
-      --arch "$SYSTEM-$ARCH" \
+      --arch "$SCRIPT_ARCH" \
       --libtype "static" \
       --buildtype "$BUILD_TYPE" \
       --sanitize "$SANITIZE" \
       --prefix "$DEP_PREFIX" \
-      --macos "$MACOS_VERSION"
+      --macos "$MACOS_VERSION" \
+      --host-path "$QT_HOST_PATH"
     popd
     rm -rf "external/$dep"
   done

@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "openssl" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm" "$@"
+parse_arch --dep "openssl" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm ios-arm64 iphonesimulator-arm64 iphonesimulator-x86_64" "$@"
 
 if [ "$SCRIPT_ARCH" == "win64" ]; then
   OPENSSL_ARCH="mingw64"
@@ -24,6 +24,12 @@ elif [ "$SCRIPT_ARCH" == "macos-x86_64" ]; then
   CROSS_COMPILE_ARCH=""
 elif [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
   OPENSSL_ARCH="darwin64-arm64-cc"
+  CROSS_COMPILE_ARCH=""
+elif [[ "$SCRIPT_ARCH" == "ios-"* ]]; then
+  OPENSSL_ARCH="ios64-xcrun"
+  CROSS_COMPILE_ARCH=""
+elif [[ "$SCRIPT_ARCH" == "iphonesimulator-"* ]]; then
+  OPENSSL_ARCH="iossimulator-xcrun"
   CROSS_COMPILE_ARCH=""
 elif [ "$SCRIPT_ARCH" == "linux-x86_64" ]; then
   OPENSSL_ARCH="linux-x86_64"

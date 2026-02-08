@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "qrencode" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm" "$@"
+parse_arch --dep "qrencode" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm ios-arm64 iphonesimulator-arm64 iphonesimulator-x86_64" "$@"
 
 if [ "$LIB_TYPE" = "shared" ]; then
   BUILD_SHARED_LIBS=ON
@@ -21,11 +21,17 @@ fi
 
 "$SCRIPT_DIR/download/download_qrencode.sh"
 
+if [[ "$SCRIPT_ARCH" == "ios-"* ]] || [[ "$SCRIPT_ARCH" == "iphonesimulator-"* ]]; then
+  DEPLOYMENT_TARGET="$IOS_MINIMUM_SUPPORTED_VERSION"
+else
+  DEPLOYMENT_TARGET="$MACOS_MINIMUM_SUPPORTED_VERSION"
+fi
+
 "${EMCMAKE[@]}" cmake . \
   -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \
   -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
-  -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOS_MINIMUM_SUPPORTED_VERSION" \
-  "$CMAKE_TOOLCHAIN_FILE" \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET="$DEPLOYMENT_TARGET" \
+  "${CMAKE_TOOLCHAIN_FILE[@]}" \
   -DWITH_TOOLS=OFF \
   -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS"
 

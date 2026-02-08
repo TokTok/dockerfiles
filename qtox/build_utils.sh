@@ -33,7 +33,8 @@ parse_arch() {
   SANITIZE=
   EXTRA_ARGS=()
   MACOS_MINIMUM_SUPPORTED_VERSION=12.0
-  IOS_MINIMUM_SUPPORTED_VERSION=10.0
+  IOS_MINIMUM_SUPPORTED_VERSION=15.0
+  QT_HOST_PATH=""
 
   while (($# > 0)); do
     case $1 in
@@ -51,6 +52,10 @@ parse_arch() {
         ;;
       --prefix)
         DEP_PREFIX=$2
+        shift 2
+        ;;
+      --host-path)
+        QT_HOST_PATH=$2
         shift 2
         ;;
       --buildtype)
@@ -89,10 +94,12 @@ parse_arch() {
   assert_supported "$SCRIPT_ARCH" "$SUPPORTED"
   export MACOS_MINIMUM_SUPPORTED_VERSION
   export IOS_MINIMUM_SUPPORTED_VERSION
+  export QT_HOST_PATH
 
   EMCONFIGURE=()
   EMMAKE=()
   EMCMAKE=()
+  CMAKE_TOOLCHAIN_FILE=()
 
   if [ "$SCRIPT_ARCH" == "win32" ] || [ "$SCRIPT_ARCH" == "win64" ]; then
     if [ "$SCRIPT_ARCH" == "win32" ]; then
@@ -107,7 +114,8 @@ parse_arch() {
     CROSS_CPPFLAG=""
     CROSS_CXXFLAG=""
     MAKE_JOBS="$(nproc)"
-    CMAKE_TOOLCHAIN_FILE="-DCMAKE_TOOLCHAIN_FILE=/build/windows-toolchain.cmake"
+    CMAKE_TOOLCHAIN_FILE=("-DCMAKE_TOOLCHAIN_FILE=/build/windows-toolchain.cmake")
+    QT_HOST_PATH="${QT_HOST_PATH:-/opt/buildhome/host/qt}"
   elif [ "$SCRIPT_ARCH" == "macos-x86_64" ] || [ "$SCRIPT_ARCH" == "macos-arm64" ]; then
     DEP_PREFIX="${DEP_PREFIX:-/opt/buildhome}"
     mkdir -p "$DEP_PREFIX"
@@ -118,31 +126,33 @@ parse_arch() {
     CROSS_CPPFLAG="$MACOS_FLAGS"
     CROSS_CXXFLAG="$MACOS_FLAGS"
     MAKE_JOBS="$(sysctl -n hw.ncpu)"
-    CMAKE_TOOLCHAIN_FILE=""
+    CMAKE_TOOLCHAIN_FILE=("-DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOS_MINIMUM_SUPPORTED_VERSION")
   elif [[ "$SCRIPT_ARCH" == "ios-"* ]]; then
     ARCH="${SCRIPT_ARCH#ios-}"
     DEP_PREFIX="${DEP_PREFIX:-/opt/buildhome}"
     mkdir -p "$DEP_PREFIX"
     HOST_OPTION=("--host=arm64-apple-darwin")
-    IOS_FLAGS="-miphoneos-version-min=$IOS_MINIMUM_SUPPORTED_VERSION -arch $ARCH -isysroot $(xcrun --sdk iphoneos --show-sdk-path)"
+    SDK_PATH=$(xcrun --sdk iphoneos --show-sdk-path)
+    IOS_FLAGS="-miphoneos-version-min=$IOS_MINIMUM_SUPPORTED_VERSION -arch $ARCH -isysroot $SDK_PATH"
     CROSS_LDFLAG="$IOS_FLAGS"
     CROSS_CFLAG="$IOS_FLAGS"
     CROSS_CPPFLAG="$IOS_FLAGS"
     CROSS_CXXFLAG="$IOS_FLAGS"
     MAKE_JOBS="$(sysctl -n hw.ncpu)"
-    CMAKE_TOOLCHAIN_FILE=""
+    CMAKE_TOOLCHAIN_FILE=("-DCMAKE_SYSTEM_NAME=iOS" "-DCMAKE_OSX_SYSROOT=iphoneos" "-DCMAKE_OSX_ARCHITECTURES=$ARCH" "-DCMAKE_OSX_DEPLOYMENT_TARGET=$IOS_MINIMUM_SUPPORTED_VERSION")
   elif [[ "$SCRIPT_ARCH" == "iphonesimulator-"* ]]; then
     ARCH="${SCRIPT_ARCH#iphonesimulator-}"
     DEP_PREFIX="${DEP_PREFIX:-/opt/buildhome}"
     mkdir -p "$DEP_PREFIX"
     HOST_OPTION=("--host=arm64-apple-darwin")
-    IOS_FLAGS="-arch $ARCH -isysroot $(xcrun --sdk iphonesimulator --show-sdk-path)"
+    SDK_PATH=$(xcrun --sdk iphonesimulator --show-sdk-path)
+    IOS_FLAGS="-arch $ARCH -isysroot $SDK_PATH"
     CROSS_LDFLAG="$IOS_FLAGS"
     CROSS_CFLAG="$IOS_FLAGS"
     CROSS_CPPFLAG="$IOS_FLAGS"
     CROSS_CXXFLAG="$IOS_FLAGS"
     MAKE_JOBS="$(sysctl -n hw.ncpu)"
-    CMAKE_TOOLCHAIN_FILE=""
+    CMAKE_TOOLCHAIN_FILE=("-DCMAKE_SYSTEM_NAME=iOS" "-DCMAKE_OSX_SYSROOT=iphonesimulator" "-DCMAKE_OSX_ARCHITECTURES=$ARCH" "-DCMAKE_OSX_DEPLOYMENT_TARGET=$IOS_MINIMUM_SUPPORTED_VERSION")
   elif [[ "$SCRIPT_ARCH" == "linux"* ]]; then
     DEP_PREFIX="${DEP_PREFIX:-/opt/buildhome}"
     mkdir -p "$DEP_PREFIX"
@@ -152,7 +162,7 @@ parse_arch() {
     CROSS_CPPFLAG=""
     CROSS_CXXFLAG=""
     MAKE_JOBS="$(nproc)"
-    CMAKE_TOOLCHAIN_FILE=""
+    CMAKE_TOOLCHAIN_FILE=()
   elif [ "$SCRIPT_ARCH" == "wasm" ]; then
     DEP_PREFIX="${DEP_PREFIX:-/opt/buildhome}"
     mkdir -p "$DEP_PREFIX"
@@ -162,12 +172,13 @@ parse_arch() {
     CROSS_CPPFLAG=""
     CROSS_CXXFLAG="-s USE_PTHREADS=1"
     MAKE_JOBS="$(nproc)"
-    CMAKE_TOOLCHAIN_FILE=""
+    CMAKE_TOOLCHAIN_FILE=()
     LIB_TYPE=static
     source "/opt/buildhome/emsdk/emsdk_env.sh"
     EMCONFIGURE=(emconfigure)
     EMMAKE=(emmake)
     EMCMAKE=(emcmake)
+    QT_HOST_PATH="${QT_HOST_PATH:-/opt/buildhome/host/qt}"
   else
     echo "Unexpected arch $SCRIPT_ARCH"
     usage "$SUPPORTED"

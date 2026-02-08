@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "sonnet" --supported "linux-x86_64 macos-x86_64 macos-arm64 win32 win64 wasm" "$@"
+parse_arch --dep "sonnet" --supported "linux-x86_64 macos-x86_64 macos-arm64 win32 win64 wasm ios-arm64 iphonesimulator-arm64 iphonesimulator-x86_64" "$@"
 
 "$SCRIPT_DIR/download/download_sonnet.sh"
 
@@ -37,7 +37,7 @@ else
   done < <(find . -name CMakeLists.txt -print0)
   sed_i -e 's/ MODULE$/ STATIC/g' "${CMAKE_LISTS[@]}"
   sed_i -e 's/install(TARGETS sonnet_\([^ ]*\) /&EXPORT KF6SonnetTargets/g' "${CMAKE_LISTS[@]}"
-  if [ "$SCRIPT_ARCH" = "macos-x86_64" ] || [ "$SCRIPT_ARCH" = "macos-arm64" ]; then
+  if [ "$SCRIPT_ARCH" = "macos-x86_64" ] || [ "$SCRIPT_ARCH" = "macos-arm64" ] || [[ "$SCRIPT_ARCH" == "ios-"* ]] || [[ "$SCRIPT_ARCH" == "iphonesimulator-"* ]]; then
     sed_i -e 's/target_link_libraries(KF6SonnetCore PUBLIC Qt6::Core)/target_link_libraries(KF6SonnetCore PUBLIC Qt6::Core sonnet_hunspell sonnet_nsspellchecker)/' "${CMAKE_LISTS[@]}"
   else
     sed_i -e 's/target_link_libraries(KF6SonnetCore PUBLIC Qt6::Core)/target_link_libraries(KF6SonnetCore PUBLIC Qt6::Core sonnet_hunspell)/' "${CMAKE_LISTS[@]}"

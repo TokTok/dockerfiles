@@ -283,3 +283,76 @@ jobs:
           prerelease: true
           replacesArtifacts: true
           artifacts: qt-static-macos-${{ matrix.arch }}-${{ matrix.macos }}.tar.gz
+
+  qt-static-ios:
+    needs: [update-nightly-tag]
+    # needs: [update-nightly-tag, qt-static-macos]
+    strategy:
+      matrix:
+        arch: [ios-arm64, iphonesimulator-arm64, iphonesimulator-x86_64]
+        include:
+          - arch: ios-arm64
+            host_arch: arm64
+          - arch: iphonesimulator-arm64
+            host_arch: arm64
+          - arch: iphonesimulator-x86_64
+            host_arch: x86_64
+    runs-on: ${{ matrix.host_arch == 'arm64' && 'macos-14' || 'macos-15-intel' }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore host Qt
+        id: cache-host-qt
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            /Users/runner/work/host-qt
+          key: qt-static-macos-${{ matrix.host_arch }}-12.0-qt
+      # BEGIN: Temporary hack to speed up testing by using pre-built nightly host Qt.
+      # TODO: Remove this and uncomment the 'needs: [..., qt-static-macos]' above once stable.
+      - name: Download host Qt
+        if: steps.cache-host-qt.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p /Users/runner/work/host-qt
+          if ! curl -fL "https://github.com/TokTok/dockerfiles/releases/download/nightly/qt-static-macos-${{ matrix.host_arch }}-12.0.tar.gz" -o qt.tar.gz; then
+            echo "::error::Failed to download host Qt for ${{ matrix.host_arch }}. The nightly release might be missing this asset."
+            exit 1
+          fi
+          tar -zxf qt.tar.gz --strip-components=1 -C /Users/runner/work/host-qt
+      # END: Temporary hack.
+      - name: Debug host Qt
+        run: |
+          echo "Checking host Qt directory: /Users/runner/work/host-qt"
+          ls -F /Users/runner/work/host-qt
+          ls -F /Users/runner/work/host-qt/bin || echo "bin/ not found"
+          ls -F /Users/runner/work/host-qt/lib/cmake/Qt6 || echo "Qt6 CMake files not found"
+      - name: Cache Qt
+        id: cache-qt
+        uses: actions/cache@v4
+        with:
+          path: |
+            /Users/runner/work/deps/qt
+          key: ${{ github.job }}-${{ matrix.arch }}-qt
+      - name: Homebrew dependencies to build dependencies
+        run: brew bundle --file qtox/deps/Brewfile-static
+      - name: Build Qt
+        if: steps.cache-qt.outputs.cache-hit != 'true'
+        run: qtox/deps/local_install_deps.sh
+          --arch ${{ matrix.arch }}
+          --dep-file qtox/deps/qt.depfile
+          --dep-prefix /Users/runner/work/deps
+          --host-path /Users/runner/work/host-qt
+      - name: Build tarball
+        run: tar -zcf qt-static-${{ matrix.arch }}.tar.gz -C /Users/runner/work/deps qt
+      - name: Upload tarball to nightly release
+        if: github.event_name == 'push'
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          tag: nightly
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          prerelease: true
+          replacesArtifacts: true
+          artifacts: qt-static-${{ matrix.arch }}.tar.gz

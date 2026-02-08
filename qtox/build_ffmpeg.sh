@@ -11,7 +11,7 @@ readonly SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 source "$SCRIPT_DIR/build_utils.sh"
 
-parse_arch --dep "ffmpeg" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm" "$@"
+parse_arch --dep "ffmpeg" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm ios-arm64 iphonesimulator-arm64 iphonesimulator-x86_64" "$@"
 
 CONFIGURE_FLAGS=()
 if [ "$LIB_TYPE" = "shared" ]; then
@@ -44,6 +44,16 @@ elif [ "$SCRIPT_ARCH" == "wasm" ]; then
     --ranlib="$EMSDK/upstream/bin/llvm-ranlib"
     --dep-cc="emcc"
   )
+elif [[ "$SCRIPT_ARCH" == "ios-"* ]] || [[ "$SCRIPT_ARCH" == "iphonesimulator-"* ]]; then
+  FFMPEG_ARCH="${SCRIPT_ARCH#*-}"
+  if [ "$FFMPEG_ARCH" == "x86_64" ]; then
+    FFMPEG_ARCH="x86_64"
+  elif [ "$FFMPEG_ARCH" == "arm64" ]; then
+    FFMPEG_ARCH="aarch64"
+  fi
+  TARGET_OS="darwin"
+  CROSS_PREFIX=""
+  CONFIGURE_FLAGS+=(--enable-cross-compile)
 else
   FFMPEG_ARCH=""
   TARGET_OS=""

@@ -42,7 +42,7 @@ mkdir _build && pushd _build
   -no-feature-dbus \
   -no-opengl \
   -device-option "CROSS_COMPILE=$CROSS_COMPILE" \
-  -qt-host-path /opt/buildhome/host/qt \
+  -qt-host-path "$QT_HOST_PATH" \
   -platform linux-g++ \
   -xplatform win32-g++ \
   -openssl-linked \

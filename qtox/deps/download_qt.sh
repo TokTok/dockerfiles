@@ -45,4 +45,8 @@ while (($# > 0)); do
 done
 
 mkdir -p "$DEP_PREFIX"
-tar -zxf <(curl -L "https://github.com/TokTok/dockerfiles/releases/download/nightly/qt-static-macos-$ARCH-$MACOS_VERSION.tar.gz") -C "$DEP_PREFIX"
+if [[ "$ARCH" == "ios-"* ]] || [[ "$ARCH" == "iphonesimulator-"* ]]; then
+  tar -zxf <(curl -L "https://github.com/TokTok/dockerfiles/releases/download/nightly/qt-static-$ARCH.tar.gz") -C "$DEP_PREFIX"
+else
+  tar -zxf <(curl -L "https://github.com/TokTok/dockerfiles/releases/download/nightly/qt-static-macos-$ARCH-$MACOS_VERSION.tar.gz") -C "$DEP_PREFIX"
+fi

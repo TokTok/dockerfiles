@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright © 2024-2025 The TokTok team
+# Copyright © 2024-2026 The TokTok team
 
-FROM alpine:edge AS common
+FROM alpine:3.23 AS common
 
 RUN ["apk", "add", \
  "bash", \
@@ -108,6 +108,7 @@ RUN tar zxf <(curl -L https://github.com/alsa-project/alsa-lib/archive/refs/tags
 RUN tar Jxf <(curl -L https://github.com/libsndfile/libsndfile/releases/download/1.2.2/libsndfile-1.2.2.tar.xz) \
  && cd libsndfile-* \
  && cmake \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
   -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX="$SYSROOT/usr" \

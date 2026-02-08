@@ -28,7 +28,7 @@ WORKDIR /home/builder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN tar -C /home/builder -Jxf <(curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.29.0-stable.tar.xz)
+RUN tar -C /home/builder -Jxf <(curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.38.9-stable.tar.xz)
 
 # Set flutter path
 ENV PATH="/home/builder/flutter/bin:/home/builder/flutter/bin/cache/dart-sdk/bin:$PATH"

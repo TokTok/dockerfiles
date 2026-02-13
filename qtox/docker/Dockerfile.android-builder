@@ -302,8 +302,8 @@ RUN tar jxf <(wget -O- https://github.com/kcat/openal-soft/releases/download/1.2
 #COPY --from=build-libvpx $SYSROOT/usr $SYSROOT/usr
 #COPY --from=build-opus $SYSROOT/usr $SYSROOT/usr
 
-RUN tar zxf <(wget -O- https://github.com/TokTok/c-toxcore/releases/download/v0.2.20/c-toxcore-0.2.20.tar.gz) \
- && cd c-toxcore-0.2.20 \
+RUN tar zxf <(wget -O- https://github.com/TokTok/c-toxcore/releases/download/v0.2.22/c-toxcore-0.2.22.tar.gz) \
+ && cd c-toxcore-0.2.22 \
  && cmake \
   -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake" \
   -DCMAKE_BUILD_TYPE=Release \

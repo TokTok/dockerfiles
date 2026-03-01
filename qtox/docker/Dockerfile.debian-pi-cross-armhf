@@ -1,0 +1,54 @@
+# Dockerfile.debian-pi-cross-armhf
+# Cross-compilation environment for Raspberry Pi (ARMHF) based on Debian Bookworm
+
+FROM debian:bookworm
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN dpkg --add-architecture armhf && \
+    apt-get update
+
+# Install native amd64 build tools
+RUN apt-get install -y --no-install-recommends \
+    build-essential \
+    crossbuild-essential-armhf \
+    cmake \
+    git \
+    pkg-config \
+    ninja-build \
+    dpkg-dev \
+    debhelper \
+    qt6-base-dev \
+    qt6-tools-dev \
+    qt6-tools-dev-tools \
+    ca-certificates
+
+# Install target dependencies for armhf
+RUN apt-get install -y --no-install-recommends \
+    pkg-config:armhf \
+    qt6-base-dev:armhf \
+    libqt6svg6-dev:armhf \
+    qt6-tools-dev:armhf \
+    libavcodec-dev:armhf \
+    libavdevice-dev:armhf \
+    libavformat-dev:armhf \
+    libavutil-dev:armhf \
+    libswscale-dev:armhf \
+    libexif-dev:armhf \
+    libqrencode-dev:armhf \
+    libsqlcipher-dev:armhf \
+    libssl-dev:armhf \
+    libtoxcore-dev:armhf \
+    libsodium-dev:armhf \
+    libopus-dev:armhf \
+    libvpx-dev:armhf \
+    libopenal-dev:armhf \
+    libv4l-dev:armhf \
+    libx11-dev:armhf \
+    libxss-dev:armhf \
+    libunwind-dev:armhf \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+
+CMD ["/bin/bash"]

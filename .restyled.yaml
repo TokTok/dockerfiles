@@ -2,4 +2,12 @@
 restylers:
   - pyment:
       enabled: false
+  - prettier-markdown:
+      image: ghcr.io/toktok/restyler-prettier:v3.9.10-6
+  - prettier-yaml:
+      image: ghcr.io/toktok/restyler-prettier:v3.9.10-6
+  - shellharden:
+      image: ghcr.io/toktok/restyler-shellharden:v4.3.2
+  - shfmt:
+      image: ghcr.io/toktok/restyler-shfmt:v3.14.1
   - "*"

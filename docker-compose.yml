@@ -57,6 +57,12 @@ services:
   debian:
     image: ghcr.io/toktok/qtox:debian
     <<: *shared_params
+  debian-pi-cross-armhf:
+    image: ghcr.io/toktok/qtox:debian-pi-cross-armhf
+    <<: *shared_params
+  debian-pi-cross-arm64:
+    image: ghcr.io/toktok/qtox:debian-pi-cross-arm64
+    <<: *shared_params
   fedora:
     image: ghcr.io/toktok/qtox:fedora
     <<: *shared_params

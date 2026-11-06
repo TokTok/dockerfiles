@@ -8,6 +8,7 @@ RUN apt-get update \
  cmake \
  curl \
  git \
+ libavcodec-dev \
  libmsgpack-dev \
  libopus-dev \
  libsodium-dev \

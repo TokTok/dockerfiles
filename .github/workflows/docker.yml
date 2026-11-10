@@ -183,10 +183,10 @@ jobs:
         version: [6.2.4, 6.8.1]
         include:
           - version: 6.2.4
-            ndk_version: 21.3.6528147
+            ndk_version: 30.0.16248370
             android_api: 24
           - version: 6.8.1
-            ndk_version: 26.1.10909125
+            ndk_version: 30.0.16248370
             android_api: 26
           - arch: armeabi-v7a
             abi_args: |
@@ -249,7 +249,7 @@ jobs:
       matrix:
         arch: [arm64, x86_64]
         macos: ["10.15", "12.0"]
-    runs-on: ${{ matrix.arch == 'arm64' && 'macos-14' || 'macos-15-intel' }}
+    runs-on: ${{ matrix.arch == 'arm64' && 'macos-26' || 'macos-15-intel' }}
     permissions:
       contents: write
     steps:
@@ -301,7 +301,7 @@ jobs:
             host_arch: arm64
           - arch: iphonesimulator-x86_64
             host_arch: x86_64
-    runs-on: ${{ matrix.host_arch == 'arm64' && 'macos-14' || 'macos-15-intel' }}
+    runs-on: ${{ matrix.host_arch == 'arm64' && 'macos-26' || 'macos-15-intel' }}
     permissions:
       contents: write
     steps:

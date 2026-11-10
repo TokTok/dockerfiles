@@ -59,7 +59,7 @@ ENV PATH=$ANDROID_SDK_HOME/cmdline-tools/tools/bin:$PATH
 RUN yes | sdkmanager --licenses || true
 RUN ["sdkmanager", "platform-tools", "platforms;android-34", "build-tools;34.0.0"]
 
-ARG NDK_VERSION=21.3.6528147
+ARG NDK_VERSION=30.0.16248370
 RUN sdkmanager "ndk;$NDK_VERSION"
 
 ENV ANDROID_NDK_ROOT=$ANDROID_SDK_HOME/ndk/$NDK_VERSION
@@ -195,6 +195,7 @@ RUN tar Jxf <(wget -O- https://www.ffmpeg.org/releases/ffmpeg-7.1.tar.xz) \
  --disable-faan \
  --disable-vaapi \
  --disable-vdpau \
+ --disable-vulkan \
  --disable-zlib \
  --disable-xlib \
  --disable-bzlib \

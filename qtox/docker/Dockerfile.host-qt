@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
  libzstd-dev \
  ninja-build \
  pkg-config \
+ python3 \
  unzip \
  xz-utils \
  && apt-get clean \
@@ -33,7 +34,10 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ARG QT_VERSION=6.2.4
 
+# Qt 6.2's androiddeployqt passes -needed-libs to llvm-readobj, which NDK r30's
+# rejects. Newer Qt passes --needed-libs.
 RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
+ && sed -i -e 's/ -needed-libs / --needed-libs /' qtbase-everywhere-src-*/src/tools/androiddeployqt/main.cpp \
  && cd qtbase-everywhere-src-* && mkdir _build && cd _build \
  && ../configure -prefix "/opt/buildhome/host/qt" \
     -release \
@@ -59,3 +63,21 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
  && cmake --build . \
  && cmake --install . \
  && rm -rf /opt/buildhome/build
+
+# Qt Quick and the shader tools it needs, for the QML user interface (Qt 6.8
+# and newer).
+RUN dpkg --compare-versions "$QT_VERSION" lt 6.8 \
+ || { tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtshadertools-everywhere-src-$QT_VERSION.tar.xz") \
+ && cd qtshadertools-everywhere-src-* && mkdir _build && cd _build \
+ && /opt/buildhome/host/qt/bin/qt-configure-module .. \
+ && cmake --build . \
+ && cmake --install . \
+ && rm -rf /opt/buildhome/build; }
+
+RUN dpkg --compare-versions "$QT_VERSION" lt 6.8 \
+ || { tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtdeclarative-everywhere-src-$QT_VERSION.tar.xz") \
+ && cd qtdeclarative-everywhere-src-* && mkdir _build && cd _build \
+ && /opt/buildhome/host/qt/bin/qt-configure-module .. \
+ && cmake --build . \
+ && cmake --install . \
+ && rm -rf /opt/buildhome/build; }

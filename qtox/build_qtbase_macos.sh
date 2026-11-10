@@ -13,10 +13,16 @@ parse_arch --dep "qtbase" --supported "macos-arm64 macos-x86_64 ios-arm64 iphone
 
 "$SCRIPT_DIR/download/download_qtbase.sh"
 
+# Xcode 26's clang knows __yield, but only <arm_acle.h> declares it. Prefer
+# __builtin_arm_yield, as Qt's dev branch does (qyieldcpu.h is new in Qt 6.7).
+if [ -f src/corelib/thread/qyieldcpu.h ]; then
+  patch -p1 <"$SCRIPT_DIR/patches/qtbase-qyieldcpu.patch"
+fi
+
 export CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
 export OBJCXXFLAGS="$CXXFLAGS"
 
-if [ -n "$SANITIZE" ]; then
+if [ "$SANITIZE" != "" ]; then
   QT_CONFIGURE_FLAGS=(-sanitize "$CLANG_SANITIZER")
   BUILD_TYPE=debug
 else
@@ -39,13 +45,13 @@ else
   fi
 fi
 
-if [ -n "$QT_HOST_PATH" ]; then
+if [ "$QT_HOST_PATH" != "" ]; then
   QT_CONFIGURE_FLAGS+=("-qt-host-path" "$QT_HOST_PATH")
 fi
 
 # We want -Werror to catch warnings related to macOS version compatibility.
 # We silence unused-variable because disabling features (like filesystemwatcher) can leave variables unused in Qt's source.
-sed -i '' -e 's/-Wextra/-Wextra -Werror -Wno-unknown-warning-option "-Wno-#warnings" -Wno-cast-function-type-mismatch -Wno-deprecated-declarations -Wno-unused-but-set-variable -Wno-unused-variable -Wno-vla-cxx-extension/' cmake/QtCompilerFlags.cmake
+sed -i '' -e 's/-Wextra/-Wextra -Werror -Wno-unknown-warning-option "-Wno-#warnings" -Wno-cast-function-type-mismatch -Wno-character-conversion -Wno-deprecated-declarations -Wno-main -Wno-objc-missing-super-calls -Wno-unused-but-set-variable -Wno-unnecessary-virtual-specifier -Wno-unused-variable -Wno-vla-cxx-extension/' cmake/QtCompilerFlags.cmake
 
 mkdir _build && pushd _build
 ../configure \

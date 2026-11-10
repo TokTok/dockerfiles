@@ -81,3 +81,13 @@ RUN dpkg --compare-versions "$QT_VERSION" lt 6.8 \
  && cmake --build . \
  && cmake --install . \
  && rm -rf /opt/buildhome/build; }
+
+# Qt Remote Objects, for the QML user interface to talk to its Tox service
+# on Android.
+RUN dpkg --compare-versions "$QT_VERSION" lt 6.8 \
+ || { tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtremoteobjects-everywhere-src-$QT_VERSION.tar.xz") \
+ && cd qtremoteobjects-everywhere-src-* && mkdir _build && cd _build \
+ && /opt/buildhome/host/qt/bin/qt-configure-module .. \
+ && cmake --build . \
+ && cmake --install . \
+ && rm -rf /opt/buildhome/build; }

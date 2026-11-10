@@ -35,6 +35,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
  "ninja-build" \
  "openjdk-17-jdk-headless" \
  "pkg-config" \
+ "python3" \
  "tcl" \
  "unzip" \
  "wget" \
@@ -154,6 +155,34 @@ RUN tar Jxf <(wget -O- "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" |
  && cmake --build . \
  && cmake --install . \
  && rm -rf /opt/buildhome/build
+
+# Qt Quick and the shader tools it needs, for the QML user interface (Qt 6.8
+# and newer).
+RUN dpkg --compare-versions "$QT_VERSION" lt 6.8 \
+ || { tar Jxf <(wget -O- "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtshadertools-everywhere-src-$QT_VERSION.tar.xz") \
+ && cd qtshadertools-everywhere-src-* && mkdir _build && cd _build \
+ && /opt/buildhome/android/qt/bin/qt-configure-module .. \
+ && cmake --build . \
+ && cmake --install . \
+ && rm -rf /opt/buildhome/build; }
+
+RUN dpkg --compare-versions "$QT_VERSION" lt 6.8 \
+ || { tar Jxf <(wget -O- "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtdeclarative-everywhere-src-$QT_VERSION.tar.xz") \
+ && cd qtdeclarative-everywhere-src-* && mkdir _build && cd _build \
+ && /opt/buildhome/android/qt/bin/qt-configure-module .. \
+ && cmake --build . \
+ && cmake --install . \
+ && rm -rf /opt/buildhome/build; }
+
+# Qt Remote Objects, for the QML user interface to talk to its Tox service
+# on Android.
+RUN dpkg --compare-versions "$QT_VERSION" lt 6.8 \
+ || { tar Jxf <(wget -O- "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtremoteobjects-everywhere-src-$QT_VERSION.tar.xz") \
+ && cd qtremoteobjects-everywhere-src-* && mkdir _build && cd _build \
+ && /opt/buildhome/android/qt/bin/qt-configure-module .. \
+ && cmake --build . \
+ && cmake --install . \
+ && rm -rf /opt/buildhome/build; }
 
 # Base for the rest of the builds
 #FROM base AS build-base

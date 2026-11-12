@@ -1,22 +1,26 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright © 2024-2025 The TokTok team
 
-FROM alpine:3.21
+FROM alpine:3.24
 
 RUN ["apk", "add", \
  "alsa-plugins", \
+ "alsa-lib-dev", \
  "alsa-plugins-pulse", \
  "at-spi2-core-dev", \
  "bash", \
  "ccache", \
  "clang", \
+ "clang-extra-tools", \
  "cmake", \
  "compiler-rt", \
  "coreutils", \
  "curl", \
  "dbus-dev", \
  "ffmpeg-dev", \
+ "file", \
  "fontconfig-dev", \
+ "gcc", \
  "git", \
  "gzip", \
  "hunspell-dev", \
@@ -27,9 +31,11 @@ RUN ["apk", "add", \
  "libvpx-dev", \
  "libxkbcommon-dev", \
  "libxscrnsaver-dev", \
- "openal-soft-dev", \
+ "ninja-build", \
  "openssl-dev", \
  "opus-dev", \
+ "pipewire-dev", \
+ "pulseaudio-dev", \
  "samurai", \
  "sqlcipher-dev", \
  "xcb-util-cursor-dev", \
@@ -114,6 +120,29 @@ RUN mkdir -p /src/toxcore \
  && cd /src/toxcore \
  && /build/build_toxcore.sh --arch "$SCRIPT_ARCH" --libtype shared \
  && rm -fr /opt/buildhome/work/toxcore
+
+# Alpine's OpenAL pulls in Alpine's Qt, so we build our own.
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN tar zxf <(curl -L https://github.com/kcat/openal-soft/archive/refs/tags/1.25.2.tar.gz) \
+ && cd openal-soft-* \
+ && cmake -Wno-dev \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=/opt/buildhome \
+  -DCMAKE_INSTALL_LIBDIR=lib \
+  -DALSOFT_EXAMPLES=OFF \
+  -DALSOFT_UTILS=OFF \
+  -DALSOFT_REQUIRE_ALSA=TRUE \
+  -DALSOFT_REQUIRE_PIPEWIRE=TRUE \
+  -DALSOFT_REQUIRE_PULSEAUDIO=TRUE \
+  -DHAVE_WFUNCTION_EFFECTS=OFF \
+  -GNinja \
+  -DCMAKE_MAKE_PROGRAM=/usr/lib/ninja-build/bin/ninja \
+  -B_build \
+  . \
+ && cmake --build _build \
+ && cmake --install _build \
+ && cd .. \
+ && rm -rf openal-soft-*
 
 # We're selective about KDE image format plugins for security reasons. We only
 # include the ones we've tested (e.g. with fuzzing).

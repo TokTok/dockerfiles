@@ -94,7 +94,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        version: [6.2.4, 6.8.1]
+        version: [6.2.4, 6.12.0]
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker Buildx
@@ -180,12 +180,12 @@ jobs:
       matrix:
         arch: [armeabi-v7a, arm64-v8a]
         build_type: [debug, release]
-        version: [6.2.4, 6.8.1]
+        version: [6.2.4, 6.12.0]
         include:
           - version: 6.2.4
             ndk_version: 30.0.16248370
             android_api: 24
-          - version: 6.8.1
+          - version: 6.12.0
             ndk_version: 30.0.16248370
             android_api: 26
           - arch: armeabi-v7a

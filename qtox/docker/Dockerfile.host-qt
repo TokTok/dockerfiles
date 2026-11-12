@@ -2,7 +2,7 @@
 # Copyright © 2024-2025 The TokTok team
 
 # Build Qt for the host system.
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 # Retry downloads that fail for a moment, e.g. GitHub's occasional HTTP 500.
 # The settings apply while building this image, not in the image itself.
@@ -36,9 +36,13 @@ ARG QT_VERSION=6.2.4
 
 # Qt 6.2's androiddeployqt passes -needed-libs to llvm-readobj, which NDK r30's
 # rejects. Newer Qt passes --needed-libs.
-RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
+#
+# Qt before 6.7 fails to configure with zstd's Threads::Threads otherwise.
+RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/${QT_VERSION%.*}/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
  && sed -i -e 's/ -needed-libs / --needed-libs /' qtbase-everywhere-src-*/src/tools/androiddeployqt/main.cpp \
  && cd qtbase-everywhere-src-* && mkdir _build && cd _build \
+ && cmake_args=() \
+ && { dpkg --compare-versions "$QT_VERSION" ge 6.7 || cmake_args=(-- -DCMAKE_FIND_PACKAGE_TARGETS_GLOBAL=ON); } \
  && ../configure -prefix "/opt/buildhome/host/qt" \
     -release \
     -feature-zstd \
@@ -49,11 +53,12 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
     -no-feature-sharedmemory \
     -no-feature-sql \
     -no-opengl \
+    "${cmake_args[@]}" \
  && cmake --build . \
  && cmake --install . \
  && rm -rf /opt/buildhome/build
 
-RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qttools-everywhere-src-$QT_VERSION.tar.xz") \
+RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/${QT_VERSION%.*}/$QT_VERSION/submodules/qttools-everywhere-src-$QT_VERSION.tar.xz") \
  && cd qttools-everywhere-src-* && mkdir _build && cd _build \
  && /opt/buildhome/host/qt/bin/qt-configure-module .. \
     -no-feature-pixeltool \
@@ -67,7 +72,7 @@ RUN tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | 
 # Qt Quick and the shader tools it needs, for the QML user interface (Qt 6.8
 # and newer).
 RUN dpkg --compare-versions "$QT_VERSION" lt 6.8 \
- || { tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtshadertools-everywhere-src-$QT_VERSION.tar.xz") \
+ || { tar Jxf <(curl -L "https://download.qt.io/archive/qt/${QT_VERSION%.*}/$QT_VERSION/submodules/qtshadertools-everywhere-src-$QT_VERSION.tar.xz") \
  && cd qtshadertools-everywhere-src-* && mkdir _build && cd _build \
  && /opt/buildhome/host/qt/bin/qt-configure-module .. \
  && cmake --build . \
@@ -75,7 +80,7 @@ RUN dpkg --compare-versions "$QT_VERSION" lt 6.8 \
  && rm -rf /opt/buildhome/build; }
 
 RUN dpkg --compare-versions "$QT_VERSION" lt 6.8 \
- || { tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtdeclarative-everywhere-src-$QT_VERSION.tar.xz") \
+ || { tar Jxf <(curl -L "https://download.qt.io/archive/qt/${QT_VERSION%.*}/$QT_VERSION/submodules/qtdeclarative-everywhere-src-$QT_VERSION.tar.xz") \
  && cd qtdeclarative-everywhere-src-* && mkdir _build && cd _build \
  && /opt/buildhome/host/qt/bin/qt-configure-module .. \
  && cmake --build . \
@@ -85,7 +90,7 @@ RUN dpkg --compare-versions "$QT_VERSION" lt 6.8 \
 # Qt Remote Objects, for the QML user interface to talk to its Tox service
 # on Android.
 RUN dpkg --compare-versions "$QT_VERSION" lt 6.8 \
- || { tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtremoteobjects-everywhere-src-$QT_VERSION.tar.xz") \
+ || { tar Jxf <(curl -L "https://download.qt.io/archive/qt/${QT_VERSION%.*}/$QT_VERSION/submodules/qtremoteobjects-everywhere-src-$QT_VERSION.tar.xz") \
  && cd qtremoteobjects-everywhere-src-* && mkdir _build && cd _build \
  && /opt/buildhome/host/qt/bin/qt-configure-module .. \
  && cmake --build . \

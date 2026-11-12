@@ -18,8 +18,8 @@ if [ "$1" = "patched" ]; then
     "https://github.com/irungentoo/openal-soft-tox/archive/$OPENAL_VERSION.tar.gz" \
     "$OPENAL_HASH"
 else
-  OPENAL_VERSION=1.24.1
-  OPENAL_HASH=e1b6ec960e00bfed3d480330274b0f102dc10e4ae0dbb70fd9db80d6978165b1
+  OPENAL_VERSION=1.25.2
+  OPENAL_HASH=fb27e5839aa11f0e5b9d33756965291fad5d6909ab928ea1f796f4a1a6877894
 
   source "$(dirname "$(realpath "$0")")/common.sh"
 

@@ -5,8 +5,8 @@
 
 set -euo pipefail
 
-ZSTD_VERSION=1.5.6
-ZSTD_HASH=8c29e06cf42aacc1eafc4077ae2ec6c6fcb96a626157e0593d5e82a34fd403c1
+ZSTD_VERSION=1.5.7
+ZSTD_HASH=eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3
 
 source "$(dirname "$(realpath "$0")")/common.sh"
 

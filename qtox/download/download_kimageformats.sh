@@ -6,8 +6,8 @@
 set -euo pipefail
 
 # https://github.com/KDE/kimageformats/tags
-KIMAGEFORMATS_VERSION=6.9.0
-KIMAGEFORMATS_HASH=5db2860ddcdf430a875815509d914a3243a82d2c06aa06436ef6725d309da8f7
+KIMAGEFORMATS_VERSION=6.31.0
+KIMAGEFORMATS_HASH=e680111b71db669b782464fb3a273e49836a9363c0932be32724172e43707461
 
 source "$(dirname "$(realpath "$0")")/common.sh"
 

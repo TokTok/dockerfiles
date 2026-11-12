@@ -1,17 +1,20 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright © 2024-2026 The TokTok team
 
-FROM alpine:3.23 AS common
+FROM alpine:3.24 AS common
 
 RUN ["apk", "add", \
  "bash", \
  "ccache", \
  "clang", \
+ "clang-extra-tools", \
  "cmake", \
  "curl", \
  "file", \
+ "gcc", \
  "git", \
  "linux-headers", \
+ "ninja-build", \
  "pkgconf", \
  "python3", \
  "samurai"]
@@ -45,6 +48,7 @@ RUN ["apk", "add", \
  "libxslt", \
  "make", \
  "meson", \
+ "nasm", \
  "py3-mako", \
  "py3-packaging", \
  "py3-yaml", \
@@ -55,12 +59,12 @@ RUN ["apk", "add", \
 WORKDIR /opt/buildhome/build
 
 # Build gettext at the front because it's needed by multiple paths.
-RUN tar zxf <(curl -L https://ftp.gnu.org/pub/gnu/gettext/gettext-0.22.5.tar.gz) \
- gettext-0.22.5/build-aux \
- gettext-0.22.5/gettext-runtime \
- gettext-0.22.5/m4 \
- gettext-0.22.5/.version \
- && cd gettext-0.22.5/gettext-runtime \
+RUN tar zxf <(curl -L https://ftp.gnu.org/pub/gnu/gettext/gettext-1.0.tar.gz) \
+ gettext-1.0/build-aux \
+ gettext-1.0/gettext-runtime \
+ gettext-1.0/m4 \
+ gettext-1.0/.version \
+ && cd gettext-1.0/gettext-runtime \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
@@ -72,8 +76,8 @@ FROM base AS build-toxcore
 ARG CURL_HOME=/etc/download-retry
 ARG WGETRC=/etc/download-retry/wgetrc
 
-RUN tar zxf <(curl -L https://github.com/jedisct1/libsodium/releases/download/1.0.20-RELEASE/libsodium-1.0.20.tar.gz) \
- && cd libsodium-1.0.20 \
+RUN tar zxf <(curl -L https://github.com/jedisct1/libsodium/releases/download/1.0.22-RELEASE/libsodium-1.0.22.tar.gz) \
+ && cd libsodium-1.0.22 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
@@ -86,15 +90,15 @@ RUN tar zxf <(curl -L https://github.com/xiph/opus/releases/download/v1.5.2/opus
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl -L https://github.com/webmproject/libvpx/archive/refs/tags/v1.15.0.tar.gz) \
- && cd libvpx-1.15.0 \
+RUN tar zxf <(curl -L https://github.com/webmproject/libvpx/archive/refs/tags/v1.17.0.tar.gz) \
+ && cd libvpx-1.17.0 \
  && ./configure --prefix="$SYSROOT/usr" --disable-examples --disable-unit-tests --enable-pic \
  && make -j"$(nproc)" \
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN mkdir c-toxcore-v0.2.24-rc.4 \
- && tar zxf <(curl -L https://github.com/TokTok/c-toxcore/releases/download/v0.2.24-rc.4/c-toxcore-v0.2.24-rc.4.tar.gz) -C c-toxcore-v0.2.24-rc.4 \
+RUN mkdir c-toxcore-v0.2.24 \
+ && tar zxf <(curl -L https://github.com/TokTok/c-toxcore/releases/download/v0.2.24/c-toxcore-v0.2.24.tar.gz) -C c-toxcore-v0.2.24 \
  && cd c-toxcore-* \
  && cmake \
   -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
@@ -114,7 +118,7 @@ FROM base AS build-audio
 ARG CURL_HOME=/etc/download-retry
 ARG WGETRC=/etc/download-retry/wgetrc
 
-RUN tar zxf <(curl -L https://github.com/alsa-project/alsa-lib/archive/refs/tags/v1.2.13.tar.gz) \
+RUN tar zxf <(curl -L https://github.com/alsa-project/alsa-lib/archive/refs/tags/v1.2.16.1.tar.gz) \
  && cd alsa-lib-* \
  && autoreconf -fi \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared --disable-python --without-libdl CFLAGS="$CFLAGS -Dpage_size=alsa_page_size" \
@@ -162,7 +166,7 @@ FROM base AS build-udev
 ARG CURL_HOME=/etc/download-retry
 ARG WGETRC=/etc/download-retry/wgetrc
 
-RUN tar zxf <(curl -L https://github.com/eudev-project/eudev/releases/download/v3.2.14/eudev-3.2.14.tar.gz) \
+RUN tar zxf <(curl -L https://github.com/eudev-project/eudev/releases/download/v3.3.0/eudev-3.3.0.tar.gz) \
  && cd eudev-* \
  && apk add gperf \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
@@ -171,23 +175,23 @@ RUN tar zxf <(curl -L https://github.com/eudev-project/eudev/releases/download/v
  && apk del gperf \
  && rm -rf /opt/buildhome/build
 
-RUN tar jxf <(curl -L https://bitmath.org/code/mtdev/mtdev-1.1.6.tar.bz2) \
+RUN tar jxf <(curl -L https://bitmath.org/code/mtdev/mtdev-1.1.7.tar.bz2) \
  && cd mtdev-* \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar Jxf <(curl -L https://www.freedesktop.org/software/libevdev/libevdev-1.12.1.tar.xz) \
+RUN tar Jxf <(curl -L https://www.freedesktop.org/software/libevdev/libevdev-1.14.0.tar.xz) \
  && cd libevdev-* \
  && meson setup build/ -Ddefault_library=static -Ddocumentation=disabled -Dtests=disabled --prefix="$SYSROOT/usr" \
  && ninja -C build/ install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl -L https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.27.0/libinput-1.27.0.tar.gz) \
+RUN tar zxf <(curl -L https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.32.0/libinput-1.32.0.tar.gz) \
  && cd libinput-* \
  && sed -i -e 's/= *shared_library(/= library(/g' $(find . -name "meson.build") \
- && meson setup build/ -Ddefault_library=static -Ddebug-gui=false -Dlibwacom=false -Dtests=false --prefix="$SYSROOT/usr" \
+ && CFLAGS="$CFLAGS -Dstrv_find=libinput_strv_find" meson setup build/ -Ddefault_library=static -Ddebug-gui=false -Dlibwacom=false -Dtests=false --prefix="$SYSROOT/usr" \
  && ninja -C build/ install \
  && rm -rf /opt/buildhome/build
 
@@ -197,7 +201,7 @@ FROM base AS build-zstd
 ARG CURL_HOME=/etc/download-retry
 ARG WGETRC=/etc/download-retry/wgetrc
 
-RUN tar zxf <(wget -O- https://github.com/facebook/zstd/releases/download/v1.5.6/zstd-1.5.6.tar.gz) \
+RUN tar zxf <(wget -O- https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz) \
  && cd zstd-* \
  && cmake \
   -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
@@ -217,8 +221,8 @@ FROM base AS build-deps
 ARG CURL_HOME=/etc/download-retry
 ARG WGETRC=/etc/download-retry/wgetrc
 
-RUN tar jxf <(curl -L https://github.com/libexif/libexif/releases/download/v0.6.24/libexif-0.6.24.tar.bz2) \
- && cd libexif-0.6.24 \
+RUN tar jxf <(curl -L https://github.com/libexif/libexif/releases/download/v0.6.26/libexif-0.6.26.tar.bz2) \
+ && cd libexif-0.6.26 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
@@ -238,7 +242,7 @@ FROM base AS build-icu
 ARG CURL_HOME=/etc/download-retry
 ARG WGETRC=/etc/download-retry/wgetrc
 
-RUN tar zxf <(curl -L https://github.com/unicode-org/icu/releases/download/release-72-1/icu4c-72_1-src.tgz) \
+RUN tar zxf <(curl -L https://github.com/unicode-org/icu/releases/download/release-79.1/icu4c-79.1-sources.tgz) \
  && cd icu/source \
  && ./runConfigureICU Linux --enable-static --disable-shared --prefix="$SYSROOT/usr" \
  && make -j"$(nproc)" \
@@ -251,18 +255,20 @@ FROM base AS build-sqlcipher
 ARG CURL_HOME=/etc/download-retry
 ARG WGETRC=/etc/download-retry/wgetrc
 
-RUN tar zxf <(curl -L https://github.com/openssl/openssl/releases/download/openssl-3.4.0/openssl-3.4.0.tar.gz) \
- && cd openssl-3.4.0 \
- && ./Configure linux-x86_64-clang --prefix="$SYSROOT/usr" -no-shared -no-tests -fPIC \
+RUN tar zxf <(curl -L https://github.com/openssl/openssl/releases/download/openssl-4.1.0/openssl-4.1.0.tar.gz) \
+ && cd openssl-4.1.0 \
+ && ./Configure linux-x86_64-clang --prefix="$SYSROOT/usr" --libdir=lib -no-shared -no-tests -fPIC \
  && make -j"$(nproc)" \
  && make install_sw \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl -L https://github.com/sqlcipher/sqlcipher/archive/refs/tags/v4.6.1.tar.gz) \
- && cd sqlcipher-4.6.1 \
- && ./configure --prefix="$SYSROOT/usr" --disable-shared LDFLAGS="-L$SYSROOT/usr/lib64" \
+RUN tar zxf <(curl -L https://github.com/sqlcipher/sqlcipher/archive/refs/tags/v4.20.0.tar.gz) \
+ && cd sqlcipher-4.20.0 \
+ && ./configure --prefix="$SYSROOT/usr" --disable-shared --disable-tcl --with-tempstore=yes \
+    CFLAGS="$CFLAGS -I$SYSROOT/usr/include -DSQLITE_HAS_CODEC -DSQLITE_EXTRA_INIT=sqlcipher_extra_init -DSQLITE_EXTRA_SHUTDOWN=sqlcipher_extra_shutdown" LDFLAGS="-L$SYSROOT/usr/lib -lcrypto" \
  && make -j"$(nproc)" \
  && make install \
+ && sed -e "s/^Name: SQLite$/Name: SQLCipher/" -e "s/^Libs: .*/& -lcrypto/" "$SYSROOT/usr/lib/pkgconfig/sqlite3.pc" >"$SYSROOT/usr/lib/pkgconfig/sqlcipher.pc" \
  && rm -rf /opt/buildhome/build
 
 FROM base AS build-tslib
@@ -278,7 +284,7 @@ RUN tar zxf <(curl -L https://github.com/BLAKE2/libb2/releases/download/v0.98.1/
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl -L https://github.com/libts/tslib/releases/download/1.23/tslib-1.23.tar.gz) \
+RUN tar zxf <(curl -L https://github.com/libts/tslib/releases/download/1.24/tslib-1.24.tar.gz) \
  && cd tslib-* \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
@@ -291,8 +297,8 @@ FROM base AS build-ffi
 ARG CURL_HOME=/etc/download-retry
 ARG WGETRC=/etc/download-retry/wgetrc
 
-RUN tar zxf <(curl -L https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz) \
- && cd libffi-3.4.6 \
+RUN tar zxf <(curl -L https://github.com/libffi/libffi/releases/download/v3.8.0/libffi-3.8.0.tar.gz) \
+ && cd libffi-3.8.0 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared --enable-portable-binary --enable-pax_emutramp --disable-exec-static-tramp \
  && make -j"$(nproc)" \
  && make install \
@@ -304,8 +310,8 @@ FROM base AS build-xproto
 ARG CURL_HOME=/etc/download-retry
 ARG WGETRC=/etc/download-retry/wgetrc
 
-RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/proto/xorgproto-2024.1.tar.gz) \
- && cd xorgproto-2024.1 \
+RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/proto/xorgproto-2026.1.tar.gz) \
+ && cd xorgproto-2026.1 \
  && ./configure --prefix="$SYSROOT/usr" \
  && make -j"$(nproc)" \
  && make install \
@@ -318,8 +324,8 @@ RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/proto/randrpr
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/proto/renderproto-0.11.tar.gz) \
- && cd renderproto-0.11 \
+RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/proto/renderproto-0.11.1.tar.gz) \
+ && cd renderproto-0.11.1 \
  && ./configure --prefix="$SYSROOT/usr" \
  && make -j"$(nproc)" \
  && make install \
@@ -345,8 +351,8 @@ FROM base AS build-glib
 ARG CURL_HOME=/etc/download-retry
 ARG WGETRC=/etc/download-retry/wgetrc
 
-RUN tar Jxf <(curl -L https://download.gnome.org/sources/glib/2.83/glib-2.83.0.tar.xz) \
- && cd glib-2.83.0 \
+RUN tar Jxf <(curl -L https://download.gnome.org/sources/glib/2.90/glib-2.90.1.tar.xz) \
+ && cd glib-2.90.1 \
  && LDFLAGS="-static-pie" meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" -Dtests=false -Dglib_debug=disabled \
  && ninja -C build/ install \
  && rm -rf /opt/buildhome/build
@@ -357,8 +363,8 @@ FROM base AS build-libxml
 ARG CURL_HOME=/etc/download-retry
 ARG WGETRC=/etc/download-retry/wgetrc
 
-RUN tar zxf <(curl -L https://github.com/libexpat/libexpat/releases/download/R_2_6_4/expat-2.6.4.tar.gz) \
- && cd expat-2.6.4 \
+RUN tar zxf <(curl -L https://github.com/libexpat/libexpat/releases/download/R_2_10_0/expat-2.10.0.tar.gz) \
+ && cd expat-2.10.0 \
  && cmake \
   -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
   -DCMAKE_INSTALL_PREFIX="$SYSROOT/usr" \
@@ -371,8 +377,8 @@ RUN tar zxf <(curl -L https://github.com/libexpat/libexpat/releases/download/R_2
  && cmake --install _build \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl -L https://github.com/GNOME/libxml2/archive/refs/tags/v2.13.5.tar.gz) \
- && cd libxml2-2.13.5 \
+RUN tar zxf <(curl -L https://github.com/GNOME/libxml2/archive/refs/tags/v2.15.4.tar.gz) \
+ && cd libxml2-2.15.4 \
  && autoreconf -fi \
  && ./configure --prefix="$SYSROOT/usr" --with-sysroot="$SYSROOT" --disable-shared \
  && make -j"$(nproc)" \
@@ -385,8 +391,8 @@ FROM base AS build-x11
 ARG CURL_HOME=/etc/download-retry
 ARG WGETRC=/etc/download-retry/wgetrc
 
-RUN tar Jxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libpciaccess-0.18.1.tar.xz) \
- && cd libpciaccess-0.18.1 \
+RUN tar Jxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libpciaccess-0.19.tar.xz) \
+ && cd libpciaccess-0.19 \
  && meson setup _build --prefix="$SYSROOT/usr" --default-library=static \
  && ninja -C _build install \
  && rm -rf /opt/buildhome/build
@@ -407,8 +413,8 @@ RUN tar zxf <(curl https://xcb.freedesktop.org/dist/libpthread-stubs-0.5.tar.gz)
 
 COPY --from=build-xproto $SYSROOT/usr $SYSROOT/usr
 
-RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXau-1.0.11.tar.gz) \
- && cd libXau-1.0.11 \
+RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXau-1.0.12.tar.gz) \
+ && cd libXau-1.0.12 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
@@ -421,15 +427,15 @@ RUN tar zxf <(curl https://xcb.freedesktop.org/dist/libxcb-1.17.0.tar.gz) \
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/xtrans-1.5.2.tar.gz) \
- && cd xtrans-1.5.2 \
+RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/xtrans-1.6.0.tar.gz) \
+ && cd xtrans-1.6.0 \
  && ./configure --prefix="$SYSROOT/usr" \
  && make -j"$(nproc)" \
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libX11-1.8.tar.gz) \
- && cd libX11-1.8 \
+RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libX11-1.8.14.tar.gz) \
+ && cd libX11-1.8.14 \
  && ./configure --prefix="$SYSROOT/usr" --with-sysroot="$SYSROOT" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
@@ -437,36 +443,36 @@ RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libX11-1.
 
 COPY --from=build-ffi $SYSROOT/usr $SYSROOT/usr
 
-RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXrender-0.9.11.tar.gz) \
- && cd libXrender-0.9.11 \
+RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXrender-0.9.13.tar.gz) \
+ && cd libXrender-0.9.13 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXext-1.3.6.tar.gz) \
- && cd libXext-1.3.6 \
+RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXext-1.3.7.tar.gz) \
+ && cd libXext-1.3.7 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXrandr-1.5.4.tar.gz) \
- && cd libXrandr-1.5.4 \
+RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXrandr-1.5.5.tar.gz) \
+ && cd libXrandr-1.5.5 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXinerama-1.1.5.tar.gz) \
- && cd libXinerama-1.1.5 \
+RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXinerama-1.1.6.tar.gz) \
+ && cd libXinerama-1.1.6 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXfixes-6.0.1.tar.gz) \
- && cd libXfixes-6.0.1 \
+RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXfixes-6.0.2.tar.gz) \
+ && cd libXfixes-6.0.2 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
@@ -479,34 +485,34 @@ RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXcurso
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXi-1.8.2.tar.gz) \
- && cd libXi-1.8.2 \
+RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libXi-1.8.4.tar.gz) \
+ && cd libXi-1.8.4 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar Jxf <(curl -L https://dri.freedesktop.org/libdrm/libdrm-2.4.123.tar.xz) \
- && cd libdrm-2.4.123 \
+RUN tar Jxf <(curl -L https://dri.freedesktop.org/libdrm/libdrm-2.4.134.tar.xz) \
+ && cd libdrm-2.4.134 \
  && meson setup _build --prefix="$SYSROOT/usr" --default-library=static -Dintel=enabled -Dtests=false \
  && ninja -C _build install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl -L https://xorg.freedesktop.org/archive/individual/lib/libxshmfence-1.3.2.tar.gz) \
- && cd libxshmfence-1.3.2 \
+RUN tar zxf <(curl -L https://xorg.freedesktop.org/archive/individual/lib/libxshmfence-1.3.3.tar.gz) \
+ && cd libxshmfence-1.3.3 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl -L https://xorg.freedesktop.org/archive/individual/lib/libXxf86vm-1.1.5.tar.gz) \
- && cd libXxf86vm-1.1.5 \
+RUN tar zxf <(curl -L https://xorg.freedesktop.org/archive/individual/lib/libXxf86vm-1.1.7.tar.gz) \
+ && cd libXxf86vm-1.1.7 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl -L https://xorg.freedesktop.org/archive/individual/lib/libXScrnSaver-1.2.4.tar.gz) \
+RUN tar zxf <(curl -L https://xorg.freedesktop.org/archive/individual/lib/libXScrnSaver-1.2.5.tar.gz) \
  && cd libXScrnSaver-* \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
@@ -527,8 +533,8 @@ RUN git clone --depth=1 https://gitlab.freedesktop.org/wayland/wayland-protocols
  && ninja -C build/ install \
  && rm -rf /opt/buildhome/build
 
-RUN tar Jxf <(curl -L https://xkbcommon.org/download/libxkbcommon-1.7.0.tar.xz) \
- && cd libxkbcommon-1.7.0 \
+RUN tar zxf <(curl -L https://github.com/xkbcommon/libxkbcommon/archive/refs/tags/xkbcommon-1.13.2.tar.gz) \
+ && cd libxkbcommon-xkbcommon-1.13.2 \
  && LDFLAGS="-lXau -L$SYSROOT/usr/lib" meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" -Denable-tools=false -Dxkb-config-root="/usr/share/X11/xkb" -Dx-locale-root="/usr/share/X11/locale" -Dsysconfdir="/etc" \
  && ninja -C build/ install \
  && rm -rf /opt/buildhome/build
@@ -554,8 +560,8 @@ RUN tar zxf <(curl https://xcb.freedesktop.org/dist/xcb-util-image-0.4.1.tar.gz)
  && make install \
  && rm -rf /opt/buildhome/build
 
-RUN tar zxf <(curl https://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.5.tar.gz) \
- && cd xcb-util-cursor-0.1.5 \
+RUN tar zxf <(curl https://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.6.tar.gz) \
+ && cd xcb-util-cursor-0.1.6 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
  && make -j"$(nproc)" \
  && make install \
@@ -577,7 +583,7 @@ RUN tar zxf <(curl https://xcb.freedesktop.org/dist/xcb-util-wm-0.4.2.tar.gz) \
 
 COPY --from=build-glib $SYSROOT/usr $SYSROOT/usr
 
-RUN tar Jxf <(curl -L https://dbus.freedesktop.org/releases/dbus/dbus-1.16.0.tar.xz) \
+RUN tar Jxf <(curl -L https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz) \
  && cd dbus-* \
  && CFLAGS="-I$SYSROOT/usr/include" LDFLAGS="-lxcb -L$SYSROOT/usr/lib" meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" -Dtools=false \
  && ninja -C build/ install \
@@ -604,7 +610,7 @@ ENV OBJCXXFLAGS="$CXXFLAGS"
 COPY download/version_qt.sh /opt/buildhome/
 
 RUN . /opt/buildhome/version_qt.sh \
- && tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
+ && tar Jxf <(curl -L "https://download.qt.io/archive/qt/${QT_VERSION%.*}/$QT_VERSION/submodules/qtbase-everywhere-src-$QT_VERSION.tar.xz") \
  && mv qtbase-everywhere-src-* qtbase && mkdir qtbase/_build && cd qtbase/_build \
  && ../configure \
     -prefix "$SYSROOT/opt/qt" \
@@ -645,7 +651,7 @@ RUN . /opt/buildhome/version_qt.sh \
  && rm -rf /opt/buildhome/build
 
 RUN . /opt/buildhome/version_qt.sh \
- && tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qttools-everywhere-src-$QT_VERSION.tar.xz") \
+ && tar Jxf <(curl -L "https://download.qt.io/archive/qt/${QT_VERSION%.*}/$QT_VERSION/submodules/qttools-everywhere-src-$QT_VERSION.tar.xz") \
  && mv qttools-everywhere-src-* qttools && mkdir qttools/_build && cd qttools/_build \
  && "$SYSROOT/opt/qt/bin/qt-configure-module" .. \
     -no-feature-assistant \
@@ -668,7 +674,7 @@ RUN . /opt/buildhome/version_qt.sh \
  && rm -rf /opt/buildhome/build
 
 RUN . /opt/buildhome/version_qt.sh \
- && tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtsvg-everywhere-src-$QT_VERSION.tar.xz") \
+ && tar Jxf <(curl -L "https://download.qt.io/archive/qt/${QT_VERSION%.*}/$QT_VERSION/submodules/qtsvg-everywhere-src-$QT_VERSION.tar.xz") \
  && mv qtsvg-everywhere-src-* qtsvg && mkdir qtsvg/_build && cd qtsvg/_build \
  && "$SYSROOT/opt/qt/bin/qt-configure-module" .. \
     -- \
@@ -681,7 +687,7 @@ RUN . /opt/buildhome/version_qt.sh \
  && rm -rf /opt/buildhome/build
 
 RUN . /opt/buildhome/version_qt.sh \
- && tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtimageformats-everywhere-src-$QT_VERSION.tar.xz") \
+ && tar Jxf <(curl -L "https://download.qt.io/archive/qt/${QT_VERSION%.*}/$QT_VERSION/submodules/qtimageformats-everywhere-src-$QT_VERSION.tar.xz") \
  && mv qtimageformats-everywhere-src-* qtimageformats && mkdir qtimageformats/_build && cd qtimageformats/_build \
  && "$SYSROOT/opt/qt/bin/qt-configure-module" .. \
     -- \
@@ -694,7 +700,7 @@ RUN . /opt/buildhome/version_qt.sh \
  && rm -rf /opt/buildhome/build
 
 RUN . /opt/buildhome/version_qt.sh \
- && tar Jxf <(curl -L "https://download.qt.io/archive/qt/$(echo "$QT_VERSION" | grep -o '...')/$QT_VERSION/submodules/qtwayland-everywhere-src-$QT_VERSION.tar.xz") \
+ && tar Jxf <(curl -L "https://download.qt.io/archive/qt/${QT_VERSION%.*}/$QT_VERSION/submodules/qtwayland-everywhere-src-$QT_VERSION.tar.xz") \
  && mv qtwayland-everywhere-src-* qtwayland && mkdir qtwayland/_build && cd qtwayland/_build \
  && "$SYSROOT/opt/qt/bin/qt-configure-module" .. \
     -- \
@@ -717,8 +723,8 @@ COPY pkg-config-static /usr/bin/pkg-config
 RUN chmod 0755 /usr/bin/pkg-config
 
 # Needs X, so we build it at the end.
-RUN tar Jxf <(curl -L https://www.ffmpeg.org/releases/ffmpeg-7.1.tar.xz) \
- && cd ffmpeg-7.1 \
+RUN tar Jxf <(curl -L https://www.ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz) \
+ && cd ffmpeg-9.0.2 \
  && ./configure \
  --prefix="$SYSROOT/usr" \
  --disable-shared \
@@ -732,7 +738,6 @@ RUN tar Jxf <(curl -L https://www.ffmpeg.org/releases/ffmpeg-7.1.tar.xz) \
  --disable-iconv \
  --disable-network \
  --disable-muxers \
- --disable-postproc \
  --disable-swresample \
  --disable-swscale-alpha \
  --disable-dwt \
@@ -768,7 +773,7 @@ RUN tar Jxf <(curl -L https://www.ffmpeg.org/releases/ffmpeg-7.1.tar.xz) \
 COPY --from=build-audio $SYSROOT/usr $SYSROOT/usr
 
 # Needs dbus, so we build it at the end.
-RUN tar zxf <(curl -L https://github.com/kcat/openal-soft/archive/refs/tags/1.24.1.tar.gz) \
+RUN tar zxf <(curl -L https://github.com/kcat/openal-soft/archive/refs/tags/1.25.2.tar.gz) \
  && cd openal-soft-* \
  && cmake -Wno-dev \
   -DCMAKE_TOOLCHAIN_FILE="$SYSROOT/static-toolchain.cmake" \
@@ -788,7 +793,9 @@ RUN tar zxf <(curl -L https://github.com/kcat/openal-soft/archive/refs/tags/1.24
   -DALSOFT_REQUIRE_SSE2=TRUE \
   -DALSOFT_REQUIRE_SSE3=TRUE \
   -DALSOFT_REQUIRE_SSE4_1=TRUE \
+  -DHAVE_WFUNCTION_EFFECTS=OFF \
   -GNinja \
+  -DCMAKE_MAKE_PROGRAM=/usr/lib/ninja-build/bin/ninja \
   -B_build \
   . \
  && cmake --build _build \

@@ -7,8 +7,8 @@
 set -euo pipefail
 
 # https://github.com/jedisct1/libsodium/releases
-SODIUM_VERSION=1.0.20
-SODIUM_HASH=ebb65ef6ca439333c2bb41a0c1990587288da07f6c7fd07cb3a18cc18d30ce19
+SODIUM_VERSION=1.0.22
+SODIUM_HASH=adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349
 
 source "$(dirname "$(realpath "$0")")/common.sh"
 

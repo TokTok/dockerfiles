@@ -2,7 +2,7 @@
 # Copyright © 2021 by The qTox Project Contributors
 # Copyright © 2024-2025 The TokTok team
 
-FROM ghcr.io/toktok/qtox:host-qt_6.8.1 AS base
+FROM ghcr.io/toktok/qtox:host-qt_6.12.0 AS base
 
 # Retry downloads that fail for a moment, e.g. GitHub's occasional HTTP 500.
 # The settings apply while building this image, not in the image itself.
@@ -28,6 +28,7 @@ RUN dpkg --add-architecture i386 \
  gnupg \
  libarchive-tools \
  libtool \
+ nasm \
  nsis \
  python3-pefile \
  tclsh \
@@ -39,8 +40,12 @@ RUN dpkg --add-architecture i386 \
  g++-mingw-w64-x86-64 \
  gcc-mingw-w64-x86-64 \
  gdb-mingw-w64 \
- && curl -L --connect-timeout 10 https://dl.winehq.org/wine-builds/winehq.key | apt-key add - \
- && echo "deb https://dl.winehq.org/wine-builds/ubuntu/ oracular main" >> /etc/apt/sources.list.d/wine.list \
+ && mkdir -p /etc/apt/keyrings \
+ && curl -L --connect-timeout 10 https://dl.winehq.org/wine-builds/winehq.key \
+  | gpg --dearmor -o /etc/apt/keyrings/winehq.gpg \
+ && . /etc/os-release \
+ && echo "deb [signed-by=/etc/apt/keyrings/winehq.gpg] https://dl.winehq.org/wine-builds/ubuntu/ $VERSION_CODENAME main" \
+  >/etc/apt/sources.list.d/winehq.list \
  && apt-get update \
  && apt-get install -y --no-install-recommends \
  winbind \

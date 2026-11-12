@@ -24,13 +24,15 @@ else
   CONFIGURE_FLAGS+=(--enable-static --disable-shared)
 fi
 
-CFLAGS="-O2 -g0 -DSQLITE_HAS_CODEC -I$DEP_PREFIX/include/ $CROSS_CFLAG"
+CFLAGS="-O2 -g0 -DSQLITE_HAS_CODEC -DSQLITE_EXTRA_INIT=sqlcipher_extra_init -DSQLITE_EXTRA_SHUTDOWN=sqlcipher_extra_shutdown -I$DEP_PREFIX/include/ $CROSS_CFLAG"
 
 if [ "$SCRIPT_ARCH" = "wasm" ]; then
-  CONFIGURE_FLAGS+=(--with-crypto-lib=libtomcrypt)
-  CONFIGURE_FLAGS+=(BUILD_CC="cc" CC=/opt/buildhome/emsdk/upstream/emscripten/emcc)
-  LDFLAGS="-L$DEP_PREFIX/lib/ -L$DEP_PREFIX/lib64/ -L$DEP_PREFIX/libx32/"
+  CFLAGS="$CFLAGS -DSQLCIPHER_CRYPTO_LIBTOMCRYPT"
+  CRYPTO_LIB=tomcrypt
+  CONFIGURE_FLAGS+=(CC_FOR_BUILD="cc" CC=/opt/buildhome/emsdk/upstream/emscripten/emcc)
+  LDFLAGS="-ltomcrypt -L$DEP_PREFIX/lib/ -L$DEP_PREFIX/lib64/ -L$DEP_PREFIX/libx32/"
 else
+  CRYPTO_LIB=crypto
   LDFLAGS="-lcrypto -L$DEP_PREFIX/lib/ -L$DEP_PREFIX/lib64/ -L$DEP_PREFIX/libx32/"
 fi
 
@@ -39,6 +41,7 @@ if [ "$SCRIPT_ARCH" = "win32" ] || [ "$SCRIPT_ARCH" = "win64" ]; then
   sed -i 's|exec $PWD/mksourceid manifest|exec $PWD/mksourceid.exe manifest|g' tool/mksqlite3h.tcl
   LIBS="-lgdi32 -lws2_32"
   LDFLAGS="$LDFLAGS -lgdi32"
+  CONFIGURE_FLAGS+=(--dll-basename=libsqlcipher-0)
 else
   LIBS=''
 fi
@@ -47,7 +50,7 @@ fi
   --prefix="$DEP_PREFIX" \
   "${CONFIGURE_FLAGS[@]}" \
   --disable-tcl \
-  --enable-tempstore=yes \
+  --with-tempstore=yes \
   CFLAGS="$CFLAGS $CROSS_CFLAG" \
   LDFLAGS="$LDFLAGS $CROSS_LDFLAG" \
   LIBS="$LIBS" ||
@@ -59,3 +62,5 @@ fi
 
 make -j "$MAKE_JOBS"
 make install
+sed -e "s/^Name: SQLite$/Name: SQLCipher/" -e "s/^Libs: .*/& -l$CRYPTO_LIB/" \
+  "$DEP_PREFIX/lib/pkgconfig/sqlite3.pc" >"$DEP_PREFIX/lib/pkgconfig/sqlcipher.pc"

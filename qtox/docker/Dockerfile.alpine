@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright © 2024-2025 The TokTok team
 
-FROM alpine:3.20
+FROM alpine:3.24
 
 RUN ["apk", "add", \
  "bash", \
@@ -10,6 +10,7 @@ RUN ["apk", "add", \
  "cmake", \
  "compiler-rt", \
  "ffmpeg-dev", \
+ "gcc", \
  "git", \
  "gzip", \
  "libexif-dev", \

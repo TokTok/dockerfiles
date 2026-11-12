@@ -13,10 +13,17 @@ parse_arch --dep "qtbase" --supported "linux-x86_64" "$@"
 
 "$SCRIPT_DIR/download/download_qtbase.sh"
 
+# appimagetool patches qt_prfxpath in QtCore and fails without it. Our
+# relocatable Qt 6.12 doesn't use it, so the compiler would drop it.
+sed -i -e 's/^static const char qt_configure_prefix_path_str/[[gnu::used]] &/' \
+  src/corelib/global/qconfig.cpp.in
+grep -q '^\[\[gnu::used\]\] static const char qt_configure_prefix_path_str' \
+  src/corelib/global/qconfig.cpp.in
+
 export CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
 export OBJCXXFLAGS="$CXXFLAGS"
 
-if [ -n "$SANITIZE" ]; then
+if [ "$SANITIZE" != "" ]; then
   QT_CONFIGURE_FLAGS=(-sanitize "$CLANG_SANITIZER")
   BUILD_TYPE=debug
 else

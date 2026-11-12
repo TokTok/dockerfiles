@@ -5,8 +5,8 @@
 
 set -euo pipefail
 
-LIBUNWIND_VERSION=1.8.1
-LIBUNWIND_HASH=ddf0e32dd5fafe5283198d37e4bf9decf7ba1770b6e7e006c33e6df79e6a6157
+LIBUNWIND_VERSION=1.8.3
+LIBUNWIND_HASH=be30d910e67f58d82e753231f1357f326a1a088acf126b21ff77e60aab19b90b
 
 source "$(dirname "$(realpath "$0")")/common.sh"
 

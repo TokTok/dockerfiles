@@ -13,12 +13,6 @@ parse_arch --dep "qtbase" --supported "macos-arm64 macos-x86_64 ios-arm64 iphone
 
 "$SCRIPT_DIR/download/download_qtbase.sh"
 
-# Xcode 26's clang knows __yield, but only <arm_acle.h> declares it. Prefer
-# __builtin_arm_yield, as Qt's dev branch does (qyieldcpu.h is new in Qt 6.7).
-if [ -f src/corelib/thread/qyieldcpu.h ]; then
-  patch -p1 <"$SCRIPT_DIR/patches/qtbase-qyieldcpu.patch"
-fi
-
 export CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
 export OBJCXXFLAGS="$CXXFLAGS"
 

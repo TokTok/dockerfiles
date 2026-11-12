@@ -6,8 +6,8 @@
 
 set -euo pipefail
 
-SQLCIPHER_VERSION=4.6.1
-SQLCIPHER_HASH=d8f9afcbc2f4b55e316ca4ada4425daf3d0b4aab25f45e11a802ae422b9f53a3
+SQLCIPHER_VERSION=4.20.0
+SQLCIPHER_HASH=38705f51b61ac0636a5fd064f9a77fafabc7227b2aa2513f1b14c8bb1102affc
 
 source "$(dirname "$(realpath "$0")")/common.sh"
 

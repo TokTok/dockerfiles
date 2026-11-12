@@ -6,8 +6,8 @@
 set -euo pipefail
 
 # https://github.com/hunspell/hunspell/releases
-HUNSPELL_VERSION=1.7.2
-HUNSPELL_HASH=11ddfa39afe28c28539fe65fc4f1592d410c1e9b6dd7d8a91ca25d85e9ec65b8
+HUNSPELL_VERSION=1.7.6
+HUNSPELL_HASH=9c650ace31d4d8cc1da925a9507c3de1d50f1a54857af2f72429f517d5d53467
 
 source "$(dirname "$(realpath "$0")")/common.sh"
 

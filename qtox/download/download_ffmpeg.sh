@@ -7,8 +7,8 @@
 set -euo pipefail
 
 # https://www.ffmpeg.org/releases
-FFMPEG_VERSION=7.1
-FFMPEG_HASH=40973d44970dbc83ef302b0609f2e74982be2d85916dd2ee7472d30678a7abe6
+FFMPEG_VERSION=9.0.2
+FFMPEG_HASH=8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e
 
 source "$(dirname "$(realpath "$0")")/common.sh"
 

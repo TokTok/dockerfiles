@@ -5,8 +5,8 @@
 
 set -euo pipefail
 
-TCL_VERSION=8.6.10
-TCL_HASH=5196dbf6638e3df8d5c87b5815c8c2b758496eb6f0e41446596c9a4e638d87ed
+TCL_VERSION=8.6.18
+TCL_HASH=14f9af32b1767ff718477a8f974ad03c34341097e6b43f4ce54644ee974e268e
 
 source "$(dirname "$(realpath "$0")")/common.sh"
 

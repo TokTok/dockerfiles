@@ -27,6 +27,14 @@ COPY toolchain/linux-static-toolchain.cmake $SYSROOT/static-toolchain.cmake
 
 FROM common AS base
 
+# Retry downloads that fail for a moment, e.g. GitHub's occasional HTTP 500.
+# The settings apply while building this image, not in the image itself.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
+RUN mkdir -p /etc/download-retry \
+ && printf 'retry = 5\nretry-delay = 10\nretry-connrefused\nretry-all-errors\nfail\n' >/etc/download-retry/.curlrc \
+ && printf 'tries = 5\nwaitretry = 10\nretry_connrefused = on\nretry_on_http_error = 429,500,502,503,504\n' >/etc/download-retry/wgetrc
+
 RUN ["apk", "add", \
  "autoconf", \
  "automake", \
@@ -59,6 +67,10 @@ RUN tar zxf <(curl -L https://ftp.gnu.org/pub/gnu/gettext/gettext-0.22.5.tar.gz)
  && rm -rf /opt/buildhome/build
 
 FROM base AS build-toxcore
+
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
 
 RUN tar zxf <(curl -L https://github.com/jedisct1/libsodium/releases/download/1.0.20-RELEASE/libsodium-1.0.20.tar.gz) \
  && cd libsodium-1.0.20 \
@@ -97,6 +109,10 @@ RUN mkdir c-toxcore-v0.2.24-rc.4 \
  && rm -rf /opt/buildhome/build
 
 FROM base AS build-audio
+
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
 
 RUN tar zxf <(curl -L https://github.com/alsa-project/alsa-lib/archive/refs/tags/v1.2.13.tar.gz) \
  && cd alsa-lib-* \
@@ -142,6 +158,10 @@ RUN tar zxf <(curl -L https://github.com/PortAudio/portaudio/archive/refs/tags/v
 
 FROM base AS build-udev
 
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
+
 RUN tar zxf <(curl -L https://github.com/eudev-project/eudev/releases/download/v3.2.14/eudev-3.2.14.tar.gz) \
  && cd eudev-* \
  && apk add gperf \
@@ -173,6 +193,10 @@ RUN tar zxf <(curl -L https://gitlab.freedesktop.org/libinput/libinput/-/archive
 
 FROM base AS build-zstd
 
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
+
 RUN tar zxf <(wget -O- https://github.com/facebook/zstd/releases/download/v1.5.6/zstd-1.5.6.tar.gz) \
  && cd zstd-* \
  && cmake \
@@ -188,6 +212,10 @@ RUN tar zxf <(wget -O- https://github.com/facebook/zstd/releases/download/v1.5.6
  && rm -rf /opt/buildhome/build
 
 FROM base AS build-deps
+
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
 
 RUN tar jxf <(curl -L https://github.com/libexif/libexif/releases/download/v0.6.24/libexif-0.6.24.tar.bz2) \
  && cd libexif-0.6.24 \
@@ -206,6 +234,10 @@ RUN tar zxf <(curl -L https://github.com/fukuchi/libqrencode/archive/refs/tags/v
 
 FROM base AS build-icu
 
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
+
 RUN tar zxf <(curl -L https://github.com/unicode-org/icu/releases/download/release-72-1/icu4c-72_1-src.tgz) \
  && cd icu/source \
  && ./runConfigureICU Linux --enable-static --disable-shared --prefix="$SYSROOT/usr" \
@@ -214,6 +246,10 @@ RUN tar zxf <(curl -L https://github.com/unicode-org/icu/releases/download/relea
  && rm -rf /opt/buildhome/build
 
 FROM base AS build-sqlcipher
+
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
 
 RUN tar zxf <(curl -L https://github.com/openssl/openssl/releases/download/openssl-3.4.0/openssl-3.4.0.tar.gz) \
  && cd openssl-3.4.0 \
@@ -231,6 +267,10 @@ RUN tar zxf <(curl -L https://github.com/sqlcipher/sqlcipher/archive/refs/tags/v
 
 FROM base AS build-tslib
 
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
+
 RUN tar zxf <(curl -L https://github.com/BLAKE2/libb2/releases/download/v0.98.1/libb2-0.98.1.tar.gz) \
  && cd libb2-* \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared \
@@ -247,6 +287,10 @@ RUN tar zxf <(curl -L https://github.com/libts/tslib/releases/download/1.23/tsli
 
 FROM base AS build-ffi
 
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
+
 RUN tar zxf <(curl -L https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz) \
  && cd libffi-3.4.6 \
  && ./configure --prefix="$SYSROOT/usr" --disable-shared --enable-portable-binary --enable-pax_emutramp --disable-exec-static-tramp \
@@ -255,6 +299,10 @@ RUN tar zxf <(curl -L https://github.com/libffi/libffi/releases/download/v3.4.6/
  && rm -rf /opt/buildhome/build
 
 FROM base AS build-xproto
+
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
 
 RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/proto/xorgproto-2024.1.tar.gz) \
  && cd xorgproto-2024.1 \
@@ -293,6 +341,10 @@ RUN tar zxf <(curl https://xorg.freedesktop.org/archive/individual/proto/xineram
 
 FROM base AS build-glib
 
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
+
 RUN tar Jxf <(curl -L https://download.gnome.org/sources/glib/2.83/glib-2.83.0.tar.xz) \
  && cd glib-2.83.0 \
  && LDFLAGS="-static-pie" meson setup build/ -Ddefault_library=static --prefix="$SYSROOT/usr" -Dtests=false -Dglib_debug=disabled \
@@ -300,6 +352,10 @@ RUN tar Jxf <(curl -L https://download.gnome.org/sources/glib/2.83/glib-2.83.0.t
  && rm -rf /opt/buildhome/build
 
 FROM base AS build-libxml
+
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
 
 RUN tar zxf <(curl -L https://github.com/libexpat/libexpat/releases/download/R_2_6_4/expat-2.6.4.tar.gz) \
  && cd expat-2.6.4 \
@@ -324,6 +380,10 @@ RUN tar zxf <(curl -L https://github.com/GNOME/libxml2/archive/refs/tags/v2.13.5
  && rm -rf /opt/buildhome/build
 
 FROM base AS build-x11
+
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
 
 RUN tar Jxf <(curl https://xorg.freedesktop.org/archive/individual/lib/libpciaccess-0.18.1.tar.xz) \
  && cd libpciaccess-0.18.1 \
@@ -534,6 +594,10 @@ COPY --from=build-zstd $SYSROOT/usr $SYSROOT/usr
 
 FROM build-x11 AS build-qt
 
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
+
 ENV CXXFLAGS="-DQT_MESSAGELOGCONTEXT"
 ENV OBJCXXFLAGS="$CXXFLAGS"
 
@@ -643,6 +707,10 @@ RUN . /opt/buildhome/version_qt.sh \
  && rm -rf /opt/buildhome/build
 
 FROM build-x11 AS build-av
+
+# The download retry settings from the base stage.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
 
 RUN mv /usr/bin/pkg-config /usr/bin/pkg-config.real
 COPY pkg-config-static /usr/bin/pkg-config

@@ -2,6 +2,14 @@
 # Otherwise, glibc won't be recent enough and our binaries won't run.
 FROM ubuntu:20.04
 
+# Retry downloads that fail for a moment, e.g. GitHub's occasional HTTP 500.
+# The settings apply while building this image, not in the image itself.
+ARG CURL_HOME=/etc/download-retry
+ARG WGETRC=/etc/download-retry/wgetrc
+RUN mkdir -p /etc/download-retry \
+ && printf 'retry = 5\nretry-delay = 10\nretry-connrefused\nretry-all-errors\nfail\n' >/etc/download-retry/.curlrc \
+ && printf 'tries = 5\nwaitretry = 10\nretry_connrefused = on\nretry_on_http_error = 429,500,502,503,504\n' >/etc/download-retry/wgetrc
+
 RUN apt-get update \
  && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
  ca-certificates \
@@ -17,7 +25,9 @@ RUN apt-get update \
  ninja-build \
  pkg-config \
  sudo \
- && curl -sSL https://get.haskellstack.org/ | sh \
+ && curl -sSL -o /tmp/install-stack.sh https://get.haskellstack.org/ \
+ && sh /tmp/install-stack.sh \
+ && rm /tmp/install-stack.sh \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 

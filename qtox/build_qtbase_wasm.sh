@@ -41,11 +41,12 @@ pushd _build
   -no-dbus \
   -no-glib \
   -no-openssl \
-  -device-option "QT_EMSCRIPTEN_ASYNCIFY=1" \
+  -device-option "QT_EMSCRIPTEN_ASYNCIFY=2" \
   -qt-host-path "${QT_HOST_PATH:-/opt/buildhome/host/qt}" \
   -platform wasm-emscripten \
   -feature-thread \
   -feature-wasm-simd128 \
+  -feature-wasm-exceptions \
   -opensource -confirm-license \
   -pch \
   -- \

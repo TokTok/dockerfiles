@@ -179,6 +179,8 @@ parse_arch() {
     CMAKE_TOOLCHAIN_FILE=()
     LIB_TYPE=static
     source "/opt/buildhome/emsdk/emsdk_env.sh"
+    # JSPI: no invoke_* imports, they can only suspend under main.
+    export EMCC_CFLAGS="-fwasm-exceptions -sSUPPORT_LONGJMP=wasm"
     EMCONFIGURE=(emconfigure)
     EMMAKE=(emmake)
     EMCMAKE=(emcmake)

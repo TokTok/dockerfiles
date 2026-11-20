@@ -9,7 +9,7 @@ set -euxo pipefail
 ARCH="$(uname -m)"
 BUILD_TYPE="release"
 SANITIZE=""
-MACOS_VERSION="12.0"
+MACOS_VERSION="14.4"
 QT_HOST_PATH=""
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
@@ -25,7 +25,7 @@ usage() {
   echo "  --dep-file <depfile>            Dependency file (required)"
   echo "  --dep-prefix <dep-prefix>       Dependency prefix (default: third_party/deps)"
   echo "  --sanitize <sanitize>           Sanitizer (address, thread, undefined)"
-  echo "  --macos-version <macos-version> macOS version (default: 12.0)"
+  echo "  --macos-version <macos-version> macOS version (default: 14.4)"
   echo "  --host-path <host-path>         Host Qt path"
   echo "  --help, -h                      Show this help message"
 }
@@ -121,7 +121,7 @@ install_deps() {
 # Read deps from depfile, ignoring lines with "#" and empty lines
 DEPS=()
 while IFS= read -r line; do
-  if [ -n "$line" ] && [ "${line:0:1}" != "#" ]; then
+  if [ "$line" != "" ] && [ "${line:0:1}" != "#" ]; then
     DEPS+=("$line")
   fi
 done <"$DEP_FILE"

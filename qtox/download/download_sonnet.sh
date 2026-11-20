@@ -5,8 +5,14 @@
 
 set -euo pipefail
 
-SONNET_VERSION=6.31.0
-SONNET_HASH=b0fb88a08d281bb1c426229259b84959acb4503e8260103d5bcacbccb93c10e3
+# macOS 10.15 builds use Qt 6.6, too old for newer KDE Frameworks.
+if [ "$MACOS_MINIMUM_SUPPORTED_VERSION" = "10.15" ]; then
+  SONNET_VERSION=6.9.0
+  SONNET_HASH=7fabe11d489b3baa4d181df0168e659766a728f812cd76fe363be21393cab86a
+else
+  SONNET_VERSION=6.31.0
+  SONNET_HASH=b0fb88a08d281bb1c426229259b84959acb4503e8260103d5bcacbccb93c10e3
+fi
 
 source "$(dirname "$(realpath "$0")")/common.sh"
 

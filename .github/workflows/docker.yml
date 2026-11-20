@@ -248,7 +248,7 @@ jobs:
     strategy:
       matrix:
         arch: [arm64, x86_64]
-        macos: ["10.15", "12.0"]
+        macos: ["10.15", "14.4"]
     runs-on: ${{ matrix.arch == 'arm64' && 'macos-26' || 'macos-15-intel' }}
     permissions:
       contents: write
@@ -309,11 +309,11 @@ jobs:
       - name: Download host Qt
         uses: actions/download-artifact@v7
         with:
-          name: qt-static-macos-${{ matrix.host_arch }}-12.0-qt
+          name: qt-static-macos-${{ matrix.host_arch }}-14.4-qt
       - name: Extract host Qt
         run: |
           mkdir -p /Users/runner/work/host-qt
-          tar -zxf qt-static-macos-${{ matrix.host_arch }}-12.0.tar.gz --strip-components=1 -C /Users/runner/work/host-qt
+          tar -zxf qt-static-macos-${{ matrix.host_arch }}-14.4.tar.gz --strip-components=1 -C /Users/runner/work/host-qt
       - name: Cache Qt
         id: cache-qt
         uses: actions/cache@v5

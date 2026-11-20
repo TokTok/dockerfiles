@@ -32,8 +32,8 @@ parse_arch() {
   BUILD_TYPE=release
   SANITIZE=
   EXTRA_ARGS=()
-  MACOS_MINIMUM_SUPPORTED_VERSION=12.0
-  IOS_MINIMUM_SUPPORTED_VERSION=15.0
+  MACOS_MINIMUM_SUPPORTED_VERSION=14.4
+  IOS_MINIMUM_SUPPORTED_VERSION=18.0
   QT_HOST_PATH=""
 
   while (($# > 0)); do
@@ -211,7 +211,7 @@ parse_arch() {
 
   if [ "$SCRIPT_ARCH" == "win32" ] || [ "$SCRIPT_ARCH" == "win64" ]; then
     QT_PREFIX=$DEP_PREFIX
-  elif [ -n "$SANITIZE" ]; then
+  elif [ "$SANITIZE" != "" ]; then
     QT_PREFIX="$DEP_PREFIX/qt-$SANITIZE"
   else
     QT_PREFIX="$DEP_PREFIX/qt"

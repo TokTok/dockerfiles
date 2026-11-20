@@ -7,14 +7,14 @@ set -euxo pipefail
 
 ARCH="arm64"
 DEP_PREFIX="third_party/deps"
-MACOS_VERSION="12.0"
+MACOS_VERSION="14.4"
 
 usage() {
   echo "Usage: $0 [options]"
   echo "Options:"
   echo "  --arch <arch>                   Architecture (arm64 or x86_64)"
   echo "  --dep-prefix <dep-prefix>       Dependency prefix (default: third_party/deps)"
-  echo "  --macos-version <macos-version> macOS version (default: 12.0)"
+  echo "  --macos-version <macos-version> macOS version (default: 14.4)"
   echo "  --help, -h                      Show this help message"
 }
 

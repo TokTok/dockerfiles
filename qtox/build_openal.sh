@@ -13,20 +13,7 @@ source "$SCRIPT_DIR/build_utils.sh"
 
 parse_arch --dep "openal" --supported "linux-x86_64 win32 win64 macos-x86_64 macos-arm64 wasm ios-arm64 iphonesimulator-arm64 iphonesimulator-x86_64" "$@"
 
-if [ "$SCRIPT_ARCH" = "win32" ] || [ "$SCRIPT_ARCH" = "win64" ]; then
-  "$SCRIPT_DIR/download/download_openal.sh" patched
-  patch -p1 <"$SCRIPT_DIR/patches/openal-cmake-3-11.patch"
-  DSOUND_INCLUDE_DIR="/usr/$MINGW_ARCH-w64-mingw32/include"
-  DSOUND_LIBRARY="/usr/$MINGW_ARCH-w64-mingw32/lib/libdsound.a"
-  MACOSX_RPATH="OFF"
-  CMAKE_POLICY_FLAGS=(-DCMAKE_POLICY_VERSION_MINIMUM=3.5)
-else
-  "$SCRIPT_DIR/download/download_openal.sh" upstream
-  DSOUND_INCLUDE_DIR=""
-  DSOUND_LIBRARY=""
-  MACOSX_RPATH="ON"
-  CMAKE_POLICY_FLAGS=()
-fi
+"$SCRIPT_DIR/download/download_openal.sh"
 
 if [ "$LIB_TYPE" = "shared" ]; then
   LIBTYPE=SHARED
@@ -44,19 +31,16 @@ export CFLAGS="-fPIC"
 export CXXFLAGS="-fPIC -std=c++20"
 "${EMCMAKE[@]}" cmake \
   "${CMAKE_TOOLCHAIN_FILE[@]}" \
-  "${CMAKE_POLICY_FLAGS[@]}" \
   -DCMAKE_INSTALL_PREFIX="$DEP_PREFIX" \
   -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \
   -DCMAKE_OSX_DEPLOYMENT_TARGET="$DEPLOYMENT_TARGET" \
-  -DCMAKE_MACOSX_RPATH="$MACOSX_RPATH" \
+  -DCMAKE_MACOSX_RPATH=ON \
   -DALSOFT_UTILS=OFF \
   -DALSOFT_EXAMPLES=OFF \
   -DALSOFT_ENABLE_MODULES=OFF \
   -DCMAKE_CXX_SCAN_FOR_MODULES=OFF \
   -DHAVE_WFUNCTION_EFFECTS=OFF \
   -DLIBTYPE="$LIBTYPE" \
-  -DDSOUND_INCLUDE_DIR="$DSOUND_INCLUDE_DIR" \
-  -DDSOUND_LIBRARY="$DSOUND_LIBRARY" \
   -GNinja \
   -B_build \
   .

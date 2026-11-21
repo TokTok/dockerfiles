@@ -1,0 +1,54 @@
+# Dockerfile.debian-pi-cross-arm64
+# Cross-compilation environment for Raspberry Pi (ARM64) based on Debian Bookworm
+
+FROM debian:bookworm
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN dpkg --add-architecture arm64 && \
+    apt-get update
+
+# Install native amd64 build tools
+RUN apt-get install -y --no-install-recommends \
+    build-essential \
+    crossbuild-essential-arm64 \
+    cmake \
+    git \
+    pkg-config \
+    ninja-build \
+    dpkg-dev \
+    debhelper \
+    qt6-base-dev \
+    qt6-tools-dev \
+    qt6-tools-dev-tools \
+    ca-certificates
+
+# Install target dependencies for arm64
+RUN apt-get install -y --no-install-recommends \
+    pkg-config:arm64 \
+    qt6-base-dev:arm64 \
+    libqt6svg6-dev:arm64 \
+    qt6-tools-dev:arm64 \
+    libavcodec-dev:arm64 \
+    libavdevice-dev:arm64 \
+    libavformat-dev:arm64 \
+    libavutil-dev:arm64 \
+    libswscale-dev:arm64 \
+    libexif-dev:arm64 \
+    libqrencode-dev:arm64 \
+    libsqlcipher-dev:arm64 \
+    libssl-dev:arm64 \
+    libtoxcore-dev:arm64 \
+    libsodium-dev:arm64 \
+    libopus-dev:arm64 \
+    libvpx-dev:arm64 \
+    libopenal-dev:arm64 \
+    libv4l-dev:arm64 \
+    libx11-dev:arm64 \
+    libxss-dev:arm64 \
+    libunwind-dev:arm64 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+
+CMD ["/bin/bash"]

@@ -132,6 +132,8 @@ jobs:
           - alpine-appimage
           - alpine-static
           - debian
+          - debian-pi-cross-armhf
+          - debian-pi-cross-arm64
           - fedora
           - flatpak-builder
           - ubuntu-lts

@@ -50,7 +50,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Build base image
         if: ${{ matrix.has_base }}
         run: |
@@ -107,7 +107,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Build and push
         uses: docker/build-push-action@v7
         with:
@@ -161,7 +161,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Build and push
         uses: docker/build-push-action@v7
         with:
@@ -216,7 +216,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Build and push
         uses: docker/build-push-action@v7
         with:
@@ -238,7 +238,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Move nightly tag to head for nightly release
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: git tag -f nightly && git push origin nightly -f
@@ -253,10 +253,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Cache Qt
         id: cache-qt
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             /Users/runner/work/deps/qt
@@ -273,7 +273,7 @@ jobs:
       - name: Build tarball
         run: tar -zcf qt-static-macos-${{ matrix.arch }}-${{ matrix.macos }}.tar.gz -C /Users/runner/work/deps qt
       - name: Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: qt-static-macos-${{ matrix.arch }}-${{ matrix.macos }}-qt
           path: qt-static-macos-${{ matrix.arch }}-${{ matrix.macos }}.tar.gz
@@ -305,9 +305,9 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Download host Qt
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: qt-static-macos-${{ matrix.host_arch }}-14.4-qt
       - name: Extract host Qt
@@ -316,7 +316,7 @@ jobs:
           tar -zxf qt-static-macos-${{ matrix.host_arch }}-14.4.tar.gz --strip-components=1 -C /Users/runner/work/host-qt
       - name: Cache Qt
         id: cache-qt
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             /Users/runner/work/deps/qt

@@ -8,7 +8,7 @@ if ! which nix-shell; then
   sh install.sh --no-daemon --no-channel-add --yes
   rm install.sh
   . "$HOME/.nix-profile/etc/profile.d/nix.sh"
-  nix-channel --add https://github.com/NixOS/nixpkgs/archive/9fbb54b33e91ee4ca368e35a78e0613c720600b3.tar.gz nixpkgs
+  nix-channel --add https://github.com/NixOS/nixpkgs/archive/2786a2a72088ecf32aea5b3ec52099e6a7cff78f.tar.gz nixpkgs
   nix-channel --update
 fi
 

@@ -43,7 +43,9 @@ in
           boot.specialFileSystems = lib.mkForce { };
           boot.tmp.useTmpfs = true;
           nix.settings.sandbox = false;
-          nix.settings.auto-optimise-store = true;
+
+          # Avoid /nix/store/.links: in Docker overlay2 it saves 1%.
+          nix.settings.auto-optimise-store = false;
 
           services.journald.settings.Journal = {
             ForwardToConsole = true;
@@ -52,7 +54,7 @@ in
           services.openssh.enable = true;
           services.nscd.enable = false;
 
-          system.stateVersion = "25.11";
+          system.stateVersion = "26.11";
           system.nssModules = lib.mkForce [ ];
 
           systemd.services.systemd-logind.enable = false;
@@ -73,7 +75,7 @@ in
             pkgs.git
             # Needed because coursier (for Kotlin) requires that java is in $PATH.
             pkgs.jdk21_headless
-            pkgs.python311
+            pkgs.python3
           ];
 
           security.sudo.wheelNeedsPassword = false;

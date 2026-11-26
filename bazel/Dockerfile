@@ -3,8 +3,10 @@ FROM ghcr.io/toktok/bazel:base AS base
 FROM scratch
 # hadolint ignore=DL3022,DL3067
 COPY --from=base / /
-# Reinstate the CMD directive from the squashed image.
+# Reinstate the CMD and STOPSIGNAL directives from the squashed image so
+# `docker stop` shuts systemd down cleanly instead of waiting for SIGKILL.
 CMD ["/usr/sbin/init"]
+STOPSIGNAL SIGRTMIN+3
 
 # We need to know where our bash is, because we haven't set up /bin/sh yet.
 ENV NIXOS_VERSION="2786a2a72088ecf32aea5b3ec52099e6a7cff78f"
